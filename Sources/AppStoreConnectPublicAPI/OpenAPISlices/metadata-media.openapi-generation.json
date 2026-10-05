@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "trait": "PublicAPIMetadataMedia",
+  "compilationCondition": "ASC_PUBLIC_API_METADATA_MEDIA",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "operationIDs": [
+      "apps_appClips_getToManyRelated"
+    ],
+    "tagPrefixes": [
+      "AppClip",
+      "AppCustomProduct",
+      "AppEventLocalizations",
+      "AppEventScreenshots",
+      "AppEventVideoClips",
+      "AppPreview",
+      "AppScreenshot",
+      "AppStoreVersionExperiment",
+      "AppStoreVersionLocalizations"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

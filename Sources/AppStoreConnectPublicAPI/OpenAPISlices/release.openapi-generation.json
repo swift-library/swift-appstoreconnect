@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "trait": "PublicAPIRelease",
+  "compilationCondition": "ASC_PUBLIC_API_RELEASE",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "tagPrefixes": [
+      "Accessibility",
+      "AgeRating",
+      "AppAvailabilities",
+      "AppCategories",
+      "AppEncryption",
+      "AppEvents",
+      "AppInfos",
+      "AppStoreReview",
+      "AppStoreVersion",
+      "AppTags",
+      "Apps",
+      "CustomerReview",
+      "Nominations",
+      "ReviewSubmission",
+      "RoutingAppCoverages"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

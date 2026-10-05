@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-05-05T14:04:41Z",
+  "schema": {
+    "path": "schema/app-store-connect-openapi.json",
+    "sha256": "83f485960fc7198542461050e192cd21716274c5f3828c683fba35333482a02f",
+    "openapi": "3.0.1",
+    "title": "App Store Connect API",
+    "version": "4.3"
+  },
+  "inventory": {
+    "pathCount": 923,
+    "operationCount": 1208,
+    "schemaCount": 1337,
+    "securitySchemes": [
+      "itc-bearer-token"
+    ],
+    "methodCounts": [
+      {
+        "method": "delete",
+        "count": 127
+      },
+      {
+        "method": "get",
+        "count": 763
+      },
+      {
+        "method": "patch",
+        "count": 151
+      },
+      {
+        "method": "post",
+        "count": 167
+      }
+    ],
+    "requestBodyContentTypes": [
+      {
+        "contentType": "application/json",
+        "count": 339
+      }
+    ],
+    "responseContentTypes": [
+      {
+        "contentType": "application/a-gzip",
+        "count": 2
+      },
+      {
+        "contentType": "application/json",
+        "count": 7475
+      },
+      {
+        "contentType": "application/vnd.apple.diagnostic-logs+json",
+        "count": 1
+      },
+      {
+        "contentType": "application/vnd.apple.xcode-metrics+json",
+        "count": 2
+      },
+      {
+        "contentType": "text/csv",
+        "count": 9
+      }
+    ],
+    "uploadRelatedOperationCount": 15,
+    "uploadRelatedOperations": [
+      {
+        "method": "post",
+        "path": "/v1/backgroundAssetUploadFiles",
+        "operationId": "backgroundAssetUploadFiles_createInstance",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/backgroundAssetUploadFiles/{id}",
+        "operationId": "backgroundAssetUploadFiles_getInstance",
+        "summary": null
+      },
+      {
+        "method": "patch",
+        "path": "/v1/backgroundAssetUploadFiles/{id}",
+        "operationId": "backgroundAssetUploadFiles_updateInstance",
+        "summary": null
+      },
+      {
+        "method": "post",
+        "path": "/v1/buildUploadFiles",
+        "operationId": "buildUploadFiles_createInstance",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/buildUploadFiles/{id}",
+        "operationId": "buildUploadFiles_getInstance",
+        "summary": null
+      },
+      {
+        "method": "patch",
+        "path": "/v1/buildUploadFiles/{id}",
+        "operationId": "buildUploadFiles_updateInstance",
+        "summary": null
+      },
+      {
+        "method": "post",
+        "path": "/v1/buildUploads",
+        "operationId": "buildUploads_createInstance",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/buildUploads/{id}",
+        "operationId": "buildUploads_getInstance",
+        "summary": null
+      },
+      {
+        "method": "delete",
+        "path": "/v1/buildUploads/{id}",
+        "operationId": "buildUploads_deleteInstance",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/apps/{id}/relationships/buildUploads",
+        "operationId": "apps_buildUploads_getToManyRelationship",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/apps/{id}/buildUploads",
+        "operationId": "apps_buildUploads_getToManyRelated",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/backgroundAssetVersions/{id}/relationships/backgroundAssetUploadFiles",
+        "operationId": "backgroundAssetVersions_backgroundAssetUploadFiles_getToManyRelationship",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/backgroundAssetVersions/{id}/backgroundAssetUploadFiles",
+        "operationId": "backgroundAssetVersions_backgroundAssetUploadFiles_getToManyRelated",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/buildUploads/{id}/relationships/buildUploadFiles",
+        "operationId": "buildUploads_buildUploadFiles_getToManyRelationship",
+        "summary": null
+      },
+      {
+        "method": "get",
+        "path": "/v1/buildUploads/{id}/buildUploadFiles",
+        "operationId": "buildUploads_buildUploadFiles_getToManyRelated",
+        "summary": null
+      }
+    ],
+    "constructCounts": {
+      "allOf": 0,
+      "oneOf": 173,
+      "anyOf": 0,
+      "nullable": 530,
+      "additionalProperties": 4,
+      "binaryFormat": 1
+    },
+    "unsupportedConstructCountForFirstGeneratorSlice": 173
+  },
+  "generationReadiness": {
+    "firstSlice": "support-only",
+    "unsupportedReason": "oneOf mapping is intentionally not selected yet; broad endpoint generation remains gated.",
+    "broadEndpointGenerationAllowed": false
+  }
+}

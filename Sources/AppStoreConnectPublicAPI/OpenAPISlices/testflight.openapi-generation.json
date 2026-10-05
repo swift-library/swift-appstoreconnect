@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "trait": "PublicAPITestFlight",
+  "compilationCondition": "ASC_PUBLIC_API_TESTFLIGHT",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "tagPrefixes": [
+      "Beta",
+      "Build",
+      "PreReleaseVersions"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

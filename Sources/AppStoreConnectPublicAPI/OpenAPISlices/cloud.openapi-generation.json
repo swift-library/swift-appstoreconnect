@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "trait": "PublicAPICloud",
+  "compilationCondition": "ASC_PUBLIC_API_CLOUD",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "tagPrefixes": [
+      "Ci",
+      "Scm"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

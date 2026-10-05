@@ -1,0 +1,15 @@
+{
+  "data" : [
+    {
+      "type" : "appStoreVersionStateChanges",
+      "id" : "state-change-1",
+      "attributes" : {
+        "createdDate" : "2026-05-08T00:00:00Z",
+        "state" : "PREPARE_FOR_SUBMISSION"
+      }
+    }
+  ],
+  "links" : {
+    "self" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersions/version-1/appStoreVersionStateChanges"
+  }
+}

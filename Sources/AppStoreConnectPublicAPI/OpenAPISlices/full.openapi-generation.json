@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "trait": "PublicAPIFull",
+  "compilationCondition": "ASC_PUBLIC_API_FULL",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "allOperations": true
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

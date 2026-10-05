@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "target": "AppStoreConnectPublicAPI",
+  "module": "AppStoreConnectPublicAPI",
+  "mode": "appleTypedUnion",
+  "schema": "../../Vendor/AppStoreConnectOpenAPI/schema/app-store-connect-openapi.json",
+  "lock": "../../Vendor/AppStoreConnectOpenAPI/spec.lock.json",
+  "audit": "../../Vendor/AppStoreConnectOpenAPI/schema-audit.json",
+  "partitionManifest": "../../Vendor/AppStoreConnectOpenAPI/partitions/public-api-traits.json",
+  "baseCapabilityManifest": "openapi-capabilities.json",
+  "appleGeneratorConfig": "openapi-generator-config.yaml",
+  "activeTraitSource": "SwiftSourceModuleTarget.compilationConditions",
+  "defaultTraits": [
+    "PublicAPIBase"
+  ],
+  "fullTrait": "PublicAPIFull",
+  "output": {
+    "directory": "GeneratedSources",
+    "files": [
+      "Types.swift",
+      "Client.swift",
+      "Server.swift",
+      "AppStoreConnectPublicAPI+Facade.swift"
+    ]
+  },
+  "symbolPolicy": {
+    "generateOnceForActiveTraitUnion": true,
+    "reason": "One AppStoreConnectPublicAPI module must not receive duplicate Components, Operations, APIProtocol, or Client symbols."
+  },
+  "typeOverridePolicy": {
+    "default": "none",
+    "jsonValueReplacement": "Only named components.schemas entries may be replaced through Apple typeOverrides. Existing facade methods must not change return type when a trait is enabled."
+  }
+}

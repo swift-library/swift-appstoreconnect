@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "trait": "PublicAPIDistribution",
+  "compilationCondition": "ASC_PUBLIC_API_DISTRIBUTION",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "operationIDs": [
+      "apps_webhooks_getToManyRelated"
+    ],
+    "tagPrefixes": [
+      "AlternativeDistribution",
+      "EndAppAvailability",
+      "EndUserLicenseAgreements",
+      "Marketplace",
+      "Territories",
+      "TerritoryAvailabilities",
+      "Webhook"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

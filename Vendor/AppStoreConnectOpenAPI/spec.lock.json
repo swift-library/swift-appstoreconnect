@@ -1,0 +1,30 @@
+{
+  "source": {
+    "name": "Apple App Store Connect OpenAPI specification",
+    "documentationURL": "https://developer.apple.com/documentation/appstoreconnectapi",
+    "overviewURL": "https://developer.apple.com/app-store-connect/api/",
+    "downloadURL": "https://developer.apple.com/sample-code/app-store-connect/app-store-connect-openapi-specification.zip",
+    "checkedAt": "2026-05-05T14:04:41Z",
+    "httpLastModified": "Tue, 10 Mar 2026 19:57:18 GMT",
+    "contentType": "application/zip",
+    "contentLength": 238508
+  },
+  "archive": {
+    "path": "archive/app-store-connect-openapi-specification.zip",
+    "fileName": "app-store-connect-openapi-specification.zip",
+    "sha256": "75d0f1ce1b8c1df3cae1d60b13076a0fb448514b8a37ce546e66d724f82d6990",
+    "extractedFile": "openapi.oas.json"
+  },
+  "schema": {
+    "path": "schema/app-store-connect-openapi.json",
+    "sha256": "83f485960fc7198542461050e192cd21716274c5f3828c683fba35333482a02f",
+    "openapi": "3.0.1",
+    "title": "App Store Connect API",
+    "version": "4.3"
+  },
+  "normalization": {
+    "command": "vendor official archive unchanged, then unzip openapi.oas.json and copy it to schema/app-store-connect-openapi.json",
+    "contentChanges": "none",
+    "notes": "The official archive is stored unchanged under archive/. The schema file is copied byte-for-byte from openapi.oas.json except for the repository-local filename."
+  }
+}

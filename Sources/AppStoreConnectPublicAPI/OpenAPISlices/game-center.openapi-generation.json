@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "trait": "PublicAPIGameCenter",
+  "compilationCondition": "ASC_PUBLIC_API_GAME_CENTER",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "operationIDs": [
+      "apps_gameCenterDetail_getToOneRelated"
+    ],
+    "tagPrefixes": [
+      "GameCenter"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "schema": "../schema/app-store-connect-openapi.json",
+  "strategy": "apple-filter-trait-aligned",
+  "defaultTraits": [
+    "PublicAPIBase"
+  ],
+  "fullTrait": "PublicAPIFull",
+  "notes": [
+    "Traits describe API slices and generated output range for AppStoreConnectPublicAPI.",
+    "The plugin resolves tagPrefixes to exact OpenAPI tags before invoking Apple's document filter.",
+    "PublicAPIFull is the aggregate typed route; generated source size is tracked but not a blocker for the first route."
+  ],
+  "typeOverridePolicies": {
+    "none": {
+      "description": "Generate Apple typed component schemas without package-added JSONValue replacement.",
+      "schemas": {}
+    },
+    "jsonValueFallback": {
+      "description": "Reserved policy for replacing selected named component schemas with OpenAPIRuntime.OpenAPIValueContainer.",
+      "replacementType": "OpenAPIRuntime.OpenAPIValueContainer",
+      "scope": "named components only"
+    }
+  },
+  "traits": [
+    {
+      "name": "PublicAPIBase",
+      "compilationCondition": "ASC_PUBLIC_API_BASE",
+      "default": true,
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "capabilityManifest": "Sources/AppStoreConnectPublicAPI/openapi-capabilities.json"
+      }
+    },
+    {
+      "name": "PublicAPIRelease",
+      "compilationCondition": "ASC_PUBLIC_API_RELEASE",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "tagPrefixes": [
+          "Accessibility",
+          "AgeRating",
+          "AppAvailabilities",
+          "AppCategories",
+          "AppEncryption",
+          "AppEvents",
+          "AppInfos",
+          "AppStoreReview",
+          "AppStoreVersion",
+          "AppTags",
+          "Apps",
+          "CustomerReview",
+          "Nominations",
+          "ReviewSubmission",
+          "RoutingAppCoverages"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPITestFlight",
+      "compilationCondition": "ASC_PUBLIC_API_TESTFLIGHT",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "tagPrefixes": [
+          "Beta",
+          "Build",
+          "PreReleaseVersions"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPIMetadataMedia",
+      "compilationCondition": "ASC_PUBLIC_API_METADATA_MEDIA",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "tagPrefixes": [
+          "AppClip",
+          "AppCustomProduct",
+          "AppEventLocalizations",
+          "AppEventScreenshots",
+          "AppEventVideoClips",
+          "AppPreview",
+          "AppScreenshot",
+          "AppStoreVersionExperiment",
+          "AppStoreVersionLocalizations"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPICommerce",
+      "compilationCondition": "ASC_PUBLIC_API_COMMERCE",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "tagPrefixes": [
+          "AppPrice",
+          "InAppPurchase",
+          "PromotedPurchases",
+          "SandboxTesters",
+          "Subscription",
+          "WinBackOffers"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPIReports",
+      "compilationCondition": "ASC_PUBLIC_API_REPORTS",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "operationIDs": [
+          "apps_perfPowerMetrics_getToManyRelated",
+          "builds_perfPowerMetrics_getToManyRelated"
+        ],
+        "tagPrefixes": [
+          "AnalyticsReport",
+          "FinanceReports",
+          "Metrics",
+          "SalesReports"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPISigningAccess",
+      "compilationCondition": "ASC_PUBLIC_API_SIGNING_ACCESS",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "tagPrefixes": [
+          "Actors",
+          "BundleId",
+          "Certificates",
+          "Devices",
+          "MerchantIds",
+          "PassTypeIds",
+          "Profiles",
+          "UserInvitations",
+          "Users"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPICloud",
+      "compilationCondition": "ASC_PUBLIC_API_CLOUD",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "tagPrefixes": [
+          "Ci",
+          "Scm"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPIGameCenter",
+      "compilationCondition": "ASC_PUBLIC_API_GAME_CENTER",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "tagPrefixes": [
+          "GameCenter"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPIDistribution",
+      "compilationCondition": "ASC_PUBLIC_API_DISTRIBUTION",
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "operationIDs": [
+          "apps_webhooks_getToManyRelated"
+        ],
+        "tagPrefixes": [
+          "AlternativeDistribution",
+          "EndAppAvailability",
+          "EndUserLicenseAgreements",
+          "Marketplace",
+          "Territories",
+          "TerritoryAvailabilities",
+          "Webhook"
+        ]
+      }
+    },
+    {
+      "name": "PublicAPIFull",
+      "compilationCondition": "ASC_PUBLIC_API_FULL",
+      "aggregate": [
+        "PublicAPIBase",
+        "PublicAPIRelease",
+        "PublicAPITestFlight",
+        "PublicAPIMetadataMedia",
+        "PublicAPICommerce",
+        "PublicAPIReports",
+        "PublicAPISigningAccess",
+        "PublicAPICloud",
+        "PublicAPIGameCenter",
+        "PublicAPIDistribution"
+      ],
+      "depth": "typed",
+      "typeOverridePolicy": "none",
+      "selectors": {
+        "allOperations": true
+      }
+    }
+  ]
+}

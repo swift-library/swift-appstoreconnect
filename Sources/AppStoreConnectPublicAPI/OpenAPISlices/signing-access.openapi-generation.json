@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "trait": "PublicAPISigningAccess",
+  "compilationCondition": "ASC_PUBLIC_API_SIGNING_ACCESS",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "tagPrefixes": [
+      "Actors",
+      "BundleId",
+      "Certificates",
+      "Devices",
+      "MerchantIds",
+      "PassTypeIds",
+      "Profiles",
+      "UserInvitations",
+      "Users"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "trait": "PublicAPIReports",
+  "compilationCondition": "ASC_PUBLIC_API_REPORTS",
+  "depth": "typed",
+  "typeOverridePolicy": "none",
+  "selectors": {
+    "operationIDs": [
+      "apps_perfPowerMetrics_getToManyRelated",
+      "builds_perfPowerMetrics_getToManyRelated"
+    ],
+    "tagPrefixes": [
+      "AnalyticsReport",
+      "FinanceReports",
+      "Metrics",
+      "SalesReports"
+    ]
+  },
+  "appleGeneratorConfig": "../openapi-generator-config.yaml"
+}
