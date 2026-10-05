@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0 WITH Swift-exception
+# Copyright (c) 2026 Xudong Xu
+"""Measure a clean default-trait consumer and compile usage on Apple platforms."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import time
+import uuid
+
+
+def main():
+    argparse.ArgumentParser(description=__doc__).parse_args()
+    root = Path(__file__).resolve().parent.parent
+    output = root / '.build/release-consumers' / ('consumer-' + uuid.uuid4().hex)
+    package = output / 'package'
+    shutil.copytree(root / 'Tests/Fixtures/ReleaseConsumer', package)
+    manifest = package / 'Package.swift'
+    declaration = '.package(name: "swift-appstoreconnect", path: ' + json.dumps(str(root)) + ')'
+    text, count = re.subn(r'\.package\(\s*url:\s*"https://github.com/swift-library/swift-appstoreconnect.git",\s*revision:\s*"release-candidate"\s*\)',
+                          lambda _: declaration, manifest.read_text())
+    if count != 1:
+        raise ValueError('Expected one consumer dependency declaration')
+    manifest.write_text(text)
+    checks = []
+
+    def run(name, command, cwd=package):
+        print('Consumer: ' + name, flush=True)
+        started = time.monotonic()
+        with (output / (name + '.log')).open('w') as log:
+            status = subprocess.run(command, cwd=cwd, stdout=log, stderr=subprocess.STDOUT, timeout=1800).returncode
+        elapsed = time.monotonic() - started
+        checks.append({'name': name, 'exit_status': status, 'elapsed_seconds': round(elapsed, 3)})
+        if status:
+            raise RuntimeError(name + ' failed; inspect ' + str((output / (name + '.log')).relative_to(root)))
+        return elapsed
+
+    run('resolve', ['swift', 'package', 'resolve'])
+    elapsed = run('clean-default-build', ['swift', 'build', '--force-resolved-versions'])
+    shutil.rmtree(package / '.build')
+    # Compile all DocC Swift snippets as an opt-in consumer, in separate function scopes.
+    snippet_package = output / 'snippets'
+    shutil.copytree(root / 'Tests/Fixtures/ReleaseConsumer', snippet_package)
+    snippet_manifest = text.replace('path: ' + json.dumps(str(root)) + ')',
+                                   'path: ' + json.dumps(str(root)) + ', traits: ["Experimental"])')
+    (snippet_package / 'Package.swift').write_text(snippet_manifest)
+    functions = []
+    imports = set()
+    catalogs = list((root / 'Sources').glob('*/*.docc/*.md'))
+    for index, path in enumerate(catalogs):
+        for snippet in re.findall(r'```swift\n(.*?)```', path.read_text(), re.DOTALL):
+            body = []
+            for line in snippet.splitlines():
+                if line.startswith('import '):
+                    imports.add(line)
+                else:
+                    body.append(line)
+            functions.append('func snippet' + str(index) + '() {\n' + '\n'.join(body) + '\n}\n')
+    (snippet_package / 'Sources/ReleaseConsumer/ReleaseConsumer.swift').write_text('\n'.join(sorted(imports)) + '\n\n' + '\n'.join(functions))
+    run('documentation-snippets', ['swift', 'build', '--force-resolved-versions'], cwd=snippet_package)
+    shutil.rmtree(snippet_package / '.build')
+    destinations = {'iOS': 'iOS Simulator', 'tvOS': 'tvOS Simulator', 'watchOS': 'watchOS Simulator', 'visionOS': 'visionOS Simulator'}
+    platforms = json.loads((root / '.github/release.json').read_text())['platforms']
+    for name, destination in destinations.items():
+        run(name.lower() + '-minimum-build', ['xcodebuild', 'build', '-scheme', 'ReleaseConsumer',
+            '-destination', 'generic/platform=' + destination, '-derivedDataPath', str(output / 'DerivedData'),
+            '-disableAutomaticPackageResolution', '-skipMacroValidation', 'CODE_SIGNING_ALLOWED=NO'])
+        shutil.rmtree(output / 'DerivedData')
+    lock = package / 'Package.resolved'
+    receipt = {'traits': ['PublicAPIBase'], 'clean_build_seconds': round(elapsed, 3),
+               'dependency_pins': json.loads(lock.read_text())['pins'],
+               'dependency_lock_sha256': hashlib.sha256(lock.read_bytes()).hexdigest(),
+               'consumer_manifest_sha256': hashlib.sha256(manifest.read_bytes()).hexdigest(),
+               'checker_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+               'platforms': {name: min(generations) for name, generations in platforms.items()},
+               'snippet_count': len(functions), 'checks': checks}
+    evidence = root / '.build/release-validation'
+    for log in output.glob('*.log'):
+        shutil.copy2(log, evidence / ('consumer-' + log.name))
+    (evidence / 'consumer.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    print('Consumer compilation passed; clean default build ' + str(round(elapsed, 3)) + ' seconds')
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        print('check-consumer: ' + str(error), file=sys.stderr)
+        sys.exit(1)

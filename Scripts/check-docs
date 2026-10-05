@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0 WITH Swift-exception
+# Copyright (c) 2026 Xudong Xu
+"""Compile and merge every public module's DocC catalog with warnings as errors."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import tarfile
+
+MODULES = ['AppStoreConnectCore', 'AppStoreConnectPublicAPI', 'AppStoreConnectWorkflow',
+           'AppStoreConnectWebSession', 'AppStoreConnectIrisAPI', 'AppStoreConnectCLI']
+
+
+def main():
+    argparse.ArgumentParser(description=__doc__).parse_args()
+    root = Path(__file__).resolve().parent.parent
+    evidence = root / '.build/release-validation'
+    evidence.mkdir(parents=True, exist_ok=True)
+    result = subprocess.run(['swift', 'package', '--traits', 'Experimental,default', '--force-resolved-versions',
+                             'dump-symbol-graph', '--skip-synthesized-members'], cwd=root,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    (evidence / 'docc-symbolgraph.log').write_text(result.stdout)
+    if result.returncode:
+        raise RuntimeError('Symbol extraction failed; inspect .build/release-validation/docc-symbolgraph.log')
+    matches = re.findall(r'^Files written to (.+)$', result.stdout, re.MULTILINE)
+    if len(matches) != 1:
+        raise RuntimeError('Symbol extraction did not identify its output directory')
+    graphs = Path(matches[0])
+    work = root / '.build/documentation'
+    work.mkdir(parents=True, exist_ok=True)
+    archives = []
+    graph_digests = {}
+    for module in MODULES:
+        symbols = work / (module + '-symbols')
+        if symbols.exists():
+            shutil.rmtree(symbols)
+        symbols.mkdir()
+        selected = [graphs / (module + '.symbols.json'), *graphs.glob(module + '@*.symbols.json')]
+        for path in selected:
+            shutil.copy2(path, symbols / path.name)
+            graph_digests[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+        archive = work / (module + '.doccarchive')
+        with (evidence / ('docc-' + module + '.log')).open('w') as log:
+            subprocess.run(['xcrun', 'docc', 'convert', str(root / 'Sources' / module / (module + '.docc')),
+                            '--additional-symbol-graph-dir', str(symbols), '--output-path', str(archive),
+                            '--warnings-as-errors'], cwd=root, stdout=log, stderr=subprocess.STDOUT, check=True)
+        archives.append(archive)
+    merged = work / 'swift-appstoreconnect.doccarchive'
+    with (evidence / 'docc-merge.log').open('w') as log:
+        subprocess.run(['xcrun', 'docc', 'merge', *map(str, archives), '--output-path', str(merged),
+                        '--synthesized-landing-page-name', 'swift-appstoreconnect'], cwd=root,
+                       stdout=log, stderr=subprocess.STDOUT, check=True)
+    archive = evidence / 'swift-appstoreconnect.doccarchive.tar.gz'
+    with tarfile.open(archive, 'w:gz') as bundle:
+        bundle.add(merged, arcname=merged.name)
+    receipt = {'checker_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+               'modules': MODULES, 'traits': ['PublicAPIBase', 'Experimental'], 'symbol_graphs': graph_digests,
+               'archive': archive.name, 'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(),
+               'checks': ['public-symbol-extraction', 'docc-warnings-as-errors', 'docc-merge']}
+    (evidence / 'documentation.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    print('DocC compilation and merge passed for ' + str(len(MODULES)) + ' modules')
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (OSError, RuntimeError, subprocess.SubprocessError) as error:
+        print('check-docs: ' + str(error), file=sys.stderr)
+        sys.exit(1)

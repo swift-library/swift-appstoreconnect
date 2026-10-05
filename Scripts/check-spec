@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0 WITH Swift-exception
+# Copyright (c) 2026 Xudong Xu
+"""Verify Apple's locked OpenAPI bytes and optionally report available updates."""
+import argparse
+import hashlib
+import io
+import json
+from pathlib import Path
+import sys
+import urllib.request
+import zipfile
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--online', action='store_true', help='Compare the current Apple download with the lock')
+    args = parser.parse_args()
+    root = Path(__file__).resolve().parent.parent
+    vendor = root / 'Vendor/AppStoreConnectOpenAPI'
+    lock = json.loads((vendor / 'spec.lock.json').read_text())
+    archive = (vendor / lock['archive']['path']).read_bytes()
+    schema = (vendor / lock['schema']['path']).read_bytes()
+    for name, data in [('archive', archive), ('schema', schema)]:
+        if digest(data) != lock[name]['sha256']:
+            raise ValueError('Locked ' + name + ' checksum differs')
+    with zipfile.ZipFile(io.BytesIO(archive)) as bundle:
+        if bundle.read(lock['archive']['extractedFile']) != schema:
+            raise ValueError('Vendored schema must be an unchanged copy of the Apple archive member')
+    document = json.loads(schema)
+    if document['info']['version'] != lock['schema']['version'] or document['openapi'] != lock['schema']['openapi']:
+        raise ValueError('Schema identity differs from the lock')
+    result = {'locked_version': document['info']['version'], 'schema_sha256': digest(schema),
+              'archive_sha256': digest(archive), 'unchanged_schema': True, 'drift': False,
+              'checker_sha256': digest(Path(__file__).read_bytes())}
+    if args.online:
+        request = urllib.request.Request(lock['source']['downloadURL'], headers={'User-Agent': 'swift-appstoreconnect-spec-check'})
+        with urllib.request.urlopen(request, timeout=30) as response:
+            latest = response.read(32 * 1024 * 1024 + 1)
+        if len(latest) > 32 * 1024 * 1024:
+            raise ValueError('Apple archive exceeds the size limit')
+        with zipfile.ZipFile(io.BytesIO(latest)) as bundle:
+            latest_schema = bundle.read(lock['archive']['extractedFile'])
+        result['latest_version'] = json.loads(latest_schema)['info']['version']
+        result['latest_schema_sha256'] = digest(latest_schema)
+        result['drift'] = digest(latest_schema) != digest(schema)
+    output = root / '.build/release-validation'
+    output.mkdir(parents=True, exist_ok=True)
+    (output / ('spec-online.json' if args.online else 'spec.json')).write_text(json.dumps(result, indent=2) + '\n')
+    if result['drift']:
+        print('::warning::Apple OpenAPI specification changed; review the new version and checksum before updating the lock.')
+        return 1
+    print('Apple OpenAPI ' + document['info']['version'] + ': locked bytes verified' + ('; no online drift' if args.online else ''))
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except (OSError, ValueError, KeyError, zipfile.BadZipFile) as error:
+        print('check-spec: ' + str(error), file=sys.stderr)
+        sys.exit(1)

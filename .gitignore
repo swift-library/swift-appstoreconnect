@@ -6,3 +6,9 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+/*.xcodeproj
+.swiftpm/config/registries.json
+/PLAN.md
+/.vscode
+/build
+*.p8

@@ -1,15 +1,19 @@
-import AppStoreConnectCore
-import Foundation
+// SPDX-License-Identifier: Apache-2.0 WITH Swift-exception
+// Copyright (c) 2026 Xudong Xu
 
-public enum IrisEndpointID: String, Codable, Sendable, CaseIterable, Equatable {
+#if ASC_EXPERIMENTAL
+  import AppStoreConnectCore
+  import Foundation
+
+  public enum IrisEndpointID: String, Codable, Sendable, CaseIterable, Equatable {
     case appStoreVersionStateChanges
-}
+  }
 
-public enum IrisDriftPolicy: String, Codable, Sendable, CaseIterable, Equatable {
+  public enum IrisDriftPolicy: String, Codable, Sendable, CaseIterable, Equatable {
     case failClosed
-}
+  }
 
-public struct IrisEndpointDescriptor: Codable, Sendable, Equatable {
+  public struct IrisEndpointDescriptor: Codable, Sendable, Equatable {
     public var id: IrisEndpointID
     public var capability: IrisCapability
     public var method: AppStoreConnectHTTPMethod
@@ -25,53 +29,55 @@ public struct IrisEndpointDescriptor: Codable, Sendable, Equatable {
     public var driftPolicy: IrisDriftPolicy
 
     public init(
-        id: IrisEndpointID,
-        capability: IrisCapability,
-        method: AppStoreConnectHTTPMethod,
-        host: URL,
-        pathTemplate: String,
-        requiredHeaders: [String],
-        sessionRequirement: String,
-        requestPayload: String,
-        responsePayload: String,
-        observationID: String,
-        observedAt: String,
-        isMutating: Bool,
-        driftPolicy: IrisDriftPolicy
+      id: IrisEndpointID,
+      capability: IrisCapability,
+      method: AppStoreConnectHTTPMethod,
+      host: URL,
+      pathTemplate: String,
+      requiredHeaders: [String],
+      sessionRequirement: String,
+      requestPayload: String,
+      responsePayload: String,
+      observationID: String,
+      observedAt: String,
+      isMutating: Bool,
+      driftPolicy: IrisDriftPolicy
     ) {
-        self.id = id
-        self.capability = capability
-        self.method = method
-        self.host = host
-        self.pathTemplate = pathTemplate
-        self.requiredHeaders = requiredHeaders
-        self.sessionRequirement = sessionRequirement
-        self.requestPayload = requestPayload
-        self.responsePayload = responsePayload
-        self.observationID = observationID
-        self.observedAt = observedAt
-        self.isMutating = isMutating
-        self.driftPolicy = driftPolicy
+      self.id = id
+      self.capability = capability
+      self.method = method
+      self.host = host
+      self.pathTemplate = pathTemplate
+      self.requiredHeaders = requiredHeaders
+      self.sessionRequirement = sessionRequirement
+      self.requestPayload = requestPayload
+      self.responsePayload = responsePayload
+      self.observationID = observationID
+      self.observedAt = observedAt
+      self.isMutating = isMutating
+      self.driftPolicy = driftPolicy
     }
 
     public func path(parameters: [String: String]) throws -> String {
-        try parameters.reduce(pathTemplate) { partial, element in
-            let token = "{\(element.key)}"
-            guard partial.contains(token) else {
-                throw AppStoreConnectError.invalidConfiguration(
-                    "Iris endpoint \(id.rawValue) does not contain path parameter \(element.key)."
-                )
-            }
-
-            return partial.replacingOccurrences(of: token, with: element.value.irisPathComponent)
+      try parameters.reduce(pathTemplate) { partial, element in
+        let token = "{\(element.key)}"
+        guard partial.contains(token) else {
+          throw AppStoreConnectError.invalidConfiguration(
+            "Iris endpoint \(id.rawValue) does not contain path parameter \(element.key)."
+          )
         }
-    }
-}
 
-private extension String {
-    var irisPathComponent: String {
-        var allowed = CharacterSet.urlPathAllowed
-        allowed.remove(charactersIn: "/")
-        return addingPercentEncoding(withAllowedCharacters: allowed) ?? self
+        return partial.replacingOccurrences(of: token, with: element.value.irisPathComponent)
+      }
     }
-}
+  }
+
+  extension String {
+    fileprivate var irisPathComponent: String {
+      var allowed = CharacterSet.urlPathAllowed
+      allowed.remove(charactersIn: "/")
+      return addingPercentEncoding(withAllowedCharacters: allowed) ?? self
+    }
+  }
+
+#endif

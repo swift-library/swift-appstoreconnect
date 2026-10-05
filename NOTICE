@@ -1,0 +1,28 @@
+swift-appstoreconnect
+Copyright (c) 2026 Xudong Xu
+
+Licensed under Apache License 2.0 with the Swift Runtime Library Exception.
+See LICENSE.txt for the complete terms.
+
+Apple App Store Connect OpenAPI specification 4.3
+Copyright Apple Inc. All rights reserved.
+
+The original archive and its schema under Vendor/AppStoreConnectOpenAPI are
+unchanged Apple materials. spec.lock.json records their source and checksums.
+Download: https://developer.apple.com/sample-code/app-store-connect/app-store-connect-openapi-specification.zip
+
+Apple's terms apply to these materials separately from this package's license:
+https://developer.apple.com/support/terms/
+https://developer.apple.com/support/downloads/terms/apple-developer-agreement/Apple-Developer-Agreement-20250318-English.pdf
+https://www.apple.com/legal/internet-services/terms/site.html
+
+The Apple Developer Agreement requires retaining ownership notices and limits
+copying, modification and redistribution to uses expressly permitted by Apple.
+Apple's website terms similarly restrict republication and distribution and
+provide the materials without warranties. Consult the applicable agreements
+for their complete terms. The downloaded specification contains no separate
+redistribution license; this notice does not grant rights to Apple's materials.
+
+Dependency licenses are available with each dependency's source:
+- Apple Swift Argument Parser, Swift OpenAPI Generator, Swift OpenAPI Runtime,
+  Swift OpenAPI URLSession, and Swift HTTP Types: Apache-2.0 WITH Swift-exception.

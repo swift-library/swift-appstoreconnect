@@ -1,23 +1,29 @@
-import Foundation
+// SPDX-License-Identifier: Apache-2.0 WITH Swift-exception
+// Copyright (c) 2026 Xudong Xu
 
-public protocol WebSessionProvider: Sendable {
+#if ASC_EXPERIMENTAL
+  import Foundation
+
+  public protocol WebSessionProvider: Sendable {
     func session(now: Date) async throws -> WebSession
-}
+  }
 
-public extension WebSessionProvider {
-    func session() async throws -> WebSession {
-        try await session(now: Date())
+  extension WebSessionProvider {
+    public func session() async throws -> WebSession {
+      try await session(now: Date())
     }
-}
+  }
 
-public struct StaticWebSessionProvider: WebSessionProvider {
+  public struct StaticWebSessionProvider: WebSessionProvider {
     public var webSession: WebSession
 
     public init(_ webSession: WebSession) {
-        self.webSession = webSession
+      self.webSession = webSession
     }
 
     public func session(now: Date) async throws -> WebSession {
-        try webSession.withSource(.staticSession).validated(now: now)
+      try webSession.withSource(.staticSession).validated(now: now)
     }
-}
+  }
+
+#endif

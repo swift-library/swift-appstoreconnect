@@ -1,17 +1,10 @@
 # Contributing
 
-This repository is currently a research package skeleton. Keep changes narrow and preserve the package layer boundaries documented under `Docs/Architecture`.
+By submitting a contribution, you confirm your right to license it under
+[the package license](LICENSE.txt).
 
-## Local Checks
-
-```bash
-swift build
-swift test
-```
-
-## Documentation
-
-- Route instructions belong in `AGENTS.md`.
-- Package and docs indexes belong in `README.md` files.
-- Current architecture truth belongs in `Docs/Architecture/*`.
-- Upstream inventory belongs in `Docs/Reference/Upstreams.md`.
+Use Conventional Commit subjects and follow `.swift-format`. Run
+`Scripts/check` before opening a pull request. Review the
+[version and release policy](Documentation/Architecture/VersioningAndRelease.md)
+and the [swift-library versioning standard](https://github.com/swift-library/.github/blob/master/VERSIONING.md)
+when changing compatibility, requirements or release inputs.
