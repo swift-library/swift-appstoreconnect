@@ -319,11 +319,11 @@ public struct GeneratorCommand: Sendable {
 
     return try OpenAPISelection.validateOperations(try requiredList("--operations", in: options))
   }
+
   private func upstreamSchemas(in options: [String: String]) -> [OpenAPIUpstreamSchemaInput] {
     guard let url = optionalURL("--comparison-schema", in: options) else { return [] }
     return [OpenAPIUpstreamSchemaInput(name: url.lastPathComponent, schemaURL: url)]
   }
-
 
   private func optionalURL(_ option: String, in options: [String: String]) -> URL? {
     options[option].map { URL(fileURLWithPath: $0) }

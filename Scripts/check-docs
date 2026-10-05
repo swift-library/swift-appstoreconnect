@@ -21,7 +21,7 @@ def main():
     root = Path(__file__).resolve().parent.parent
     evidence = root / '.build/release-validation'
     evidence.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(['swift', 'package', '--traits', 'Experimental,default', '--force-resolved-versions',
+    result = subprocess.run(['swift', 'package', '--build-system', 'native', '--traits', 'Experimental,default', '--force-resolved-versions',
                              'dump-symbol-graph', '--skip-synthesized-members'], cwd=root,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     (evidence / 'docc-symbolgraph.log').write_text(result.stdout)
@@ -48,6 +48,8 @@ def main():
         with (evidence / ('docc-' + module + '.log')).open('w') as log:
             subprocess.run(['xcrun', 'docc', 'convert', str(root / 'Sources' / module / (module + '.docc')),
                             '--additional-symbol-graph-dir', str(symbols), '--output-path', str(archive),
+                            '--checkout-path', str(root), '--source-service', 'github',
+                            '--source-service-base-url', 'https://github.com/swift-library/swift-appstoreconnect/blob/master',
                             '--warnings-as-errors'], cwd=root, stdout=log, stderr=subprocess.STDOUT, check=True)
         archives.append(archive)
     merged = work / 'swift-appstoreconnect.doccarchive'

@@ -38,7 +38,7 @@ for entry in config['trait_configurations']:
     name = entry['name']
     print('Build and test traits: ' + name, flush=True)
     log_path = root / ('tests-' + name + '.log')
-    command = ['swift', 'test', '--force-resolved-versions', '--disable-index-store',
+    command = ['swift', 'test', '--build-system', 'native', '--force-resolved-versions', '--disable-index-store',
                '-debug-info-format', 'none', *entry['arguments']]
     with log_path.open('w') as log:
         status = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT).returncode
@@ -53,18 +53,31 @@ for entry in config['trait_configurations']:
                     'test_count': sum(map(int, matches)), 'exit_status': status})
 (root / 'traits.json').write_text(json.dumps(results, indent=2) + '\n')
 PY
-  swift build -c release --product appstoreconnect --force-resolved-versions > .build/release-validation/release-build.log 2>&1
-  .build/release/appstoreconnect --version > .build/release-validation/cli-version.txt
+  swift build --build-system native -c release --product appstoreconnect --force-resolved-versions > .build/release-validation/release-build.log 2>&1
+  cli="$(swift build --build-system native -c release --show-bin-path)/appstoreconnect"
+  "$cli" --version > .build/release-validation/cli-version.txt
   diff VERSION .build/release-validation/cli-version.txt
-  .build/release/appstoreconnect --help > .build/release-validation/cli-help.txt
-  .build/release/appstoreconnect --generate-completion-script zsh > .build/release-validation/completion.zsh
-  .build/release/appstoreconnect workflow dry-run public-release-readiness --app-id example-app > .build/release-validation/cli-dry-run.txt
+  "$cli" --help > .build/release-validation/cli-help.txt
+  "$cli" --generate-completion-script zsh > .build/release-validation/completion.zsh
+  "$cli" workflow dry-run public-release-readiness --app-id example-app > .build/release-validation/cli-dry-run.txt
   Scripts/check-docs
   Scripts/check-consumer
 fi
 python3 - <<'PY'
-import hashlib, json, os, pathlib, platform, subprocess
+import hashlib, json, os, pathlib, platform, subprocess, tempfile
 root = pathlib.Path('.build/release-validation')
+prefixes = {str(pathlib.Path.cwd()): '<package>', str(pathlib.Path.home()): '<home>',
+            tempfile.gettempdir(): '<temporary>',
+            subprocess.check_output(['xcode-select', '-p'], text=True).strip(): '<developer>'}
+if tempfile.gettempdir().startswith('/var/'):
+    prefixes['/private' + tempfile.gettempdir()] = '<temporary>'
+for path in root.glob('*.log'):
+    if path.name == 'check.log':
+        continue
+    log = path.read_text(errors='replace')
+    for prefix, replacement in sorted(prefixes.items(), key=lambda item: len(item[0]), reverse=True):
+        log = log.replace(prefix, replacement).replace(prefix.replace('/', '\\/'), replacement)
+    path.write_text(log)
 result = json.loads((root / 'version.json').read_text())
 result['scope'] = os.environ['RELEASE_CHECK_SCOPE']
 result['os'] = platform.platform()
@@ -84,6 +97,7 @@ if result['scope'] in ('all', 'compiler'):
     result['documentation'] = json.loads((root / 'documentation.json').read_text())
     result['consumer'] = json.loads((root / 'consumer.json').read_text())
 result['checker_digests'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in pathlib.Path('Scripts').iterdir() if p.is_file()}
+result['log_paths'] = 'package, home, temporary and developer directory prefixes normalized'
 (root / 'provenance.json').write_text(json.dumps(result, indent=2) + '\n')
 PY
 echo 'checks ok'

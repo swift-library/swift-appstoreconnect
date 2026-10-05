@@ -34,6 +34,9 @@ macOS 13, tvOS 16, watchOS 9 and visionOS 1. `.github/release.json` owns
 compiler and platform validation settings. CI selects Xcode 26.4 and 26.6;
 local evidence records the selected compiler and SDKs.
 
+Repository tests, release builds and symbol extraction use SwiftPM's native
+build engine. Consumer checks use the toolchain's default engine and Xcode.
+
 `Scripts/check` tests default traits, disabled default traits, `PublicAPIFull`
 and `Experimental` with defaults. WebSession and Iris products compile empty
 when `Experimental` is disabled. Public API code generation always includes

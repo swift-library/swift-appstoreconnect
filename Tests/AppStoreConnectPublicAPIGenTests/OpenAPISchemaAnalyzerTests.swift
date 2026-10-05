@@ -359,7 +359,7 @@ import Testing
 
   #expect(output.contains("wrote capability report"))
   #expect(reportText.contains("\"selectedOperationCount\" : 144"))
-  #expect(reportText.contains("\"upstream\" : \"app-store-connect-openapi.json\""))
+  #expect(reportText.contains("\"upstream\" : \"\(schemaURL.lastPathComponent)\""))
 }
 
 private func packageRoot() -> URL {
