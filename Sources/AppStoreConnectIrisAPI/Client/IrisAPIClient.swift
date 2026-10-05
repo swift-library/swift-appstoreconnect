@@ -47,6 +47,7 @@
       pathParameters: [String: String] = [:],
       now: Date = Date()
     ) async throws -> AppStoreConnectResponse {
+      try validateReadOnly(endpoint)
       let session = try await sessionProvider.session(now: now)
       let request = try request(
         for: endpoint,
@@ -69,6 +70,7 @@
       session: WebSession,
       now: Date = Date()
     ) throws -> AppStoreConnectRequest {
+      try validateReadOnly(endpoint)
       let path = try endpoint.path(parameters: pathParameters)
       let cookieHeader = try session.validated(now: now).cookieHeader(now: now)
 
@@ -83,6 +85,12 @@
           "X-Requested-With": "XMLHttpRequest",
         ]
       )
+    }
+
+    private func validateReadOnly(_ endpoint: IrisEndpointDescriptor) throws {
+      guard endpoint.method == .get, !endpoint.isMutating else {
+        throw AppStoreConnectError.unsupportedCapability("Iris mutations are unavailable.")
+      }
     }
 
     private func mapFailure(

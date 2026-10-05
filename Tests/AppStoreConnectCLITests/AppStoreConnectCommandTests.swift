@@ -3118,13 +3118,16 @@ private func temporaryDirectory() -> URL {
 
 @Test func commandErrorsRedactBearerTokensAndPrivateKeyPaths() async {
   let token = "eyJ0ZXN0.eyJmaXh0dXJl.c2lnbmF0dXJl"
+  let whitespaceHeader = Data("{\n\"alg\":\"none\"}".utf8).base64EncodedString()
+    .replacingOccurrences(of: "=", with: "")
+  let unsignedToken = whitespaceHeader + ".e30."
   let directory = temporaryDirectory()
   let paths = [
     directory.appendingPathComponent("AuthKey.p8").path,
     directory.appendingPathComponent("Private Keys/AuthKey.p8").path,
     "relative/private key.p8",
   ]
-  for value in [token, "Bearer example-secret"] + paths {
+  for value in [token, unsignedToken, "Bearer example-secret"] + paths {
     let result = await AppStoreConnectCommand.run(
       arguments: [value], environment: ["ASC_API_TOKEN": token])
     #expect(result.exitCode != 0)
@@ -3133,8 +3136,9 @@ private func temporaryDirectory() -> URL {
   }
   let password = "example-password"
   let result = await AppStoreConnectCommand.run(
-    arguments: ["unknown", "--demo-account-password", password], environment: [:])
+    arguments: [password, "--demo-account-password", password], environment: [:])
   #expect(!(result.stdout + result.stderr).contains(password))
+  #expect((result.stdout + result.stderr).contains("[REDACTED]"))
 }
 
 @Test func versionIsDerivedFromVersionDeclaration() async throws {

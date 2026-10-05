@@ -131,6 +131,32 @@
     }
   }
 
+  @Test func clientRejectsMutatingDescriptorsBeforeTransport() async {
+    let fixture = AppStoreConnectTransportFixture(responses: [
+      AppStoreConnectResponse(statusCode: 200)
+    ])
+    let client = IrisAPIClient(
+      sessionProvider: StaticWebSessionProvider(
+        WebSession(cookies: ["myacinfo": "example-cookie"])),
+      transport: AppStoreConnectFixtureTransport(fixture: fixture)
+    )
+    for (method, isMutating) in [
+      (AppStoreConnectHTTPMethod.get, true), (.post, false), (.delete, true),
+    ] {
+      var endpoint = IrisEndpointLedger.appStoreVersionStateChanges
+      endpoint.method = method
+      endpoint.isMutating = isMutating
+      await #expect(
+        throws: AppStoreConnectError.unsupportedCapability("Iris mutations are unavailable.")
+      ) {
+        _ = try await client.send(
+          endpoint, pathParameters: ["appStoreVersionID": "example-version"])
+      }
+    }
+    let requests = await fixture.requests()
+    #expect(requests.isEmpty)
+  }
+
   private func fixtureData(_ name: String) throws -> Data {
     let url = try #require(Bundle.module.url(forResource: name, withExtension: nil))
     return try Data(contentsOf: url)

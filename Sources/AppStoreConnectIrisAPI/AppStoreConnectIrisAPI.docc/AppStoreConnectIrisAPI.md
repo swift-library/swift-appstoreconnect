@@ -24,6 +24,9 @@ let provider = StaticWebSessionProvider(
     WebSession(cookies: ["myacinfo": "example-cookie"])
 )
 let client = IrisAPIClient(
-    sessionProvider: provider, transport: AppStoreConnectTransportFixture()
+    sessionProvider: provider,
+    transport: AppStoreConnectFixtureTransport(
+        fixture: AppStoreConnectTransportFixture(responses: [AppStoreConnectResponse(statusCode: 200)])
+    )
 )
 ```

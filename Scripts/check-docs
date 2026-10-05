@@ -6,7 +6,6 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-import re
 import shutil
 import subprocess
 import sys
@@ -21,20 +20,21 @@ def main():
     root = Path(__file__).resolve().parent.parent
     evidence = root / '.build/release-validation'
     evidence.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(['swift', 'package', '--build-system', 'native', '--traits', 'Experimental,default', '--force-resolved-versions',
-                             'dump-symbol-graph', '--skip-synthesized-members'], cwd=root,
+    work = root / '.build/documentation'
+    graphs = work / 'symbol-graphs'
+    if graphs.exists():
+        shutil.rmtree(graphs)
+    graphs.mkdir(parents=True)
+    result = subprocess.run(['swift', 'build', '--build-system', 'native', '--traits', 'Experimental,default',
+                             '--force-resolved-versions', '--disable-index-store', '-debug-info-format', 'none',
+                             '-Xswiftc', '-emit-symbol-graph', '-Xswiftc', '-emit-symbol-graph-dir', '-Xswiftc', str(graphs)], cwd=root,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     (evidence / 'docc-symbolgraph.log').write_text(result.stdout)
     if result.returncode:
         raise RuntimeError('Symbol extraction failed; inspect .build/release-validation/docc-symbolgraph.log')
-    matches = re.findall(r'^Files written to (.+)$', result.stdout, re.MULTILINE)
-    if len(matches) != 1:
-        raise RuntimeError('Symbol extraction did not identify its output directory')
-    graphs = Path(matches[0])
-    work = root / '.build/documentation'
-    work.mkdir(parents=True, exist_ok=True)
     archives = []
     graph_digests = {}
+    generated_prefix = (root / '.build').as_uri() + '/'
     for module in MODULES:
         symbols = work / (module + '-symbols')
         if symbols.exists():
@@ -42,8 +42,13 @@ def main():
         symbols.mkdir()
         selected = [graphs / (module + '.symbols.json'), *graphs.glob(module + '@*.symbols.json')]
         for path in selected:
-            shutil.copy2(path, symbols / path.name)
-            graph_digests[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+            graph = json.loads(path.read_text())
+            for symbol in graph.get('symbols', []):
+                if symbol.get('location', {}).get('uri', '').startswith(generated_prefix):
+                    del symbol['location']
+            output = symbols / path.name
+            output.write_text(json.dumps(graph) + '\n')
+            graph_digests[path.name] = hashlib.sha256(output.read_bytes()).hexdigest()
         archive = work / (module + '.doccarchive')
         with (evidence / ('docc-' + module + '.log')).open('w') as log:
             subprocess.run(['xcrun', 'docc', 'convert', str(root / 'Sources' / module / (module + '.docc')),
@@ -65,6 +70,7 @@ def main():
                'archive': archive.name, 'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(),
                'checks': ['public-symbol-extraction', 'docc-warnings-as-errors', 'docc-merge']}
     (evidence / 'documentation.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    shutil.rmtree(work)
     print('DocC compilation and merge passed for ' + str(len(MODULES)) + ' modules')
 
 

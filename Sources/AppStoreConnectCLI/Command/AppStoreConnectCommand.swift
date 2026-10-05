@@ -22,10 +22,17 @@ public enum AppStoreConnectCommand {
     environment: [String: String] = ProcessInfo.processInfo.environment,
     currentDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
   ) async -> AppStoreConnectCLIResult {
+    let parsed = ParsedArguments(arguments)
+    if parsed.hasFlag("version") {
+      return AppStoreConnectCLIResult(exitCode: 0, stdout: AppStoreConnectVersion.value + "\n")
+    }
+    if parsed.commands.isEmpty || parsed.hasFlag("help") {
+      return AppStoreConnectCLIResult(exitCode: 0, stdout: helpText)
+    }
     let result: AppStoreConnectCLIResult
     do {
       result = try await execute(
-        parsed: ParsedArguments(arguments),
+        parsed: parsed,
         environment: environment,
         currentDirectory: currentDirectory
       )
@@ -41,7 +48,7 @@ public enum AppStoreConnectCommand {
     )
   }
 
-  private static func redacted(
+  static func redacted(
     _ text: String, arguments: [String], environment: [String: String]
   ) -> String {
     var output = text
@@ -49,12 +56,15 @@ public enum AppStoreConnectCommand {
       let name = key.uppercased()
       return !value.isEmpty
         && (name.contains("TOKEN") || name.contains("PASSWORD")
-          || name.contains("SECRET") || name.contains("PRIVATE_KEY") || value.hasSuffix(".p8"))
+          || name.contains("SECRET") || name.contains("PRIVATE_KEY")
+          || value.lowercased().hasSuffix(".p8"))
         ? value : nil
     }
     if let cookies = environment["ASC_WEB_SESSION_COOKIES"] {
       secrets += cookies.split(separator: ";").compactMap { cookie in
-        cookie.split(separator: "=", maxSplits: 1).last.map(String.init)
+        cookie.split(separator: "=", maxSplits: 1).last.map {
+          String($0).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
       }.filter { !$0.isEmpty }
     }
     secrets += arguments.filter { $0.lowercased().hasSuffix(".p8") }
@@ -80,12 +90,31 @@ public enum AppStoreConnectCommand {
       of: #"eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+"#,
       with: "[REDACTED]", options: .regularExpression
     )
+    if let expression = try? NSRegularExpression(
+      pattern: #"[A-Za-z0-9_-]+={0,2}\.[A-Za-z0-9_-]+={0,2}\.[A-Za-z0-9_-]*={0,2}"#
+    ) {
+      let matches = expression.matches(in: output, range: NSRange(output.startIndex..., in: output))
+      for match in matches.reversed() {
+        guard let range = Range(match.range, in: output),
+          let header = output[range].split(separator: ".").first
+        else { continue }
+        var encoded = header.replacingOccurrences(of: "-", with: "+")
+          .replacingOccurrences(of: "_", with: "/")
+        encoded += String(repeating: "=", count: (4 - encoded.count % 4) % 4)
+        guard let data = Data(base64Encoded: encoded),
+          let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+          object["alg"] != nil
+        else { continue }
+        output.replaceSubrange(range, with: "[REDACTED]")
+      }
+    }
     output = output.replacingOccurrences(
       of: #"(?i)Bearer\s+[A-Za-z0-9._~+/=-]+"#, with: "Bearer [REDACTED]",
       options: .regularExpression
     )
     return output.replacingOccurrences(
-      of: #"(?:/|~/)[^\s\"']+\.p8"#, with: "[REDACTED]", options: .regularExpression
+      of: #"(?:/|~/)[^\r\n\"']+?\.p8"#, with: "[REDACTED]",
+      options: [.regularExpression, .caseInsensitive]
     )
   }
 
@@ -94,14 +123,6 @@ public enum AppStoreConnectCommand {
     environment: [String: String],
     currentDirectory: URL
   ) async throws -> AppStoreConnectCLIResult {
-    if parsed.hasFlag("version") {
-      return AppStoreConnectCLIResult(exitCode: 0, stdout: AppStoreConnectVersion.value + "\n")
-    }
-
-    guard !parsed.commands.isEmpty, !parsed.hasFlag("help") else {
-      return AppStoreConnectCLIResult(exitCode: 0, stdout: helpText)
-    }
-
     switch parsed.commands {
     case ["commands", "list"]:
       return try render(AppStoreConnectCLICommandRegistry.descriptors, json: parsed.wantsJSON)

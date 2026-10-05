@@ -30,7 +30,7 @@ fi
 if [ "$RELEASE_CHECK_SCOPE" = all ] || [ "$RELEASE_CHECK_SCOPE" = compiler ]; then
   python3 -B -m unittest discover -s Tests/ReleaseTools
   python3 - <<'PY'
-import json, pathlib, re, subprocess
+import json, pathlib, re, shutil, subprocess
 root = pathlib.Path('.build/release-validation')
 config = json.loads(pathlib.Path('.github/release.json').read_text())
 results = []
@@ -38,7 +38,8 @@ for entry in config['trait_configurations']:
     name = entry['name']
     print('Build and test traits: ' + name, flush=True)
     log_path = root / ('tests-' + name + '.log')
-    command = ['swift', 'test', '--build-system', 'native', '--force-resolved-versions', '--disable-index-store',
+    build_path = pathlib.Path('.build/release-traits') / name
+    command = ['swift', 'test', '--build-system', 'native', '--scratch-path', str(build_path), '--force-resolved-versions', '--disable-index-store',
                '-debug-info-format', 'none', *entry['arguments']]
     with log_path.open('w') as log:
         status = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT).returncode
@@ -51,6 +52,7 @@ for entry in config['trait_configurations']:
         raise SystemExit('Trait validation did not report a passing test count: ' + name)
     results.append({'name': name, 'arguments': entry['arguments'], 'command': command,
                     'test_count': sum(map(int, matches)), 'exit_status': status})
+    shutil.rmtree(build_path)
 (root / 'traits.json').write_text(json.dumps(results, indent=2) + '\n')
 PY
   swift build --build-system native -c release --product appstoreconnect --force-resolved-versions > .build/release-validation/release-build.log 2>&1

@@ -36,6 +36,8 @@ local evidence records the selected compiler and SDKs.
 
 Repository tests, release builds and symbol extraction use SwiftPM's native
 build engine. Consumer checks use the toolchain's default engine and Xcode.
+Each trait configuration uses an independent build directory; validation retains
+its logs and removes the generated products after a successful run.
 
 `Scripts/check` tests default traits, disabled default traits, `PublicAPIFull`
 and `Experimental` with defaults. WebSession and Iris products compile empty
@@ -58,7 +60,9 @@ Release acceptance uses clean committed source, strict formatting, complete
 Swift tests, Release builds, compiler/platform checks
 and a fresh consumer. The tested lockfile is enforced for repository
 builds; consumer validation also records its independently resolved dependency
-graph. Source ownership and dependency notices are reviewed when dependencies
+graph. The OpenAPI generator is pinned to an exact version because the build
+tool integrates with its internal `_OpenAPIGeneratorCore` API. Source ownership
+and dependency notices are reviewed when dependencies
 or incorporated code change.
 
 Validation records the commit/tree, lockfile digest, toolchain, OS, SDK, checker

@@ -52,7 +52,7 @@ def main():
     functions = []
     imports = set()
     catalogs = list((root / 'Sources').glob('*/*.docc/*.md'))
-    for index, path in enumerate(catalogs):
+    for path in catalogs:
         for snippet in re.findall(r'```swift\n(.*?)```', path.read_text(), re.DOTALL):
             body = []
             for line in snippet.splitlines():
@@ -60,8 +60,9 @@ def main():
                     imports.add(line)
                 else:
                     body.append(line)
-            functions.append('func snippet' + str(index) + '() {\n' + '\n'.join(body) + '\n}\n')
+            functions.append('func snippet' + str(len(functions)) + '() {\n' + '\n'.join(body) + '\n}\n')
     (snippet_package / 'Sources/ReleaseConsumer/ReleaseConsumer.swift').write_text('\n'.join(sorted(imports)) + '\n\n' + '\n'.join(functions))
+    run('documentation-resolve', ['swift', 'package', 'resolve'], cwd=snippet_package)
     run('documentation-snippets', ['swift', 'build', '--force-resolved-versions'], cwd=snippet_package)
     shutil.rmtree(snippet_package / '.build')
     destinations = {'iOS': 'iOS Simulator', 'tvOS': 'tvOS Simulator', 'watchOS': 'watchOS Simulator', 'visionOS': 'visionOS Simulator'}
