@@ -104,7 +104,8 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0"),
-    .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.12.0"),
+    // The generator integration uses an internal API that can change in minor releases.
+    .package(url: "https://github.com/apple/swift-openapi-generator", exact: "1.12.0"),
     .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.11.0"),
     .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.3.0"),
     .package(url: "https://github.com/apple/swift-http-types", from: "1.0.0"),
