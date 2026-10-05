@@ -60,8 +60,20 @@ PY
   "$cli" --version > .build/release-validation/cli-version.txt
   diff VERSION .build/release-validation/cli-version.txt
   "$cli" --help > .build/release-validation/cli-help.txt
-  "$cli" --generate-completion-script zsh > .build/release-validation/completion.zsh
+  for completion_shell in zsh bash fish; do
+    "$cli" --generate-completion-script "$completion_shell" > ".build/release-validation/completion.$completion_shell"
+  done
   "$cli" workflow dry-run public-release-readiness --app-id example-app > .build/release-validation/cli-dry-run.txt
+  python3 - "$cli" <<'PY'
+import hashlib, json, pathlib, shutil, sys
+binary = pathlib.Path(sys.argv[1]).resolve()
+products = binary.parent
+products.relative_to(pathlib.Path('.build').resolve())
+receipt = {'version': pathlib.Path('VERSION').read_text().strip(),
+           'binary_sha256': hashlib.sha256(binary.read_bytes()).hexdigest()}
+pathlib.Path('.build/release-validation/cli-binary.json').write_text(json.dumps(receipt, indent=2) + '\n')
+shutil.rmtree(products)
+PY
   Scripts/check-docs
   Scripts/check-consumer
 fi

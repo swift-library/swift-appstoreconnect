@@ -22,10 +22,11 @@ def main():
     evidence.mkdir(parents=True, exist_ok=True)
     work = root / '.build/documentation'
     graphs = work / 'symbol-graphs'
-    if graphs.exists():
-        shutil.rmtree(graphs)
+    if work.exists():
+        shutil.rmtree(work)
     graphs.mkdir(parents=True)
-    result = subprocess.run(['swift', 'build', '--build-system', 'native', '--traits', 'Experimental,default',
+    result = subprocess.run(['swift', 'build', '--build-system', 'native', '--scratch-path', str(work / 'build'),
+                             '--traits', 'Experimental,default',
                              '--force-resolved-versions', '--disable-index-store', '-debug-info-format', 'none',
                              '-Xswiftc', '-emit-symbol-graph', '-Xswiftc', '-emit-symbol-graph-dir', '-Xswiftc', str(graphs)], cwd=root,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
