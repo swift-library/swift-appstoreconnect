@@ -29,9 +29,10 @@ the complete formatting configuration. Local checks run both scopes.
 
 ## Supported Environments
 
-Package.swift declares Swift tools 6.3 and deployment floors of iOS 16,
-macOS 13, tvOS 16, watchOS 9 and visionOS 1. `.github/release.json` owns
-compiler and platform validation settings. CI selects Xcode 26.4 and 26.6;
+The supported system window is each platform's latest three major releases.
+Package.swift declares Swift tools 6.3 and uses the oldest release in that
+window as its deployment floor. `.github/release.json` records the window and
+owns compiler and platform validation settings. CI selects Xcode 26.4 and 26.6;
 local evidence records the selected compiler and SDKs.
 
 Repository tests, release builds and symbol extraction use SwiftPM's native

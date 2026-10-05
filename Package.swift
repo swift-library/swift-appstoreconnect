@@ -25,11 +25,11 @@ let experimentalSwiftSettings: [SwiftSetting] = [
 let package = Package(
   name: "swift-appstoreconnect",
   platforms: [
-    .iOS(.v16),
-    .macOS(.v13),
-    .tvOS(.v16),
-    .watchOS(.v9),
-    .visionOS(.v1),
+    .iOS(.v18),
+    .macOS(.v15),
+    .tvOS(.v18),
+    .watchOS(.v11),
+    .visionOS(.v2),
   ],
   products: [
     .library(name: "AppStoreConnectCore", targets: ["AppStoreConnectCore"]),
