@@ -73,7 +73,9 @@ prefixes = {str(pathlib.Path.cwd()): '<package>', str(pathlib.Path.home()): '<ho
             subprocess.check_output(['xcode-select', '-p'], text=True).strip(): '<developer>'}
 if tempfile.gettempdir().startswith('/var/'):
     prefixes['/private' + tempfile.gettempdir()] = '<temporary>'
-for path in root.glob('*.log'):
+for path in root.iterdir():
+    if path.suffix not in ('.log', '.json', '.txt', '.zsh', '.bash', '.fish'):
+        continue
     if path.name == 'check.log':
         continue
     log = path.read_text(errors='replace')
@@ -99,7 +101,7 @@ if result['scope'] in ('all', 'compiler'):
     result['documentation'] = json.loads((root / 'documentation.json').read_text())
     result['consumer'] = json.loads((root / 'consumer.json').read_text())
 result['checker_digests'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in pathlib.Path('Scripts').iterdir() if p.is_file()}
-result['log_paths'] = 'package, home, temporary and developer directory prefixes normalized'
+result['evidence_paths'] = 'package, home, temporary and developer directory prefixes normalized in text receipts and logs'
 (root / 'provenance.json').write_text(json.dumps(result, indent=2) + '\n')
 PY
 echo 'checks ok'
