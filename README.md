@@ -1,311 +1,184 @@
-# swift-appstoreconnect
+<p align="center">
+  <img src="Documentation/Assets/Logo.svg" width="160" alt="swift-appstoreconnect logo">
+</p>
 
-`swift-appstoreconnect` is a Swift package foundation for App Store Connect research and automation. The package is organized as all-Swift targets for public API access, private Iris API research, Apple Account web-session handling, and higher-level release workflows.
+<h1 align="center">swift-appstoreconnect</h1>
 
-## Package Shape
+<p align="center">
+  Typed App Store Connect clients, workflow plans, and command-line tools for Swift.
+</p>
 
-- `AppStoreConnectCore`: shared HTTP, environment, error, retry, pagination, and upload foundations.
-- `AppStoreConnectPublicAPI`: public App Store Connect API bindings, trait-aligned Apple typed clients, and generated capability facades.
-- `AppStoreConnectWebSession`: Apple Account web-session provider, cookie, browser/session-file, and cache primitives; SRP/2FA remain Phase 2 work.
-- `AppStoreConnectIrisAPI`: `/iris/v1` private API client and models.
-- `AppStoreConnectWorkflow`: built-in workflows, workflow-file runner, and runtime composition.
-- `AppStoreConnectCLI`: thin executable command surface over workflow APIs.
+<p align="center">
+  <a href="https://github.com/swift-library/swift-appstoreconnect/actions/workflows/ci.yml"><img src="https://github.com/swift-library/swift-appstoreconnect/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI"></a>
+  <img src="https://img.shields.io/badge/Swift-6.3%2B-F05138" alt="Swift 6.3+">
+  <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License: Apache-2.0 WITH Swift-exception"></a>
+</p>
 
-## Current Scope
+[Overview](#overview) · [Install](#install) · [Quick start](#quick-start) ·
+[CLI](#cli) · [Traits](#traits) · [Requirements](#requirements) ·
+[Documentation](#documentation) · [Contributing](#contributing) · [License](#license)
 
-The current package is a compilable foundation. It establishes module
-boundaries, Core request/transport/auth/pagination/upload primitives, locked
-public API schema inputs, an Apple-generator selected typed public API client
-path with SwiftPM trait-aligned expansion toward full typed coverage, generated
-PublicAPI capability facades, workflow
-dry-run scaffolding, one PublicAPI-backed workflow slice, deterministic
-WebSession providers/cache, one fixture-backed Iris endpoint baseline, and a
-thin CLI plus workflow-file runner with the first PublicAPI-backed read
-commands for apps, builds, App Store versions, and TestFlight beta
-groups/testers plus signing/provisioning bundle IDs, certificates, devices,
-profiles including decoded certificate/profile content download/export, users, user
-invitations, build beta details, and prerelease versions,
-including build processing-state polling and TestFlight build namespace
-aliases. It also exposes review submission reads, TestFlight feedback/crash
-reads, TestFlight metrics reads, TestFlight beta tester invitation
-dry-run/confirmed create, TestFlight group/tester core mutations, beta review
-detail update and submission create, app update, App Store version
-create/update/delete/release-request mutations, review submission
-create/update/submit/cancel mutations, review item create/update/delete
-mutations, signing/provisioning bundle ID/certificate/device/profile core
-mutations, user invitation/user role/visibility/delete mutations, trait-gated
-actor read commands under `PublicAPISigningAccess`, trait-gated commerce core
-commands for IAP reads/mutations, subscriptions, promoted purchases, win-back
-offers, and app pricing reads under `PublicAPICommerce`,
-analytics report/request/segment/instance commands, sales and finance report
-downloads, trait-gated performance metrics commands, trait-gated app category
-read/write commands, age-rating view/update commands, and app-event core
-read/write commands plus customer review list/view/rating-summary/response
-commands under `PublicAPIRelease`, trait-gated territory list and EULA
-read/write commands plus
-alternative distribution, marketplace webhook, and webhook read commands under
-`PublicAPIDistribution`, including webhook create/update/delete, delivery
-linkage, redelivery, and ping dry-run/confirmed commands, trait-gated App Clips
-read commands under `PublicAPIMetadataMedia`, and trait-gated Game Center
-detail, achievement, leaderboard, leaderboard set, and challenge read commands
-under `PublicAPIGameCenter`,
-local Xcode version/archive/export/upload handoff commands and publish
-appstore/testflight workflow dry-run planners,
-metadata JSON validation plus metadata pull/push/keyword dry-run planners,
-screenshots list/view commands, and video-preview list/view commands,
-local schema introspection, registry-backed shell completion, and a snapshot
-release/review status read command.
+> [!NOTE]
+> swift-appstoreconnect is pre-1.0. Minor releases may include source-breaking
+> changes, so depend on it with `.upToNextMinor(from:)`.
 
-## Documentation
+## Overview
 
-- [Docs/README.md](Docs/README.md): documentation index.
-- [Docs/Architecture/README.md](Docs/Architecture/README.md): current architecture truth index.
-- [Docs/Architecture/Layering.md](Docs/Architecture/Layering.md): target boundaries.
-- [Docs/Architecture/TechnicalDesign.md](Docs/Architecture/TechnicalDesign.md): implementation contract.
-- [Docs/Architecture/Codegen.md](Docs/Architecture/Codegen.md): public API code generation design.
-- [Docs/Architecture/Workflow.md](Docs/Architecture/Workflow.md): workflow model.
+Build App Store Connect integrations with typed requests, explicit credentials,
+and serializable workflow plans. The Public API client is generated from the
+locked Apple OpenAPI specification. Domain traits select the API surface your
+application needs.
 
-## Validation
+| Product | Purpose |
+| --- | --- |
+| `AppStoreConnectCore` | Requests, transports, JWT credentials, retries, pagination, and upload primitives. |
+| `AppStoreConnectPublicAPI` | Generated typed clients and capability facades. |
+| `AppStoreConnectWorkflow` | Domain commands, built-in plans, and the workflow-file runner. |
+| `AppStoreConnectWebSession` | Experimental cookie inputs, providers, and JSON session storage. |
+| `AppStoreConnectIrisAPI` | Experimental read-only Iris endpoint access. |
+| `appstoreconnect` | Command-line interface over Workflow. |
 
-```bash
-swift test
-swift test --traits PublicAPICommerce,default
-swift test --traits PublicAPIReports,default
-swift test --traits PublicAPIRelease,default
-swift test --traits PublicAPISigningAccess,default
-swift test --traits PublicAPIDistribution,default
-swift test --traits PublicAPIGameCenter,PublicAPIMetadataMedia,default
+Supported Public API commands include app and build reads, TestFlight,
+signing and provisioning, review submissions, commerce, reports, and
+trait-selected domain operations. Implemented CLI writes are dry-run by default.
+App Store/TestFlight publishing and metadata pull/push currently produce plans;
+end-to-end publishing, metadata apply, resumable media upload, live Apple Account
+login, and Iris writes are unavailable. See the
+[command guide](Sources/AppStoreConnectCLI/AppStoreConnectCLI.docc/CommandGuide.md)
+for command-specific behavior.
+
+## Install
+
+Add the dependency and select the products your target imports:
+
+```swift
+dependencies: [
+    .package(
+        url: "https://github.com/swift-library/swift-appstoreconnect.git",
+        .upToNextMinor(from: "0.1.0")
+    )
+],
+targets: [
+    .target(
+        name: "YourTarget",
+        dependencies: [
+            .product(name: "AppStoreConnectCore", package: "swift-appstoreconnect"),
+            .product(name: "AppStoreConnectPublicAPI", package: "swift-appstoreconnect"),
+            .product(name: "AppStoreConnectWorkflow", package: "swift-appstoreconnect")
+        ]
+    )
+]
+```
+
+## Quick start
+
+Construct a typed client with an existing JWT. This example creates the client
+without sending a request; replace the example token through your application's
+credential input before making live calls.
+
+```swift
+import AppStoreConnectCore
+import AppStoreConnectPublicAPI
+
+let client = AppStoreConnectPublicClient(
+    client: Client.appStoreConnectURLSession(
+        credential: AppStoreConnectBearerToken(token: "example-token")
+    )
+)
+let apps = client.apps
+```
+
+To sign tokens in your application, use `AppStoreConnectJWTSigningKey` with
+`AppStoreConnectJWTSigner` and `AppStoreConnectCachedJWTCredential`. The key-file
+loader requires an owned regular file with no group or other permissions.
+
+Create a workflow plan without credentials or network access:
+
+```swift
+import AppStoreConnectWorkflow
+
+let workflow = WorkflowRunner().dryRun(.publishAppStore)
+let steps = workflow.steps
 ```
 
 ## CLI
 
-```bash
-swift run appstoreconnect commands list
-swift run appstoreconnect workflows list
-swift run appstoreconnect workflow list
-swift run appstoreconnect workflow dry-run public-release-readiness --app-id <app-id>
-swift run appstoreconnect workflow run public-release-readiness --app-id <app-id>
-swift run appstoreconnect workflow validate --file .asc/workflow.json
-swift run appstoreconnect workflow run --file .asc/workflow.json
-swift run appstoreconnect workflow-file dry-run --path .asc/workflow.json
-swift run appstoreconnect workflow-file run --path .asc/workflow.json
-swift run appstoreconnect apps list --limit 10
-swift run appstoreconnect apps view --id <app-id>
-swift run appstoreconnect apps update --id <app-id> --primary-locale en-US --dry-run
-swift run appstoreconnect builds list --app <app-id> --limit 10
-swift run appstoreconnect builds info --build-id <build-id>
-swift run appstoreconnect builds info --app <app-id> --latest
-swift run appstoreconnect builds wait --build-id <build-id> --target-processing-state VALID
-swift run appstoreconnect builds beta-details list --build <build-id>
-swift run appstoreconnect prerelease list --app <app-id> --platform IOS
-swift run appstoreconnect versions list --app <app-id> --platform IOS
-swift run appstoreconnect versions view --id <app-store-version-id>
-swift run appstoreconnect versions create --app <app-id> --version 1.3.0 --platform IOS --dry-run
-swift run appstoreconnect versions update --id <app-store-version-id> --build <build-id> --dry-run
-swift run appstoreconnect versions delete --id <app-store-version-id> --dry-run
-swift run appstoreconnect versions release --id <app-store-version-id> --dry-run
-swift run appstoreconnect testflight builds list --app <app-id> --limit 10
-swift run appstoreconnect testflight builds wait --build-id <build-id> --target-processing-state VALID
-swift run appstoreconnect testflight builds localizations list --build <build-id> --locale en-US
-swift run appstoreconnect testflight groups list --app <app-id>
-swift run appstoreconnect testflight groups view --id <group-id>
-swift run appstoreconnect testflight groups create --app <app-id> --name "Internal" --dry-run
-swift run appstoreconnect testflight groups update --id <group-id> --name "Internal Beta" --dry-run
-swift run appstoreconnect testflight groups delete --id <group-id> --dry-run
-swift run appstoreconnect testflight testers list --group <group-id>
-swift run appstoreconnect testflight testers view --id <tester-id>
-swift run appstoreconnect testflight testers create --email tester@example.com --group <group-id> --dry-run
-swift run appstoreconnect testflight testers delete --id <tester-id> --dry-run
-swift run appstoreconnect testflight app-localizations list --app <app-id> --locale en-US
-swift run appstoreconnect testflight build-localizations list --build <build-id> --locale en-US
-swift run appstoreconnect testflight review-details list --app <app-id>
-swift run appstoreconnect testflight review-details update --id <review-detail-id> --contact-email review@example.com --dry-run
-swift run appstoreconnect testflight review-submissions list --build <build-id> --beta-review-state IN_REVIEW
-swift run appstoreconnect testflight review-submissions create --build <build-id> --dry-run
-swift run appstoreconnect testflight license-agreements list --app <app-id>
-swift run appstoreconnect testflight invitations create --app <app-id> --dry-run
-swift run appstoreconnect bundle-ids list --identifier <bundle-id> --platform IOS
-swift run appstoreconnect bundle-ids create --identifier com.example.app --name "Example App" --platform IOS --dry-run
-swift run appstoreconnect bundle-ids update --id <bundle-id-resource-id> --name "Example App" --dry-run
-swift run appstoreconnect bundle-ids delete --id <bundle-id-resource-id> --dry-run
-swift run appstoreconnect certificates list --certificate-type IOS_DEVELOPMENT
-swift run appstoreconnect certificates download --id <certificate-id> --output ./certificate.cer
-swift run appstoreconnect certificates create --certificate-type IOS_DEVELOPMENT --csr-path ./CertificateSigningRequest.certSigningRequest --dry-run
-swift run appstoreconnect certificates revoke --id <certificate-id> --dry-run
-swift run appstoreconnect devices list --status ENABLED --platform IOS
-swift run appstoreconnect devices register --name "QA iPhone" --udid <udid> --platform IOS --dry-run
-swift run appstoreconnect devices disable --id <device-id> --dry-run
-swift run appstoreconnect profiles list --profile-type IOS_APP_STORE
-swift run appstoreconnect profiles download --id <profile-id> --output ./profile.mobileprovision
-swift run appstoreconnect profiles create --name "Example App Store" --profile-type IOS_APP_STORE --bundle-id <bundle-id-resource-id> --certificate <certificate-id> --dry-run
-swift run appstoreconnect profiles delete --id <profile-id> --dry-run
-swift run appstoreconnect users list --role DEVELOPER
-swift run appstoreconnect users update --id <user-id> --role APP_MANAGER --visible-app <app-id> --dry-run
-swift run appstoreconnect users delete --id <user-id> --dry-run
-swift run appstoreconnect users invite --email user@example.com --first-name Example --last-name User --role DEVELOPER --dry-run
-swift run appstoreconnect users invitations list --email user@example.com
-swift run appstoreconnect users invitations create --email user@example.com --first-name Example --last-name User --role DEVELOPER --dry-run
-swift run appstoreconnect users invitations delete --id <invitation-id> --dry-run
-swift run appstoreconnect xcode version
-swift run appstoreconnect xcode archive --workspace App.xcworkspace --scheme App --archive-path ./build/App.xcarchive --dry-run
-swift run appstoreconnect xcode export --archive-path ./build/App.xcarchive --export-path ./build/export --export-options-plist ./ExportOptions.plist --dry-run
-swift run appstoreconnect xcode upload --file ./build/App.ipa --api-key <key-id> --api-issuer <issuer-id> --dry-run
-swift run appstoreconnect metadata validate --path ./metadata
-swift run appstoreconnect metadata pull --app <app-id> --version-id <app-store-version-id> --locale en-US --path ./metadata --dry-run
-swift run appstoreconnect metadata push --path ./metadata --dry-run
-swift run appstoreconnect metadata keywords --id <app-store-version-localization-id> --keywords "productivity,calendar" --dry-run
-swift run appstoreconnect screenshots list --set <app-screenshot-set-id>
-swift run appstoreconnect screenshots view --id <app-screenshot-id>
-swift run appstoreconnect video-previews list --set <app-preview-set-id>
-swift run appstoreconnect video-previews view --id <app-preview-id>
-swift run --traits PublicAPISigningAccess,default appstoreconnect actors list --field actorType,userEmail
-swift run --traits PublicAPISigningAccess,default appstoreconnect actors view --id <actor-id>
-swift run --traits PublicAPICommerce,default appstoreconnect iap list --app <app-id> --type consumable --state approved
-swift run --traits PublicAPICommerce,default appstoreconnect iap create --app <app-id> --name "Coin Pack" --product-id coins100 --type consumable --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect iap submit --id <in-app-purchase-id> --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect iap localizations create --iap <in-app-purchase-id> --locale en-US --name "Coin Pack" --description "100 coins" --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect subscription-groups create --app <app-id> --reference-name "Premium" --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect subscription-groups localizations create --group <subscription-group-id> --locale en-US --name "Premium" --custom-app-name "Example Premium" --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect subscriptions list --group <subscription-group-id>
-swift run --traits PublicAPICommerce,default appstoreconnect subscriptions create --group <subscription-group-id> --name "Premium Monthly" --product-id premium.monthly --period one-month --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect subscriptions submit --id <subscription-id> --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect subscriptions localizations create --subscription <subscription-id> --locale en-US --name "Premium Monthly" --description "Monthly access" --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect promoted-purchases list --app <app-id> --include iap
-swift run --traits PublicAPICommerce,default appstoreconnect promoted-purchases create --app <app-id> --iap <in-app-purchase-id> --visible-for-all-users true --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect win-back-offers list --subscription <subscription-id>
-swift run --traits PublicAPICommerce,default appstoreconnect win-back-offers create --subscription <subscription-id> --reference-name "Come Back" --offer-id come_back --duration one-month --offer-mode pay-as-you-go --period-count 1 --paid-subscription-months 3 --last-subscribed-min-months 1 --last-subscribed-max-months 12 --start-date 2026-05-10 --priority normal --price <win-back-offer-price-id> --dry-run
-swift run --traits PublicAPICommerce,default appstoreconnect pricing tiers --app <app-id> --territory USA
-swift run --traits PublicAPICommerce,default appstoreconnect pricing current --app <app-id> --include-base-territory --include-manual-prices
-swift run appstoreconnect analytics reports view --id <analytics-report-id>
-swift run appstoreconnect analytics request create --app <app-id> --access-type one-time-snapshot --dry-run
-swift run appstoreconnect analytics request view --id <analytics-report-request-id>
-swift run appstoreconnect analytics segments view --id <analytics-report-segment-id>
-swift run appstoreconnect analytics instances view --id <analytics-report-instance-id>
-swift run appstoreconnect finance reports --vendor-number <vendor-number> --region-code US --report-date 2026-04 --output-path ./finance.gz
-swift run appstoreconnect reports sales --vendor-number <vendor-number> --frequency daily --report-date 2026-05-09 --output-path ./sales.gz
-swift run --traits PublicAPIReports,default appstoreconnect performance list --app <app-id> --metric-type hang --platform IOS
-swift run --traits PublicAPIReports,default appstoreconnect performance download --build <build-id> --metric-type launch --output-path ./performance.json
-swift run --traits PublicAPIRelease,default appstoreconnect categories list --platform IOS --root-only
-swift run --traits PublicAPIRelease,default appstoreconnect categories view --id <category-id>
-swift run --traits PublicAPIRelease,default appstoreconnect categories parent --id <category-id>
-swift run --traits PublicAPIRelease,default appstoreconnect categories subcategories --id <category-id> --limit 25
-swift run --traits PublicAPIRelease,default appstoreconnect categories set --app-info-id <app-info-id> --primary-category <category-id> --primary-subcategory-one <subcategory-id> --dry-run
-swift run --traits PublicAPIRelease,default appstoreconnect age-rating view --app-info-id <app-info-id>
-swift run --traits PublicAPIRelease,default appstoreconnect age-rating update --id <age-rating-declaration-id> --all-none --dry-run
-swift run --traits PublicAPIRelease,default appstoreconnect app-events list --app <app-id> --state DRAFT
-swift run --traits PublicAPIRelease,default appstoreconnect app-events create --app <app-id> --reference-name "Launch Event" --badge LIVE_EVENT --purpose ATTRACT_NEW_USERS --dry-run
-swift run --traits PublicAPIRelease,default appstoreconnect app-events update --id <app-event-id> --reference-name "Updated Launch Event" --dry-run
-swift run --traits PublicAPIRelease,default appstoreconnect app-events delete --id <app-event-id> --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect alternative-distribution domains list --field domain,referenceName,createdDate
-swift run --traits PublicAPIDistribution,default appstoreconnect alternative-distribution keys list --exists-app true --field publicKey
-swift run --traits PublicAPIDistribution,default appstoreconnect marketplace webhooks list --field endpointUrl
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks list --app <app-id> --field name,url,enabled,eventTypes
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks create --app <app-id> --name "Release hook" --url https://example.com/asc --secret <secret> --events BUILD_UPLOAD_STATE_UPDATED --enabled true --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks update --id <webhook-id> --name "Release hook updated" --enabled false --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks delete --id <webhook-id> --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks deliveries --id <webhook-id> --state SUCCEEDED
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks deliveries links --id <webhook-id>
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks deliveries redeliver --delivery-id <delivery-id> --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect webhooks ping --id <webhook-id> --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect territories list --field currency
-swift run --traits PublicAPIDistribution,default appstoreconnect eula view --id <eula-id> --include-territories
-swift run --traits PublicAPIDistribution,default appstoreconnect eula create --app <app-id> --text-path ./EULA.txt --territory USA,CAN --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect eula update --id <eula-id> --text "Updated EULA text" --dry-run
-swift run --traits PublicAPIDistribution,default appstoreconnect eula delete --id <eula-id> --dry-run
-swift run --traits PublicAPICloud,default appstoreconnect xcode-cloud products list --type APP --include-app
-swift run --traits PublicAPICloud,default appstoreconnect xcode-cloud workflows list --product <ci-product-id> --include-repository
-swift run --traits PublicAPICloud,default appstoreconnect xcode-cloud runs list --workflow <ci-workflow-id> --sort -number
-swift run --traits PublicAPICloud,default appstoreconnect xcode-cloud actions list --run <ci-build-run-id>
-swift run --traits PublicAPICloud,default appstoreconnect xcode-cloud logs list --action <ci-build-action-id>
-swift run --traits PublicAPIMetadataMedia,default appstoreconnect app-clips list --app <app-id> --include-default-experiences
-swift run --traits PublicAPIMetadataMedia,default appstoreconnect app-clips default-experiences list --app-clip <app-clip-id> --include-localizations
-swift run --traits PublicAPIMetadataMedia,default appstoreconnect app-clips localizations view --id <app-clip-localization-id>
-swift run --traits PublicAPIGameCenter,default appstoreconnect game-center details app --app <app-id> --include-achievements --include-leaderboards
-swift run --traits PublicAPIGameCenter,default appstoreconnect game-center achievements list --detail <game-center-detail-id>
-swift run --traits PublicAPIGameCenter,default appstoreconnect game-center leaderboards view --id <leaderboard-id>
-swift run --traits PublicAPIGameCenter,default appstoreconnect game-center leaderboard-sets list --detail <game-center-detail-id>
-swift run --traits PublicAPIGameCenter,default appstoreconnect game-center challenges view --id <challenge-id>
-swift run appstoreconnect publish appstore --dry-run
+From a source checkout, inspect the command registry and preview a workflow:
+
+```sh
+swift run appstoreconnect commands list --json
+swift run appstoreconnect workflow dry-run public-release-readiness --app-id example-app
 swift run appstoreconnect publish testflight --dry-run
-swift run --traits PublicAPIRelease,default appstoreconnect reviews list --app <app-id> --territory USA --rating 5
-swift run --traits PublicAPIRelease,default appstoreconnect reviews view --id <customer-review-id> --include-response
-swift run --traits PublicAPIRelease,default appstoreconnect reviews ratings --app <app-id> --platform IOS --territory USA
-swift run --traits PublicAPIRelease,default appstoreconnect reviews response view --review <customer-review-id>
-swift run --traits PublicAPIRelease,default appstoreconnect reviews responses create --review <customer-review-id> --body "Thanks for the review." --dry-run
-swift run --traits PublicAPIRelease,default appstoreconnect reviews responses delete --id <customer-review-response-id> --dry-run
-swift run appstoreconnect review submissions list --app <app-id> --review-state IN_REVIEW
-swift run appstoreconnect review submissions create --app <app-id> --platform IOS --dry-run
-swift run appstoreconnect review submissions submit --id <review-submission-id> --dry-run
-swift run appstoreconnect review submissions cancel --id <review-submission-id> --dry-run
-swift run appstoreconnect review items create --review-submission-id <review-submission-id> --version-id <app-store-version-id> --dry-run
-swift run appstoreconnect review items update --id <review-submission-item-id> --resolved true --dry-run
-swift run appstoreconnect review items delete --id <review-submission-item-id> --dry-run
-swift run appstoreconnect submit status --id <review-submission-id>
-swift run appstoreconnect status --app <app-id> --version-id <app-store-version-id>
-swift run appstoreconnect validate --app <app-id> --dry-run
-swift run appstoreconnect schema --json
-swift run appstoreconnect schema path
-swift run appstoreconnect completion zsh
-swift run appstoreconnect auth status --include-cookie-names
-swift run appstoreconnect auth doctor --session-file ~/.appstoreconnect/web-session.json
-swift run appstoreconnect auth logout --session-file ~/.appstoreconnect/web-session.json --dry-run
 ```
 
-Run commands, PublicAPI read commands, and confirmed PublicAPI write commands
-require `ASC_API_TOKEN`; dry-run commands do not require live network or
-credentials. Commands accepted but not executable yet return
-a structured unsupported result instead of being treated as unknown.
-Auth commands inspect deterministic WebSession sources and do not require
-`ASC_API_TOKEN`; live Apple Account login remains blocked until a dedicated
-WebSession provider exists.
-Local `xcode` commands are Workflow-owned handoffs. `xcode version` is
-read-only; `archive`, `export`, and `upload` default to dry-run and require
-`--confirm` before invoking local Xcode or Apple upload tooling.
-Commerce commands require enabling the `PublicAPICommerce` SwiftPM trait so the
-Apple generated commerce operations are present in `AppStoreConnectPublicAPI`,
-`AppStoreConnectWorkflow`, and `AppStoreConnectCLI`. The commerce trait covers
-IAP/subscription/subscription-group localization list/view/create/update/delete
-commands in addition to core IAP, subscription, promoted-purchase,
-win-back-offer, and pricing commands.
-Sales and finance report commands write Apple's binary gzip response body to the
-requested output path.
-Performance metrics commands require enabling the `PublicAPIReports` SwiftPM
-trait. They call Apple's generated perf power metrics operations for app or
-build scope and can either render a summary or write the raw metrics JSON body.
-App category list/view/parent/subcategories/set and age-rating view/update
-commands require enabling the `PublicAPIRelease` SwiftPM trait. They call
-Apple's generated app category, app-info category relationship, and
-age-rating declaration operations. Category and age-rating writes are
-dry-run-first and require explicit confirmation for live mutation. Customer
-review list/view/rating-summary and response read/write commands also require
-`PublicAPIRelease` and call Apple's generated customer review and customer
-review response operations.
-`publish appstore` and `publish testflight` currently expose executable
-Workflow dry-run plans; live end-to-end publish remains an explicit workflow
-execution follow-up rather than a claimed CLI mutation.
-App-event core list/view/create/update/delete commands use the same release trait;
-app-event localizations and deeper schedule helpers remain metadata/media
-follow-up slices.
-Metadata commands currently provide local JSON validation and dry-run plans for
-pull, push, and keyword updates. Screenshots and video previews provide typed
-set/asset read commands over Apple's generated media operations. Localization
-upload/update and media upload/download/poster-frame commands are intentionally
-blocked until the package metadata directory and resumable media contracts are
-finalized.
-Actor list/view commands require enabling the `PublicAPISigningAccess` SwiftPM
-trait. They call Apple's generated actor collection and instance operations;
-WebSession login/account commands stay separate from public actor reads.
-Territory list and EULA view/get/create/update/edit/delete/remove commands require enabling the
-`PublicAPIDistribution` SwiftPM trait. Alternative distribution domain/key
-reads, marketplace webhook list, and webhook list/view/get/deliveries/linkages
-commands use Apple's generated distribution operations in the same trait,
-including the app-scoped webhook list operation that Apple tags under `Apps`.
-Webhook create/update/delete, delivery redelivery, and ping commands route
-through `PublicAPIWriteCommands` with serializable dry-run plans and require
-`--confirm` for live mutation. Dry-run output records webhook secret length but
-does not render the secret value.
-Territory and EULA commands call Apple's generated territory collection and
-end-user license agreement collection/instance operations. EULA create/update
-plans record `agreementTextLength` instead of rendering full agreement text;
-generic `agreements` remains blocked because Apple's official schema does not
-expose a generic agreements list/view API.
+![A terminal showing the version and TestFlight workflow plan](Documentation/Assets/TerminalDemo.svg)
+
+Live Public API reads and supported writes use the caller-provided JWT in
+`ASC_API_TOKEN`. For example, `swift run appstoreconnect apps list --limit 10`
+reads apps visible to that credential. Supported mutations require `--confirm`;
+plan-only commands return an unsupported result when asked to execute.
+
+`commands list --json` distinguishes implemented commands, aliases, blocked
+commands, and commands outside the package's scope. An implemented command may
+provide planning only. Local Xcode archive, export, and upload commands require
+macOS to execute and also require `--confirm`.
+
+## Traits
+
+`PublicAPIBase` is enabled by default. Disabling default traits still retains the
+baseline needed by Workflow and CLI. Choose domain traits for additional typed
+operations; `PublicAPIFull` enables all Public API domains and increases generated
+source and compilation work. It does not enable `Experimental`.
+
+| Trait | Additional API domain |
+| --- | --- |
+| `PublicAPIRelease` | Release, metadata, review, availability, and app events. |
+| `PublicAPITestFlight` | Builds and TestFlight. |
+| `PublicAPIMetadataMedia` | Localizations, screenshots, previews, custom product pages, and App Clips. |
+| `PublicAPICommerce` | Purchases, subscriptions, prices, and offers. |
+| `PublicAPIReports` | Analytics, metrics, sales, and finance reports. |
+| `PublicAPISigningAccess` | Signing, provisioning, users, and access. |
+| `PublicAPICloud` | Xcode Cloud and source-control integration. |
+| `PublicAPIGameCenter` | Game Center. |
+| `PublicAPIDistribution` | Alternative distribution, marketplaces, webhooks, and territories. |
+
+For example, enable commerce while keeping defaults:
+
+```sh
+swift run --traits PublicAPICommerce,default appstoreconnect iap list --app example-app
+```
+
+`Experimental` is default-off. It enables WebSession, Iris, and their Workflow/CLI
+paths; the WebSession and Iris products have no experimental declarations without
+it. Session providers consume explicit cookie, session-file, or
+browser-cookie-file input. They do not perform interactive account login.
+
+## Requirements
+
+Swift 6.3 or later; iOS 18, macOS 15, tvOS 18, watchOS 11, or visionOS 2 or later.
+Local Xcode process execution requires macOS. Package checks cover the default,
+disabled-default, full Public API, and experimental trait configurations, plus
+independent consumer builds. Simulator compilation checks deployment floors;
+live API access requires your own credentials and is excluded from public CI.
+
+## Documentation
+
+- [API documentation](https://swift-library.github.io/swift-appstoreconnect/): module reference and usage.
+- [Command guide](Sources/AppStoreConnectCLI/AppStoreConnectCLI.docc/CommandGuide.md): commands, traits, and execution boundaries.
+- [Documentation index](Docs/README.md): module design and architecture.
+- [Versioning and release](Documentation/Architecture/VersioningAndRelease.md): compatibility and release policy.
+- [Specification lock](Vendor/AppStoreConnectOpenAPI/spec.lock.json): Apple specification source and checksums.
+- [Changelog](CHANGELOG.md): release history.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Run `Scripts/check` for the complete
+package checks and `Scripts/check-docs` for the six-module documentation build.
+Report security issues through [SECURITY.md](SECURITY.md).
+
+## License
+
+Package code is licensed under [Apache-2.0 with the Swift exception](LICENSE.txt).
+Apple's specification is governed separately; see [NOTICE](NOTICE) for its
+ownership and applicable terms. This independent project is not affiliated with
+or endorsed by Apple. App Store Connect is a trademark of Apple Inc.

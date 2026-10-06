@@ -311,6 +311,56 @@ import Testing
   #expect(next.headers["Authorization"] == "Bearer token")
 }
 
+@Test(arguments: [
+  "https://unrelated.invalid/v1/apps",
+  "http://api.appstoreconnect.apple.com/v1/apps",
+  "https://api.appstoreconnect.apple.com:444/v1/apps",
+  "https://token@api.appstoreconnect.apple.com/v1/apps",
+])
+func authenticatedPaginationRejectsUntrustedDestinations(nextURL: String) async throws {
+  let fixture = AppStoreConnectTransportFixture(responses: [.init(statusCode: 200)])
+  let credential = RecordingCredential()
+  let transport = AppStoreConnectAuthenticatedTransport(
+    base: AppStoreConnectFixtureTransport(fixture: fixture), credential: credential)
+  let request = try #require(
+    AppStoreConnectPaginator().nextRequest(
+      after: .init(method: .get, path: "/v1/apps", headers: ["Authorization": "Bearer previous"]),
+      links: .init(next: try #require(URL(string: nextURL)))))
+
+  await #expect(
+    throws: AppStoreConnectError.authenticationFailed(
+      "Authenticated request must use the environment's HTTP origin.")
+  ) {
+    try await transport.send(request, in: .publicAPI)
+  }
+  #expect(await credential.calls == 0)
+  #expect(await fixture.requests().isEmpty)
+}
+
+@Test(arguments: [
+  "/v1/apps",
+  "https://api.appstoreconnect.apple.com/v1/apps?cursor=next",
+  "https://API.APPSTORECONNECT.APPLE.COM:443/v1/apps?cursor=next",
+])
+func authenticatedTransportAcceptsEquivalentOrigins(path: String) async throws {
+  let fixture = AppStoreConnectTransportFixture(responses: [.init(statusCode: 200)])
+  let transport = AppStoreConnectAuthenticatedTransport(
+    base: AppStoreConnectFixtureTransport(fixture: fixture),
+    credential: AppStoreConnectBearerToken(token: "fixture"))
+  _ = try await transport.send(.init(method: .get, path: path), in: .publicAPI)
+  let requests = await fixture.requests()
+  #expect(requests.count == 1)
+  #expect(requests.first?.request.headers["Authorization"] == "Bearer fixture")
+}
+
+private actor RecordingCredential: AppStoreConnectCredential {
+  private(set) var calls = 0
+  func authorizationHeaderValue() async throws -> String {
+    calls += 1
+    return "Bearer fixture"
+  }
+}
+
 @Test func uploadOperationKeepsChunkMetadata() throws {
   let operation = AppStoreConnectUploadOperation(
     method: .put,
@@ -330,6 +380,27 @@ import Testing
   #expect(uploadRequest.path == "https://example.com/upload")
   #expect(uploadRequest.headers["Content-Type"] == "application/octet-stream")
   #expect(String(data: try #require(uploadRequest.body), encoding: .utf8) == "01234567890123456789")
+}
+
+@Test(arguments: [(Int64.max, 1), (1, Int64.max), (4, 1), (-1, 1), (0, -1)] as [(Int64, Int64)])
+func uploadRejectsInvalidBounds(bounds: (Int64, Int64)) throws {
+  let operation = AppStoreConnectUploadOperation(
+    method: .put, url: try #require(URL(string: "https://example.com/upload")),
+    offset: bounds.0, length: bounds.1)
+  #expect(throws: AppStoreConnectError.self) {
+    try operation.bodyChunk(from: Data([0, 1, 2, 3]))
+  }
+}
+
+@Test func uploadOffsetsAreRelativeToSlicedData() throws {
+  let data = Data([0, 1, 2, 3, 4, 5])[2..<6]
+  var operation = AppStoreConnectUploadOperation(
+    method: .put, url: try #require(URL(string: "https://example.com/upload")),
+    offset: 1, length: 2)
+  #expect(try operation.bodyChunk(from: data) == Data([3, 4]))
+  operation.offset = 4
+  operation.length = 0
+  #expect(try operation.bodyChunk(from: data).isEmpty)
 }
 
 private func tokenParts(_ token: String) -> (header: String, payload: String, signature: String) {

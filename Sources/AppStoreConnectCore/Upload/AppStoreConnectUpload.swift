@@ -29,6 +29,8 @@ public struct AppStoreConnectUploadOperation: Codable, Sendable, Equatable {
     self.length = length
   }
 
+  /// Copies the byte range relative to the start of `data`, including sliced data.
+  /// Throws `AppStoreConnectError.uploadFailed` for missing, negative, or out-of-range bounds.
   public func bodyChunk(from data: Data) throws -> Data {
     guard let offset, let length else {
       throw AppStoreConnectError.uploadFailed(
@@ -48,14 +50,14 @@ public struct AppStoreConnectUploadOperation: Codable, Sendable, Equatable {
       )
     }
 
-    let end = start + count
-    guard start <= data.count, end <= data.count else {
+    guard start <= data.count, count <= data.count - start else {
       throw AppStoreConnectError.uploadFailed(
-        "Upload operation chunk range \(start)..<\(end) exceeds data size \(data.count)."
+        "Upload operation chunk bounds offset=\(start), length=\(count) exceed data size \(data.count)."
       )
     }
 
-    return Data(data[start..<end])
+    let lowerBound = data.startIndex + start
+    return Data(data[lowerBound..<(lowerBound + count)])
   }
 
   public func request(from data: Data) throws -> AppStoreConnectRequest {

@@ -3,6 +3,7 @@
 
 #if ASC_EXPERIMENTAL
   import AppStoreConnectCore
+  import Darwin
   import Foundation
 
   public enum WebSessionCachePolicy: String, Codable, Sendable, CaseIterable, Equatable {
@@ -39,15 +40,54 @@
       return session
     }
 
+    /// Atomically replaces the session file with an owned file whose permissions are 0600.
+    /// The parent directory must be owned by the current user and not writable by others.
+    /// A destination symlink is replaced; its target is never written.
     public func save(_ session: WebSession) throws {
+      guard fileURL.isFileURL else {
+        throw AppStoreConnectError.invalidConfiguration(
+          "Web session storage requires a local file.")
+      }
       let directory = fileURL.deletingLastPathComponent()
-      try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+      try FileManager.default.createDirectory(
+        at: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
 
       let encoder = JSONEncoder()
       encoder.dateEncodingStrategy = .iso8601
       encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
       let data = try encoder.encode(session)
-      try data.write(to: fileURL, options: [.atomic])
+      let directoryDescriptor = directory.withUnsafeFileSystemRepresentation { path in
+        guard let path else { return Int32(-1) }
+        return open(path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+      }
+      guard directoryDescriptor >= 0 else { throw storageError() }
+      defer { close(directoryDescriptor) }
+      var attributes = stat()
+      guard fstat(directoryDescriptor, &attributes) == 0 else { throw storageError() }
+      guard attributes.st_uid == geteuid(), attributes.st_mode & 0o022 == 0 else {
+        throw AppStoreConnectError.authenticationFailed(
+          "Web session directory must be owned by the current user and not writable by others.")
+      }
+
+      let temporaryName = ".session-\(UUID().uuidString)"
+      let descriptor = openat(
+        directoryDescriptor, temporaryName, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC,
+        mode_t(0o600))
+      guard descriptor >= 0 else { throw storageError() }
+      defer {
+        close(descriptor)
+        unlinkat(directoryDescriptor, temporaryName, 0)
+      }
+      guard fchmod(descriptor, 0o600) == 0 else { throw storageError() }
+      try FileHandle(fileDescriptor: descriptor, closeOnDealloc: false).write(contentsOf: data)
+      guard
+        renameat(directoryDescriptor, temporaryName, directoryDescriptor, fileURL.lastPathComponent)
+          == 0
+      else { throw storageError() }
+    }
+
+    private func storageError() -> POSIXError {
+      POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
     }
   }
 

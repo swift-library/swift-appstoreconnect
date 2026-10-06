@@ -1,8 +1,13 @@
 # ``AppStoreConnectIrisAPI``
 
+@Metadata {
+  @PageImage(purpose: icon, source: "appstoreconnectirisapi-icon", alt: "swift-appstoreconnect icon")
+  @PageColor(yellow)
+}
+
 Experimental read-only Iris client.
 
-Enable the `Experimental` package trait to use this module. Its product compiles empty when the trait is disabled. Live Apple Account login, 2FA, and Iris mutations are unavailable.
+Enable the default-off `Experimental` package trait to use the read-only `appStoreVersionStateChanges-v1` endpoint. Provide an existing `WebSessionProvider`; the client does not acquire Apple Account credentials. Mutating or non-GET descriptors are rejected before loading a session or sending a request. When the trait is disabled, this module has no experimental declarations.
 
 ## Topics
 

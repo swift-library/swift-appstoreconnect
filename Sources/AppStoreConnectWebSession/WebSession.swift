@@ -45,6 +45,8 @@
     }
   }
 
+  /// Explicit cookies and optional expiry/account metadata for an experimental web session.
+  /// Cookie values and encoded session data are credentials and must be stored privately.
   public struct WebSession: Codable, Sendable, Equatable {
     public var cookies: [WebSessionCookie]
     public var expiresAt: Date?
@@ -89,12 +91,15 @@
       cookies.isEmpty
     }
 
+    /// A name-to-value view; the last cookie with a duplicate name wins.
     public var cookieValues: [String: String] {
       cookies.reduce(into: [String: String]()) { result, cookie in
         result[cookie.name] = cookie.value
       }
     }
 
+    /// Joins unexpired cookies by name; throws when none remain.
+    /// This method does not select cookies for a destination or check session-level expiry.
     public func cookieHeader(now: Date = Date()) throws -> String {
       let usableCookies = cookies.filter { !$0.isExpired(now: now) }
 
@@ -121,6 +126,7 @@
       return cookies.allSatisfy { $0.isExpired(now: now) }
     }
 
+    /// Rejects empty or expired sessions without contacting the service or refreshing cookies.
     public func validated(now: Date = Date()) throws -> WebSession {
       guard !isEmpty else {
         throw AppStoreConnectError.authenticationFailed("Web session has no cookies.")

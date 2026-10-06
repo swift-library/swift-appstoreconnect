@@ -11,13 +11,14 @@ import shutil
 import subprocess
 import sys
 import time
-import uuid
 
 
 def main():
     argparse.ArgumentParser(description=__doc__).parse_args()
     root = Path(__file__).resolve().parent.parent
-    output = root / '.build/release-consumers' / ('consumer-' + uuid.uuid4().hex)
+    output = root / '.build/release-consumers/current'
+    if output.exists():
+        shutil.rmtree(output)
     package = output / 'package'
     shutil.copytree(root / 'Tests/Fixtures/ReleaseConsumer', package)
     manifest = package / 'Package.swift'
@@ -81,9 +82,11 @@ def main():
                'platforms': {name: min(generations) for name, generations in platforms.items()},
                'snippet_count': len(functions), 'checks': checks}
     evidence = root / '.build/release-validation'
+    evidence.mkdir(parents=True, exist_ok=True)
     for log in output.glob('*.log'):
         shutil.copy2(log, evidence / ('consumer-' + log.name))
     (evidence / 'consumer.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    shutil.rmtree(output)
     print('Consumer compilation passed; clean default build ' + str(round(elapsed, 3)) + ' seconds')
 
 

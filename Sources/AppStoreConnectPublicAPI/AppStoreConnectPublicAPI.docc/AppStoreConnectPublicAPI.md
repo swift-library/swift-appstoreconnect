@@ -1,8 +1,13 @@
 # ``AppStoreConnectPublicAPI``
 
+@Metadata {
+  @PageImage(purpose: icon, source: "appstoreconnectpublicapi-icon", alt: "swift-appstoreconnect icon")
+  @PageColor(yellow)
+}
+
 Typed clients generated from the locked Apple specification.
 
-`PublicAPIBase` is the default typed slice. Optional domain traits and `PublicAPIFull` select additional generated operations.
+`Client`, `Components`, and `Operations` are generated from the locked Apple OpenAPI specification. `AppStoreConnectPublicClient` groups the selected operations behind capability facades. `PublicAPIBase` is enabled by default; domain traits and `PublicAPIFull` expand the generated API. Disabling default traits retains the baseline used by Workflow and CLI.
 
 ## Topics
 

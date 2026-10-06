@@ -5,6 +5,7 @@ import CryptoKit
 import Darwin
 import Foundation
 
+/// Supplies the time used to issue JWTs and determine cached-token expiry.
 public protocol AppStoreConnectClock: Sendable {
   var now: Date { get }
 }
@@ -25,11 +26,13 @@ public struct AppStoreConnectFixedClock: AppStoreConnectClock, Sendable, Equatab
   }
 }
 
+/// Selects team issuer claims or the individual-user subject claim.
 public enum AppStoreConnectJWTSubject: Sendable, Equatable {
   case team(issuerID: String)
   case individualUser
 }
 
+/// An ES256 private signing key held in memory; input parsing failures are authentication errors.
 public struct AppStoreConnectJWTSigningKey: Sendable {
   public var keyID: String
 
@@ -56,6 +59,8 @@ public struct AppStoreConnectJWTSigningKey: Sendable {
     try self.init(keyID: keyID, pemRepresentation: pem)
   }
 
+  /// Reads an owned regular local file with no group or other permissions.
+  /// Rejects a final-path symlink and invalid UTF-8 or ES256 PEM key data.
   public static func load(keyID: String, from url: URL) throws -> AppStoreConnectJWTSigningKey {
     guard url.isFileURL else {
       throw AppStoreConnectError.authenticationFailed("Private key must be a local file.")
@@ -93,6 +98,8 @@ public struct AppStoreConnectJWTSigningKey: Sendable {
   }
 }
 
+/// Signs ES256 JWTs using an injected clock, audience, subject, and lifetime in seconds.
+/// The default lifetime and maximum are both 20 minutes; custom limits are caller-owned.
 public struct AppStoreConnectJWTSigner: Sendable {
   public static let defaultAudience = "appstoreconnect-v1"
   public static let maximumStandardLifetime: TimeInterval = 20 * 60
@@ -122,6 +129,7 @@ public struct AppStoreConnectJWTSigner: Sendable {
     try validate()
   }
 
+  /// Signs a token after validating the current configuration; an empty scope omits its claim.
   public func token(scope: [String] = []) throws -> String {
     try validate()
 
@@ -166,6 +174,7 @@ public struct AppStoreConnectJWTSigner: Sendable {
   }
 }
 
+/// Signs a fresh token for every token or Authorization-header request.
 public struct AppStoreConnectJWTCredential: AppStoreConnectCredential, Sendable {
   public var signer: AppStoreConnectJWTSigner
   public var scope: [String]
@@ -184,9 +193,12 @@ public struct AppStoreConnectJWTCredential: AppStoreConnectCredential, Sendable 
   }
 }
 
+/// Serializes access to an in-memory JWT cache and refreshes before its recorded expiry.
+/// Call `invalidate()` after changing the signer or scope to discard the previous token.
 public actor AppStoreConnectCachedJWTCredential: AppStoreConnectCredential {
   public var signer: AppStoreConnectJWTSigner
   public var scope: [String]
+  /// Seconds before expiry at which a token is refreshed; the initializer defaults to 30.
   public var refreshSkew: TimeInterval
 
   private var cachedToken: String?
@@ -222,6 +234,7 @@ public actor AppStoreConnectCachedJWTCredential: AppStoreConnectCredential {
     "Bearer \(try token())"
   }
 
+  /// Discards the cached token so the next request signs with the current configuration.
   public func invalidate() {
     cachedToken = nil
     cachedExpiresAt = nil

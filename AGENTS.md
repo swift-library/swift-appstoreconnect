@@ -83,3 +83,29 @@ versions, requirements, dependencies or release workflows.
 - Keep WebSession acquisition separate from Iris endpoints. Both APIs and their Workflow/CLI paths require the default-off `Experimental` trait.
 - Keep the CLI as a thin process boundary over Workflow.
 - Validate with `Scripts/check`; `Scripts/check-docs` owns multi-module DocC compilation.
+
+## Code Review Rules
+
+### Compatibility and versioning
+
+Flag public API or behavior changes, including raised deployment targets,
+without the CHANGELOG entry and version increment required by
+`Documentation/Architecture/VersioningAndRelease.md`. Add the entry under the
+next version and apply that policy before release.
+
+### Claims
+
+Flag README, DocC, or CHANGELOG claims unsupported by implementation and tests.
+Distinguish command plans from live execution and default APIs from
+Experimental APIs. Describe only the capabilities and platforms the evidence supports.
+
+### Public documentation
+
+Flag new public symbols without usage documentation, or public prose about
+internal process or comparisons with other packages. Document the symbol and
+explain this package's current behavior in its module's DocC catalog.
+
+### Tests
+
+Flag behavior changes without a regression test that would have failed before
+the change. Add it beside the owning module's existing suites.

@@ -4,6 +4,7 @@
 import AppStoreConnectCore
 import AppStoreConnectPublicAPI
 
+/// Names built-in plans; a plan does not imply that every step has a live implementation.
 public enum BuiltinWorkflow: String, Codable, Sendable, CaseIterable {
   case publicReleaseReadiness
   case publishAppStore
@@ -22,6 +23,7 @@ public enum WorkflowStepSource: String, Codable, Sendable, Equatable {
   case localOnly
 }
 
+/// Reported step state. Planned and needs-input steps do not establish successful execution.
 public enum WorkflowStepStatus: String, Codable, Sendable, Equatable {
   case planned
   case running
@@ -116,6 +118,7 @@ public struct WorkflowStep: Codable, Sendable, Equatable {
   }
 }
 
+/// Serializable step descriptions and dependencies, with no execution side effects.
 public struct WorkflowPlan: Codable, Sendable, Equatable {
   public var workflow: BuiltinWorkflow
   public var steps: [WorkflowStep]
@@ -126,6 +129,7 @@ public struct WorkflowPlan: Codable, Sendable, Equatable {
   }
 }
 
+/// A step's reported outcome, outputs, diagnostics, and resume capability.
 public struct WorkflowStepResult: Codable, Sendable, Equatable {
   public var stepID: String
   public var status: WorkflowStepStatus
@@ -154,6 +158,7 @@ public struct WorkflowStepResult: Codable, Sendable, Equatable {
   }
 }
 
+/// Per-step outcomes for a run; inspect individual statuses for failures or required input.
 public struct WorkflowRunResult: Codable, Sendable, Equatable {
   public var workflow: BuiltinWorkflow
   public var steps: [WorkflowStepResult]
@@ -167,6 +172,7 @@ public struct WorkflowRunResult: Codable, Sendable, Equatable {
 public struct WorkflowRunner: Sendable {
   public init() {}
 
+  /// Returns the built-in plan without credentials, network requests, or local process execution.
   public func dryRun(_ workflow: BuiltinWorkflow) -> WorkflowPlan {
     WorkflowPlan(
       workflow: workflow,

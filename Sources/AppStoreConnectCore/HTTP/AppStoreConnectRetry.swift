@@ -3,13 +3,17 @@
 
 import Foundation
 
+/// Retry eligibility and delays in seconds. Default methods are GET, HEAD, and OPTIONS.
+/// The initializer clamps negative counts and delays to zero and multipliers below one to one.
 public struct AppStoreConnectRetryPolicy: Sendable, Equatable {
   public static let transientStatusCodes: Set<Int> = [429, 500, 502, 503, 504]
   public static let idempotentMethods: Set<String> = ["GET", "HEAD", "OPTIONS"]
 
+  /// Maximum additional attempts after the initial request.
   public var maxRetries: Int
   public var initialDelay: TimeInterval
   public var backoffMultiplier: Double
+  /// Caps computed backoff; an accepted Retry-After value takes precedence over this cap.
   public var maximumDelay: TimeInterval?
   public var retryableStatusCodes: Set<Int>
   public var retryableMethods: Set<String>
@@ -36,6 +40,7 @@ public struct AppStoreConnectRetryPolicy: Sendable, Equatable {
     self.retriesTransportErrors = retriesTransportErrors
   }
 
+  /// Sends only the initial request, without retrying responses or errors.
   public static var never: AppStoreConnectRetryPolicy {
     AppStoreConnectRetryPolicy(maxRetries: 0, initialDelay: 0)
   }
@@ -80,6 +85,7 @@ public struct AppStoreConnectRetryPolicy: Sendable, Equatable {
     )
   }
 
+  /// Permits retries for POST and PUT; use only when repeating the upload operation is safe.
   public static func upload(
     maxRetries: Int,
     delay: TimeInterval,
@@ -163,8 +169,10 @@ public struct AppStoreConnectRetryPolicy: Sendable, Equatable {
   }
 }
 
+/// Suspends before another attempt, receiving a delay in seconds; errors may terminate retries.
 public typealias AppStoreConnectRetrySleep = @Sendable (TimeInterval) async throws -> Void
 
+/// Repeats the same request according to a policy, with an injectable sleep operation.
 public struct AppStoreConnectRetryingTransport: AppStoreConnectTransport {
   public var base: any AppStoreConnectTransport
   public var policy: AppStoreConnectRetryPolicy
@@ -218,6 +226,8 @@ public struct AppStoreConnectRetryingTransport: AppStoreConnectTransport {
   }
 }
 
+/// Retries downloads and removes a failed response's temporary file before another attempt.
+/// The caller owns the file returned by the final successful download.
 public struct AppStoreConnectRetryingDownloadTransport: AppStoreConnectDownloadTransport {
   public var base: any AppStoreConnectDownloadTransport
   public var policy: AppStoreConnectRetryPolicy
@@ -278,6 +288,7 @@ public struct AppStoreConnectRetryingDownloadTransport: AppStoreConnectDownloadT
 }
 
 extension AppStoreConnectResponse {
+  /// Nonnegative Retry-After seconds, or nil when absent or invalid. HTTP-date values are unsupported.
   public var retryAfterDelay: TimeInterval? {
     guard let value = headers.caseInsensitiveValue(for: "Retry-After") else {
       return nil

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0 WITH Swift-exception
 // Copyright (c) 2026 Xudong Xu
 
+import Foundation
+
+/// Attaches credentials only to requests within the supplied environment's HTTP origin.
+/// Requests to another scheme, host, or port fail before credentials or transport are invoked.
 public struct AppStoreConnectAuthenticatedTransport: AppStoreConnectTransport {
   public var base: any AppStoreConnectTransport
   public var credential: any AppStoreConnectCredential
@@ -17,11 +21,27 @@ public struct AppStoreConnectAuthenticatedTransport: AppStoreConnectTransport {
     _ request: AppStoreConnectRequest,
     in environment: AppStoreConnectEnvironment
   ) async throws -> AppStoreConnectResponse {
-    try await base.send(request.authorized(using: credential), in: environment)
+    let destination = try request.resolvedURL(in: environment)
+    let origin = environment.baseURL
+    guard let scheme = destination.scheme?.lowercased(),
+      ["http", "https"].contains(scheme),
+      scheme == origin.scheme?.lowercased(),
+      let host = destination.host?.lowercased(), host == origin.host?.lowercased(),
+      destination.port ?? defaultPort(scheme) == origin.port ?? defaultPort(scheme),
+      destination.user == nil, destination.password == nil
+    else {
+      throw AppStoreConnectError.authenticationFailed(
+        "Authenticated request must use the environment's HTTP origin.")
+    }
+    return try await base.send(request.authorized(using: credential), in: environment)
   }
+
+  private func defaultPort(_ scheme: String) -> Int { scheme == "https" ? 443 : 80 }
 }
 
 extension AppStoreConnectRequest {
+  /// Returns a copy with the credential header, without checking or sending its destination.
+  /// Use `AppStoreConnectAuthenticatedTransport` to enforce the environment's origin at send time.
   public func authorized(using credential: any AppStoreConnectCredential) async throws
     -> AppStoreConnectRequest
   {

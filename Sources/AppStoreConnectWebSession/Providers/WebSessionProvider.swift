@@ -4,6 +4,7 @@
 #if ASC_EXPERIMENTAL
   import Foundation
 
+  /// Supplies a session using explicit input; the supplied time supports expiry validation.
   public protocol WebSessionProvider: Sendable {
     func session(now: Date) async throws -> WebSession
   }
@@ -14,6 +15,7 @@
     }
   }
 
+  /// Returns its session after validating it at the requested time; performs no login or refresh.
   public struct StaticWebSessionProvider: WebSessionProvider {
     public var webSession: WebSession
 

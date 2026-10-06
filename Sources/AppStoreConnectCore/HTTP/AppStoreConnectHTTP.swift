@@ -154,7 +154,7 @@ public struct URLSessionAppStoreConnectTransport: AppStoreConnectDownloadTranspo
     _ request: AppStoreConnectRequest,
     in environment: AppStoreConnectEnvironment
   ) throws -> URLRequest {
-    let url = try resolveURL(for: request, in: environment)
+    let url = try request.resolvedURL(in: environment)
     var urlRequest = URLRequest(url: url)
     urlRequest.httpMethod = request.method
     urlRequest.httpBody = request.body
@@ -166,32 +166,32 @@ public struct URLSessionAppStoreConnectTransport: AppStoreConnectDownloadTranspo
     return urlRequest
   }
 
-  private func resolveURL(
-    for request: AppStoreConnectRequest,
-    in environment: AppStoreConnectEnvironment
-  ) throws -> URL {
+}
+
+extension AppStoreConnectRequest {
+  func resolvedURL(in environment: AppStoreConnectEnvironment) throws -> URL {
     let baseURL: URL
 
-    if let absoluteURL = URL(string: request.path), absoluteURL.scheme != nil {
+    if let absoluteURL = URL(string: path), absoluteURL.scheme != nil {
       baseURL = absoluteURL
     } else {
-      baseURL = environment.baseURL.appendingPathComponent(request.path.trimmedLeadingSlash)
+      baseURL = environment.baseURL.appendingPathComponent(path.trimmedLeadingSlash)
     }
 
     guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
       throw AppStoreConnectError.invalidConfiguration(
-        "Could not resolve URL for path \(request.path).")
+        "Could not resolve URL for path \(path).")
     }
 
-    if !request.queryItems.isEmpty {
-      components.queryItems = request.queryItems.map {
+    if !queryItems.isEmpty {
+      components.queryItems = queryItems.map {
         URLQueryItem(name: $0.name, value: $0.value)
       }
     }
 
     guard let url = components.url else {
       throw AppStoreConnectError.invalidConfiguration(
-        "Could not build URL for path \(request.path).")
+        "Could not build URL for path \(path).")
     }
 
     return url
