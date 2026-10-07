@@ -32,8 +32,10 @@ the complete formatting configuration. Local checks run both scopes.
 The supported system window is each platform's latest three major releases.
 Package.swift declares Swift tools 6.3 and uses the oldest release in that
 window as its deployment floor. `.github/release.json` records the window and
-owns compiler and platform validation settings. CI selects Xcode 26.4 and 26.6;
-local evidence records the selected compiler and SDKs.
+owns compiler and platform validation settings. CI combines the declared
+standalone Swift toolchain with the hosted SDK on macOS 15, and uses the
+declared Xcode toolchain on macOS 26. Evidence records the selected compiler
+and SDKs.
 
 Repository tests, release builds and symbol extraction use SwiftPM's native
 build engine. Consumer checks use the toolchain's default engine and Xcode.
