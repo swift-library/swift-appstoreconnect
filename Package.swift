@@ -23,7 +23,7 @@ let experimentalSwiftSettings: [SwiftSetting] = [
 ]
 
 // Tool dependencies execute on a development host, including during cross-compilation.
-let codeGenerationHost: TargetDependencyCondition = .when(platforms: [.macOS, .linux, .windows])
+let codeGenerationHost = TargetDependencyCondition.when(platforms: [.macOS, .linux, .windows])
 
 let package = Package(
   name: "swift-appstoreconnect",
