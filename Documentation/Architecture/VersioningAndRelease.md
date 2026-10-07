@@ -37,6 +37,13 @@ standalone Swift toolchain with the hosted SDK on macOS 15, and uses the
 declared Xcode toolchain on macOS 26. Evidence records the selected compiler
 and SDKs.
 
+Both compiler lanes validate native SwiftPM consumers. The macOS 26 lane also
+validates Xcode consumers on every declared Apple platform. Xcode's package
+resolver must support the manifest's Swift tools version; installing a separate
+Swift compiler does not update an older Xcode's resolver. The macOS 15 lane
+therefore selects the `swiftpm` consumer scope. Local `Scripts/check` defaults
+to the complete consumer scope and requires Xcode 26.4 or later.
+
 Repository tests, release builds and symbol extraction use SwiftPM's native
 build engine. Consumer checks use the toolchain's default engine and Xcode.
 Each trait configuration uses an independent build directory; validation retains

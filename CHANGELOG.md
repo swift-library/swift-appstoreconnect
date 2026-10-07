@@ -11,4 +11,4 @@
 - Store session files atomically with private permissions in owned directories.
 - Restrict authenticated transport requests to the configured HTTP origin.
 - Validate upload chunk bounds without overflow and support sliced input data.
-- Require iOS 18, macOS 15, tvOS 18, watchOS 11, or visionOS 2 and newer.
+- Require iOS 18, macOS 15, tvOS 18, watchOS 11, or visionOS 2 and newer; Xcode consumers require Xcode 26.4 or newer.
