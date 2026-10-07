@@ -108,7 +108,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0"),
     // Pin the generator so resolved consumers produce the reviewed Swift source.
-    .package(url: "https://github.com/apple/swift-openapi-generator", exact: "1.12.0"),
+    .package(url: "https://github.com/apple/swift-openapi-generator", exact: "1.13.1"),
     .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.11.0"),
     .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.3.0"),
     .package(url: "https://github.com/apple/swift-http-types", from: "1.0.0"),
