@@ -22,6 +22,9 @@ let experimentalSwiftSettings: [SwiftSetting] = [
   .define("ASC_EXPERIMENTAL", .when(traits: ["Experimental"]))
 ]
 
+// Tool dependencies execute on a development host, including during cross-compilation.
+let codeGenerationHost: TargetDependencyCondition = .when(platforms: [.macOS, .linux, .windows])
+
 let package = Package(
   name: "swift-appstoreconnect",
   platforms: [
@@ -171,21 +174,25 @@ let package = Package(
     .executableTarget(
       name: "AppStoreConnectPublicAPIGen",
       dependencies: [
-        "AppStoreConnectPublicAPIGenCore"
+        .target(name: "AppStoreConnectPublicAPIGenCore", condition: codeGenerationHost)
       ],
       path: "Plugins/AppStoreConnectPublicAPIGen"
     ),
     .plugin(
       name: "AppStoreConnectVersionGen",
       capability: .buildTool(),
-      dependencies: ["AppStoreConnectPublicAPIGen"]
+      dependencies: [
+        .target(name: "AppStoreConnectPublicAPIGen", condition: codeGenerationHost)
+      ]
     ),
     .plugin(
       name: "AppStoreConnectOpenAPIGen",
       capability: .buildTool(),
       dependencies: [
-        "AppStoreConnectPublicAPIGen",
-        .product(name: "swift-openapi-generator", package: "swift-openapi-generator"),
+        .target(name: "AppStoreConnectPublicAPIGen", condition: codeGenerationHost),
+        .product(
+          name: "swift-openapi-generator", package: "swift-openapi-generator",
+          condition: codeGenerationHost),
       ]
     ),
     .testTarget(
