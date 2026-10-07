@@ -12,6 +12,7 @@ struct AppStoreConnectOpenAPIGen: BuildToolPlugin {
     }
 
     let selector = try context.tool(named: "AppStoreConnectPublicAPIGen")
+    let generator = try context.tool(named: "swift-openapi-generator")
     let schema = context.package.directoryURL
       .appendingPathComponent("Vendor")
       .appendingPathComponent("AppStoreConnectOpenAPI")
@@ -63,12 +64,12 @@ struct AppStoreConnectOpenAPIGen: BuildToolPlugin {
       ),
       .buildCommand(
         displayName: "Generate AppStoreConnect OpenAPI Swift",
-        executable: selector.url,
+        executable: generator.url,
         arguments: [
-          "generate-openapi-swift",
-          "--document", activeOpenAPI.path,
+          "generate", activeOpenAPI.path,
           "--config", config.path,
-          "--output", generatedSources.path,
+          "--output-directory", generatedSources.path,
+          "--plugin-source", "build",
         ],
         inputFiles: [stamp, activeOpenAPI, config],
         outputFiles: generatedFiles

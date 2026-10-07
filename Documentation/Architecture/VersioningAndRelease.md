@@ -63,8 +63,8 @@ Release acceptance uses clean committed source, strict formatting, complete
 Swift tests, Release builds, compiler/platform checks
 and a fresh consumer. The tested lockfile is enforced for repository
 builds; consumer validation also records its independently resolved dependency
-graph. The OpenAPI generator is pinned to an exact version because the build
-tool integrates with its internal `_OpenAPIGeneratorCore` API. Source ownership
+graph. The OpenAPI generator executable is pinned to an exact version so
+consumers produce the reviewed generated Swift source. Source ownership
 and dependency notices are reviewed when dependencies
 or incorporated code change.
 

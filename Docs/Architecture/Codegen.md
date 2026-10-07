@@ -223,19 +223,20 @@ The package generator exposes deterministic commands for two audiences:
 - `verify-openapi-selection`: verify a generated or tracked selected OpenAPI
   input against the locked schema and capability manifest, then write a build
   stamp;
-- `generate-openapi-swift`: plugin-facing command that calls Apple
-  `_OpenAPIGeneratorCore.runGenerator` with the filtered OpenAPI document and
-  active generator config;
 - `generate-openapi-facade`: plugin-facing command that emits package-owned
   capability clients over the generated selected OpenAPI client;
 - `generate-type-overrides-config`: diagnostic command that creates an Apple
   generator config replacing selected named component schemas with
   `OpenAPIRuntime.OpenAPIValueContainer`.
 
-The build tool plugin must invoke `filter-openapi` before
-`generate-openapi-swift`, and must emit the facade from the same active OpenAPI
-input. These commands use only tracked schema, lock, audit, partition,
-generation manifests, capability manifest, generated compilation conditions,
+The build tool plugin invokes `filter-openapi`, then runs Apple's
+`swift-openapi-generator generate` executable with the filtered document and
+generator config. Both executables are plugin tool dependencies built for the
+host. The generator's `--plugin-source build` option produces all declared
+outputs, including an empty file for each unselected mode. The plugin emits the
+facade from the same active OpenAPI input. These commands use only tracked
+schema, lock, audit, partition, generation manifests, capability manifest,
+generated compilation conditions,
 and generator config inputs. A normal build must not require a developer-local
 dependency checkout beyond the resolved package graph or network access.
 
