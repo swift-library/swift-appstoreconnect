@@ -29,6 +29,7 @@ if [ "$RELEASE_CHECK_SCOPE" = all ] || [ "$RELEASE_CHECK_SCOPE" = format ]; then
 fi
 if [ "$RELEASE_CHECK_SCOPE" = all ] || [ "$RELEASE_CHECK_SCOPE" = compiler ]; then
   python3 -B -m unittest discover -s Tests/ReleaseTools
+  Scripts/check-consumer
   python3 - <<'PY'
 import json, pathlib, re, shutil, subprocess
 root = pathlib.Path('.build/release-validation')
@@ -75,7 +76,6 @@ pathlib.Path('.build/release-validation/cli-binary.json').write_text(json.dumps(
 shutil.rmtree(products)
 PY
   Scripts/check-docs
-  Scripts/check-consumer
 fi
 python3 - <<'PY'
 import hashlib, json, os, pathlib, platform, subprocess, tempfile

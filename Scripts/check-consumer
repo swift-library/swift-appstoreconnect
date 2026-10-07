@@ -13,6 +13,24 @@ import sys
 import time
 
 
+def run_check(name, command, *, cwd, output, evidence, checks):
+    print('Consumer: ' + name, flush=True)
+    started = time.monotonic()
+    path = output / (name + '.log')
+    status = None
+    try:
+        with path.open('w') as log:
+            status = subprocess.run(command, cwd=cwd, stdout=log, stderr=subprocess.STDOUT, timeout=1800).returncode
+    finally:
+        evidence.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, evidence / ('consumer-' + path.name))
+        checks.append({'name': name, 'exit_status': status,
+                       'elapsed_seconds': round(time.monotonic() - started, 3)})
+    if status:
+        raise RuntimeError(name + ' failed; inspect consumer-' + path.name + ' in validation evidence')
+    return checks[-1]['elapsed_seconds']
+
+
 def main():
     argparse.ArgumentParser(description=__doc__).parse_args()
     root = Path(__file__).resolve().parent.parent
@@ -29,17 +47,10 @@ def main():
         raise ValueError('Expected one consumer dependency declaration')
     manifest.write_text(text)
     checks = []
+    evidence = root / '.build/release-validation'
 
     def run(name, command, cwd=package):
-        print('Consumer: ' + name, flush=True)
-        started = time.monotonic()
-        with (output / (name + '.log')).open('w') as log:
-            status = subprocess.run(command, cwd=cwd, stdout=log, stderr=subprocess.STDOUT, timeout=1800).returncode
-        elapsed = time.monotonic() - started
-        checks.append({'name': name, 'exit_status': status, 'elapsed_seconds': round(elapsed, 3)})
-        if status:
-            raise RuntimeError(name + ' failed; inspect ' + str((output / (name + '.log')).relative_to(root)))
-        return elapsed
+        return run_check(name, command, cwd=cwd, output=output, evidence=evidence, checks=checks)
 
     run('resolve', ['swift', 'package', 'resolve'])
     elapsed = run('clean-default-build', ['swift', 'build', '--force-resolved-versions'])
@@ -81,10 +92,6 @@ def main():
                'checker_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                'platforms': {name: min(generations) for name, generations in platforms.items()},
                'snippet_count': len(functions), 'checks': checks}
-    evidence = root / '.build/release-validation'
-    evidence.mkdir(parents=True, exist_ok=True)
-    for log in output.glob('*.log'):
-        shutil.copy2(log, evidence / ('consumer-' + log.name))
     (evidence / 'consumer.json').write_text(json.dumps(receipt, indent=2) + '\n')
     shutil.rmtree(output)
     print('Consumer compilation passed; clean default build ' + str(round(elapsed, 3)) + ' seconds')
