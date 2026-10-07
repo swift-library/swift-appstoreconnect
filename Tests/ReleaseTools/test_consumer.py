@@ -6,6 +6,8 @@ import importlib.machinery
 import importlib.util
 import json
 from pathlib import Path
+import plistlib
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -33,6 +35,8 @@ class ConsumerEvidenceTests(unittest.TestCase):
                 (fixture / 'Package.swift').write_text(
                     '.package(url: "https://github.com/swift-library/swift-appstoreconnect.git", '
                     'revision: "release-candidate")')
+                shutil.copytree(ROOT / 'Tests/Fixtures/ReleaseConsumer/ReleaseConsumer.xcodeproj',
+                                fixture / 'ReleaseConsumer.xcodeproj')
                 catalog = root / 'Sources/Example/Example.docc'
                 catalog.mkdir(parents=True)
                 (catalog / 'Example.md').write_text('```swift\nimport Foundation\nlet value = 1\n```\n')
@@ -50,6 +54,18 @@ class ConsumerEvidenceTests(unittest.TestCase):
                     elif command[:2] == ['swift', 'build']:
                         (cwd / '.build').mkdir()
                     elif command[0] == 'xcodebuild':
+                        project = Path(command[command.index('-project') + 1])
+                        graph = plistlib.loads((project / 'project.pbxproj').read_bytes())
+                        references = [v for v in graph['objects'].values()
+                                      if v['isa'] == 'XCLocalSwiftPackageReference']
+                        self.assertEqual(references[0]['relativePath'], str(root))
+                        linked = {v['productName'] for v in graph['objects'].values()
+                                  if v['isa'] == 'XCSwiftPackageProductDependency'}
+                        self.assertEqual(linked, {'AppStoreConnectCore', 'AppStoreConnectPublicAPI',
+                                                  'AppStoreConnectWorkflow', 'AppStoreConnectWebSession',
+                                                  'AppStoreConnectIrisAPI'})
+                        lock = project / 'project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
+                        self.assertEqual(lock.read_bytes(), (cwd / 'Package.resolved').read_bytes())
                         Path(command[command.index('-derivedDataPath') + 1]).mkdir()
                     arguments['stdout'].write('consumer diagnostics\n')
                     return subprocess.CompletedProcess(command, 0)

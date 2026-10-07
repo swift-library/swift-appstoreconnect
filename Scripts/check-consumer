@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import plistlib
 import re
 import shutil
 import subprocess
@@ -29,6 +30,30 @@ def run_check(name, command, *, cwd, output, evidence, checks):
     if status:
         raise RuntimeError(name + ' failed; inspect consumer-' + path.name + ' in validation evidence')
     return checks[-1]['elapsed_seconds']
+
+
+def prepare_xcode_project(package, root, platforms):
+    project = package / 'ReleaseConsumer.xcodeproj'
+    path = project / 'project.pbxproj'
+    data = plistlib.loads(path.read_bytes())
+    references = [value for value in data['objects'].values()
+                  if value['isa'] == 'XCLocalSwiftPackageReference']
+    if len(references) != 1 or references[0]['relativePath'] != 'release-candidate':
+        raise ValueError('Expected one Xcode consumer dependency declaration')
+    references[0]['relativePath'] = str(root)
+    settings = {'iOS': 'IPHONEOS_DEPLOYMENT_TARGET', 'macOS': 'MACOSX_DEPLOYMENT_TARGET',
+                'tvOS': 'TVOS_DEPLOYMENT_TARGET', 'watchOS': 'WATCHOS_DEPLOYMENT_TARGET',
+                'visionOS': 'XROS_DEPLOYMENT_TARGET'}
+    for value in data['objects'].values():
+        build = value.get('buildSettings', {})
+        if 'PRODUCT_BUNDLE_IDENTIFIER' in build:
+            for platform, key in settings.items():
+                build[key] = str(min(platforms[platform])) + '.0'
+    path.write_bytes(plistlib.dumps(data))
+    lock = project / 'project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(package / 'Package.resolved', lock)
+    return project
 
 
 def main(arguments=None):
@@ -83,8 +108,10 @@ def main(arguments=None):
     destinations = {'iOS': 'iOS Simulator', 'tvOS': 'tvOS Simulator', 'watchOS': 'watchOS Simulator', 'visionOS': 'visionOS Simulator'}
     platforms = json.loads((root / '.github/release.json').read_text())['platforms']
     if args.scope == 'all':
+        project = prepare_xcode_project(package, root, platforms)
         for name, destination in destinations.items():
-            run(name.lower() + '-minimum-build', ['xcodebuild', 'build', '-scheme', 'ReleaseConsumer',
+            run(name.lower() + '-minimum-build', ['xcodebuild', 'build', '-project', str(project),
+                '-scheme', 'ReleaseConsumer',
                 '-destination', 'generic/platform=' + destination, '-derivedDataPath', str(output / 'DerivedData'),
                 '-disableAutomaticPackageResolution', '-skipMacroValidation', 'CODE_SIGNING_ALLOWED=NO'])
             shutil.rmtree(output / 'DerivedData')
