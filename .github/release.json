@@ -65,13 +65,15 @@
         "runner": "macos-15",
         "xcode": "26.0.1",
         "command": "Scripts/check --compiler-check",
-        "swift": "6.3.3"
+        "swift": "6.3.3",
+        "timeout_minutes": 180
       },
       {
         "name": "macos-26-swift-6.3",
         "runner": "macos-26",
         "xcode": "26.6",
-        "command": "Scripts/check --compiler-check"
+        "command": "Scripts/check --compiler-check",
+        "timeout_minutes": 180
       },
       {
         "name": "strict-format",
