@@ -156,7 +156,8 @@ browser-cookie-file input. They do not perform interactive account login.
 ## Requirements
 
 Swift 6.3 or later; iOS 18, macOS 15, tvOS 18, watchOS 11, or visionOS 2 or later.
-Local Xcode process execution requires macOS. Package checks cover the default,
+Xcode integration requires Xcode 26.4 or later. Local Xcode process execution
+requires macOS. Package checks cover the default,
 disabled-default, full Public API, and experimental trait configurations, plus
 independent consumer builds. Simulator compilation checks deployment floors;
 live API access requires your own credentials and is excluded from public CI.

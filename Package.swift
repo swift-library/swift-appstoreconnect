@@ -22,6 +22,9 @@ let experimentalSwiftSettings: [SwiftSetting] = [
   .define("ASC_EXPERIMENTAL", .when(traits: ["Experimental"]))
 ]
 
+// Tool dependencies execute on a development host, including during cross-compilation.
+let codeGenerationHost = TargetDependencyCondition.when(platforms: [.macOS, .linux, .windows])
+
 let package = Package(
   name: "swift-appstoreconnect",
   platforms: [
@@ -104,7 +107,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.0"),
-    // The generator integration uses an internal API that can change in minor releases.
+    // Pin the generator so resolved consumers produce the reviewed Swift source.
     .package(url: "https://github.com/apple/swift-openapi-generator", exact: "1.12.0"),
     .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.11.0"),
     .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.3.0"),
@@ -171,20 +174,26 @@ let package = Package(
     .executableTarget(
       name: "AppStoreConnectPublicAPIGen",
       dependencies: [
-        "AppStoreConnectPublicAPIGenCore",
-        .product(name: "_OpenAPIGeneratorCore", package: "swift-openapi-generator"),
+        .target(name: "AppStoreConnectPublicAPIGenCore", condition: codeGenerationHost)
       ],
       path: "Plugins/AppStoreConnectPublicAPIGen"
     ),
     .plugin(
       name: "AppStoreConnectVersionGen",
       capability: .buildTool(),
-      dependencies: ["AppStoreConnectPublicAPIGen"]
+      dependencies: [
+        .target(name: "AppStoreConnectPublicAPIGen", condition: codeGenerationHost)
+      ]
     ),
     .plugin(
       name: "AppStoreConnectOpenAPIGen",
       capability: .buildTool(),
-      dependencies: ["AppStoreConnectPublicAPIGen"]
+      dependencies: [
+        .target(name: "AppStoreConnectPublicAPIGen", condition: codeGenerationHost),
+        .product(
+          name: "swift-openapi-generator", package: "swift-openapi-generator",
+          condition: codeGenerationHost),
+      ]
     ),
     .testTarget(
       name: "AppStoreConnectWorkflowTests",

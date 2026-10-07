@@ -42,24 +42,19 @@ or descriptor emitter to the build. Full-schema lightweight catalog generation
 is deferred until the Apple filter/typeOverrides route is proven insufficient
 for a specific CLI or SDK workflow.
 
-The intended SwiftPM shape is:
+The SwiftPM targets are:
 
 - `AppStoreConnectOpenAPIGen`: build tool plugin attached to the public API
   generation lane. It reads generation manifests, derives active API slices
   from SwiftPM trait-backed compilation conditions, verifies the locked schema
-  inputs, and invokes the package adapter executable;
+  inputs, and invokes the package adapter and official generator executables;
 - `AppStoreConnectPublicAPIGen`: executable generation adapter used by the
   plugin and diagnostics commands. It dispatches package generation modes to
-  active OpenAPI filtering, Apple generator calls, and package facade
-  generation;
+  active OpenAPI filtering and package facade generation;
 - `AppStoreConnectPublicAPIGenCore`: testable manifest, audit, partition,
   reporting, and facade logic shared by the executable and generator tests;
 - `Vendor/AppStoreConnectOpenAPI/`: schema snapshot directory with a
   lock/provenance file, audit file, and trait partition manifests.
-
-Existing target names may still include `PublicAPIGen` while the adapter is
-being renamed. The architectural role is `OpenAPIGen`: schema and generation
-control plane for App Store Connect Public API bindings.
 
 The selected typed-client lane emits Apple generated `Components`,
 `Operations`, `APIProtocol`, and `Client` source for the current public
@@ -223,19 +218,21 @@ The package generator exposes deterministic commands for two audiences:
 - `verify-openapi-selection`: verify a generated or tracked selected OpenAPI
   input against the locked schema and capability manifest, then write a build
   stamp;
-- `generate-openapi-swift`: plugin-facing command that calls Apple
-  `_OpenAPIGeneratorCore.runGenerator` with the filtered OpenAPI document and
-  active generator config;
 - `generate-openapi-facade`: plugin-facing command that emits package-owned
   capability clients over the generated selected OpenAPI client;
 - `generate-type-overrides-config`: diagnostic command that creates an Apple
   generator config replacing selected named component schemas with
   `OpenAPIRuntime.OpenAPIValueContainer`.
 
-The build tool plugin must invoke `filter-openapi` before
-`generate-openapi-swift`, and must emit the facade from the same active OpenAPI
-input. These commands use only tracked schema, lock, audit, partition,
-generation manifests, capability manifest, generated compilation conditions,
+The build tool plugin invokes `filter-openapi`, then runs Apple's
+`swift-openapi-generator generate` executable with the filtered document and
+generator config. Both executables and the selector's core dependency declare
+development-host platform conditions; they execute on the host when the public
+libraries compile for another platform. The generator's `--plugin-source build` option produces all declared
+outputs, including an empty file for each unselected mode. The plugin emits the
+facade from the same active OpenAPI input. These commands use only tracked
+schema, lock, audit, partition, generation manifests, capability manifest,
+generated compilation conditions,
 and generator config inputs. A normal build must not require a developer-local
 dependency checkout beyond the resolved package graph or network access.
 
@@ -367,8 +364,7 @@ Its tracked `openapi-capabilities.json` drives `openapi.json`, which contains 7
 capabilities, 74 paths, 128 operations, and 240 referenced component schemas.
 Default
 `swift build` verifies the selection stamp and compiles the typed generated
-source emitted by `AppStoreConnectOpenAPIGen` through the package generator
-host:
+source emitted by `AppStoreConnectOpenAPIGen` through its host tools:
 
 - `Types.swift`: 93,690 generated lines;
 - `Client.swift`: 26,040 generated lines;

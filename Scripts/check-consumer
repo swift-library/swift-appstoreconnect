@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import plistlib
 import re
 import shutil
 import subprocess
@@ -13,8 +14,53 @@ import sys
 import time
 
 
-def main():
-    argparse.ArgumentParser(description=__doc__).parse_args()
+def run_check(name, command, *, cwd, output, evidence, checks):
+    print('Consumer: ' + name, flush=True)
+    started = time.monotonic()
+    path = output / (name + '.log')
+    status = None
+    try:
+        with path.open('w') as log:
+            status = subprocess.run(command, cwd=cwd, stdout=log, stderr=subprocess.STDOUT, timeout=1800).returncode
+    finally:
+        evidence.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, evidence / ('consumer-' + path.name))
+        checks.append({'name': name, 'exit_status': status,
+                       'elapsed_seconds': round(time.monotonic() - started, 3)})
+    if status:
+        raise RuntimeError(name + ' failed; inspect consumer-' + path.name + ' in validation evidence')
+    return checks[-1]['elapsed_seconds']
+
+
+def prepare_xcode_project(package, root, platforms):
+    project = package / 'ReleaseConsumer.xcodeproj'
+    path = project / 'project.pbxproj'
+    data = plistlib.loads(path.read_bytes())
+    references = [value for value in data['objects'].values()
+                  if value['isa'] == 'XCLocalSwiftPackageReference']
+    if len(references) != 1 or references[0]['relativePath'] != 'release-candidate':
+        raise ValueError('Expected one Xcode consumer dependency declaration')
+    references[0]['relativePath'] = str(root)
+    settings = {'iOS': 'IPHONEOS_DEPLOYMENT_TARGET', 'macOS': 'MACOSX_DEPLOYMENT_TARGET',
+                'tvOS': 'TVOS_DEPLOYMENT_TARGET', 'watchOS': 'WATCHOS_DEPLOYMENT_TARGET',
+                'visionOS': 'XROS_DEPLOYMENT_TARGET'}
+    for value in data['objects'].values():
+        build = value.get('buildSettings', {})
+        if 'PRODUCT_BUNDLE_IDENTIFIER' in build:
+            for platform, key in settings.items():
+                build[key] = str(min(platforms[platform])) + '.0'
+    path.write_bytes(plistlib.dumps(data))
+    lock = project / 'project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(package / 'Package.resolved', lock)
+    return project
+
+
+def main(arguments=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--scope', choices=('all', 'swiftpm'), default='all',
+                        help='SwiftPM consumers, or SwiftPM and Xcode platform consumers')
+    args = parser.parse_args(arguments)
     root = Path(__file__).resolve().parent.parent
     output = root / '.build/release-consumers/current'
     if output.exists():
@@ -29,17 +75,10 @@ def main():
         raise ValueError('Expected one consumer dependency declaration')
     manifest.write_text(text)
     checks = []
+    evidence = root / '.build/release-validation'
 
     def run(name, command, cwd=package):
-        print('Consumer: ' + name, flush=True)
-        started = time.monotonic()
-        with (output / (name + '.log')).open('w') as log:
-            status = subprocess.run(command, cwd=cwd, stdout=log, stderr=subprocess.STDOUT, timeout=1800).returncode
-        elapsed = time.monotonic() - started
-        checks.append({'name': name, 'exit_status': status, 'elapsed_seconds': round(elapsed, 3)})
-        if status:
-            raise RuntimeError(name + ' failed; inspect ' + str((output / (name + '.log')).relative_to(root)))
-        return elapsed
+        return run_check(name, command, cwd=cwd, output=output, evidence=evidence, checks=checks)
 
     run('resolve', ['swift', 'package', 'resolve'])
     elapsed = run('clean-default-build', ['swift', 'build', '--force-resolved-versions'])
@@ -68,23 +107,23 @@ def main():
     shutil.rmtree(snippet_package / '.build')
     destinations = {'iOS': 'iOS Simulator', 'tvOS': 'tvOS Simulator', 'watchOS': 'watchOS Simulator', 'visionOS': 'visionOS Simulator'}
     platforms = json.loads((root / '.github/release.json').read_text())['platforms']
-    for name, destination in destinations.items():
-        run(name.lower() + '-minimum-build', ['xcodebuild', 'build', '-scheme', 'ReleaseConsumer',
-            '-destination', 'generic/platform=' + destination, '-derivedDataPath', str(output / 'DerivedData'),
-            '-disableAutomaticPackageResolution', '-skipMacroValidation', 'CODE_SIGNING_ALLOWED=NO'])
-        shutil.rmtree(output / 'DerivedData')
+    if args.scope == 'all':
+        project = prepare_xcode_project(package, root, platforms)
+        for name, destination in destinations.items():
+            run(name.lower() + '-minimum-build', ['xcodebuild', 'build', '-project', str(project),
+                '-scheme', 'ReleaseConsumer',
+                '-destination', 'generic/platform=' + destination, '-derivedDataPath', str(output / 'DerivedData'),
+                '-disableAutomaticPackageResolution', '-skipMacroValidation', 'CODE_SIGNING_ALLOWED=NO'])
+            shutil.rmtree(output / 'DerivedData')
     lock = package / 'Package.resolved'
-    receipt = {'traits': ['PublicAPIBase'], 'clean_build_seconds': round(elapsed, 3),
+    receipt = {'scope': args.scope, 'traits': ['PublicAPIBase'], 'clean_build_seconds': round(elapsed, 3),
                'dependency_pins': json.loads(lock.read_text())['pins'],
                'dependency_lock_sha256': hashlib.sha256(lock.read_bytes()).hexdigest(),
                'consumer_manifest_sha256': hashlib.sha256(manifest.read_bytes()).hexdigest(),
                'checker_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-               'platforms': {name: min(generations) for name, generations in platforms.items()},
+               'platforms': {name: min(generations) for name, generations in platforms.items()
+                             if name == 'macOS' or args.scope == 'all'},
                'snippet_count': len(functions), 'checks': checks}
-    evidence = root / '.build/release-validation'
-    evidence.mkdir(parents=True, exist_ok=True)
-    for log in output.glob('*.log'):
-        shutil.copy2(log, evidence / ('consumer-' + log.name))
     (evidence / 'consumer.json').write_text(json.dumps(receipt, indent=2) + '\n')
     shutil.rmtree(output)
     print('Consumer compilation passed; clean default build ' + str(round(elapsed, 3)) + ' seconds')

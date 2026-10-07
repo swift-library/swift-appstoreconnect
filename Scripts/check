@@ -3,12 +3,26 @@
 # Copyright (c) 2026 Xudong Xu
 set -euo pipefail
 cd "$(dirname "$0")/.."
-case "${1:-all}" in
-  all) export RELEASE_CHECK_SCOPE=all ;;
-  --format-check) export RELEASE_CHECK_SCOPE=format ;;
-  --compiler-check) export RELEASE_CHECK_SCOPE=compiler ;;
-  *) echo 'Usage: Scripts/check [--format-check|--compiler-check]' >&2; exit 2 ;;
-esac
+usage() {
+  echo 'Usage: Scripts/check [--format-check|--compiler-check] [--consumer-scope all|swiftpm]' >&2
+  exit 2
+}
+export RELEASE_CHECK_SCOPE=all
+export RELEASE_CONSUMER_SCOPE=all
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    all) export RELEASE_CHECK_SCOPE=all ;;
+    --format-check) export RELEASE_CHECK_SCOPE=format ;;
+    --compiler-check) export RELEASE_CHECK_SCOPE=compiler ;;
+    --consumer-scope)
+      [ "$#" -ge 2 ] || usage
+      case "$2" in all|swiftpm) export RELEASE_CONSUMER_SCOPE="$2" ;; *) usage ;; esac
+      shift
+      ;;
+    *) usage ;;
+  esac
+  shift
+done
 mkdir -p .build/release-validation
 Scripts/validate-version --json > .build/release-validation/version.json
 swift package dump-package > .build/release-validation/package.json
@@ -29,6 +43,7 @@ if [ "$RELEASE_CHECK_SCOPE" = all ] || [ "$RELEASE_CHECK_SCOPE" = format ]; then
 fi
 if [ "$RELEASE_CHECK_SCOPE" = all ] || [ "$RELEASE_CHECK_SCOPE" = compiler ]; then
   python3 -B -m unittest discover -s Tests/ReleaseTools
+  Scripts/check-consumer --scope "$RELEASE_CONSUMER_SCOPE"
   python3 - <<'PY'
 import json, pathlib, re, shutil, subprocess
 root = pathlib.Path('.build/release-validation')
@@ -75,7 +90,6 @@ pathlib.Path('.build/release-validation/cli-binary.json').write_text(json.dumps(
 shutil.rmtree(products)
 PY
   Scripts/check-docs
-  Scripts/check-consumer
 fi
 python3 - <<'PY'
 import hashlib, json, os, pathlib, platform, subprocess, tempfile
@@ -108,7 +122,9 @@ if result['scope'] in ('all', 'format'):
     result['checks'].append('strict-format')
     result['formatter'] = subprocess.check_output(['xcrun', 'swift-format', '--version'], text=True).strip()
 if result['scope'] in ('all', 'compiler'):
-    result['checks'] += ['release-tools', 'trait-matrix', 'release-build', 'cli-smoke', 'docc', 'local-consumer', 'platform-builds']
+    result['checks'] += ['release-tools', 'trait-matrix', 'release-build', 'cli-smoke', 'docc', 'local-consumer']
+    if os.environ['RELEASE_CONSUMER_SCOPE'] == 'all':
+        result['checks'].append('platform-builds')
     result['traits'] = json.loads((root / 'traits.json').read_text())
     result['documentation'] = json.loads((root / 'documentation.json').read_text())
     result['consumer'] = json.loads((root / 'consumer.json').read_text())
