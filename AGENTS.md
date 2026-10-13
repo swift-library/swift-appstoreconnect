@@ -79,7 +79,7 @@ versions, requirements, dependencies or release workflows.
 
 ## Package Boundaries
 
-- Read `Docs/Architecture/Layering.md` and `Docs/Architecture/TechnicalDesign.md` before changing module boundaries.
+- Read `Documentation/Architecture/Layering.md` and `Documentation/Architecture/TechnicalDesign.md` before changing module boundaries.
 - Keep WebSession acquisition separate from Iris endpoints. Both APIs and their Workflow/CLI paths require the default-off `Experimental` trait.
 - Keep the CLI as a thin process boundary over Workflow.
 - Validate with `Scripts/check`; `Scripts/check-docs` owns multi-module DocC compilation.

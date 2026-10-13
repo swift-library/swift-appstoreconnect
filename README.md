@@ -11,6 +11,7 @@
 <p align="center">
   <a href="https://github.com/swift-library/swift-appstoreconnect/actions/workflows/ci.yml"><img src="https://github.com/swift-library/swift-appstoreconnect/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI"></a>
   <img src="https://img.shields.io/badge/Swift-6.3%2B-F05138" alt="Swift 6.3+">
+  <img src="https://img.shields.io/badge/platforms-iOS%2018%2B%20%7C%20macOS%2015%2B%20%7C%20tvOS%2018%2B%20%7C%20watchOS%2011%2B%20%7C%20visionOS%202%2B-lightgrey" alt="Platforms: iOS 18+ | macOS 15+ | tvOS 18+ | watchOS 11+ | visionOS 2+">
   <a href="LICENSE.txt"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License: Apache-2.0 WITH Swift-exception"></a>
 </p>
 
@@ -166,7 +167,7 @@ live API access requires your own credentials and is excluded from public CI.
 
 - [API documentation](https://swift-library.github.io/swift-appstoreconnect/): module reference and usage.
 - [Command guide](Sources/AppStoreConnectCLI/AppStoreConnectCLI.docc/CommandGuide.md): commands, traits, and execution boundaries.
-- [Documentation index](Docs/README.md): module design and architecture.
+- [Documentation index](Documentation/README.md): module design and architecture.
 - [Versioning and release](Documentation/Architecture/VersioningAndRelease.md): compatibility and release policy.
 - [Specification lock](Vendor/AppStoreConnectOpenAPI/spec.lock.json): Apple specification source and checksums.
 - [Changelog](CHANGELOG.md): release history.

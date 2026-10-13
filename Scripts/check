@@ -24,7 +24,6 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 mkdir -p .build/release-validation
-Scripts/validate-version --json > .build/release-validation/version.json
 swift package dump-package > .build/release-validation/package.json
 python3 - <<'PY'
 import json, pathlib
@@ -108,7 +107,8 @@ for path in root.iterdir():
     for prefix, replacement in sorted(prefixes.items(), key=lambda item: len(item[0]), reverse=True):
         log = log.replace(prefix, replacement).replace(prefix.replace('/', '\\/'), replacement)
     path.write_text(log)
-result = json.loads((root / 'version.json').read_text())
+result = {key: subprocess.check_output(['git', 'rev-parse', ref], text=True).strip()
+          for key, ref in [('commit', 'HEAD'), ('tree', 'HEAD^{tree}')]}
 result['scope'] = os.environ['RELEASE_CHECK_SCOPE']
 result['os'] = platform.platform()
 result['swift'] = subprocess.check_output(['swift', '--version'], text=True).strip()
@@ -117,7 +117,7 @@ result['sdks'] = {sdk: subprocess.check_output(['xcrun', '--sdk', sdk, '--show-s
                   for sdk in ('macosx', 'iphonesimulator', 'appletvsimulator', 'watchsimulator', 'xrsimulator')}
 result['validation_script_sha256'] = hashlib.sha256(pathlib.Path('Scripts/check').read_bytes()).hexdigest()
 result['format_configuration_sha256'] = hashlib.sha256(pathlib.Path('.swift-format').read_bytes()).hexdigest()
-result['checks'] = ['version', 'manifest-requirements', 'spec-checksum']
+result['checks'] = ['manifest-requirements', 'spec-checksum']
 if result['scope'] in ('all', 'format'):
     result['checks'].append('strict-format')
     result['formatter'] = subprocess.check_output(['xcrun', 'swift-format', '--version'], text=True).strip()

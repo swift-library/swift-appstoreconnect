@@ -224,8 +224,8 @@ Typed pagination follows the generated response type, not a parallel model.
 `AppStoreConnectOpenAPIPagination` extracts generated `PagedDocumentLinks`, and
 `RawPublicAPIClient.nextPage` follows `links.next` absolute URLs before decoding
 back into the same Apple generated page response type. This keeps pagination
-usable for operations whose OpenAPI operation input does not expose cursor
-parameters directly.
+usable for operations whose OpenAPI operation input does not expose continuation
+tokens directly.
 
 The stable public client surface should prefer typed clients by capability
 area, such as apps, builds, TestFlight, metadata, screenshots, subscriptions,
