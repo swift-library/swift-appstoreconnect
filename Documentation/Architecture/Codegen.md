@@ -388,21 +388,24 @@ so its version, operation list and counts stay synchronized with that input.
 
 ## Generator compatibility
 
-The generation adapter works around these upstream generator defects without
-editing Apple's archive/schema or the generator/runtime dependencies:
+The generation adapter addresses upstream generator defects and Apple's nullable
+reference annotations. Apple's archive/schema and the generator/runtime
+dependencies remain unchanged:
 
-- Object properties and required constraints beside `anyOf` or `oneOf` are
+- Upstream composition defect: object properties and required constraints beside `anyOf` or `oneOf` are
   ignored during typed generation. The input adapter distributes shared object
   constraints into every alternative and recursively combines nested properties
   and required keys. Conflicting constraints fail validation before generation.
-- Nullable required properties use `decodeIfPresent` and
+- Upstream required-nullable defect: nullable required properties use `decodeIfPresent` and
   `encodeIfPresent` semantics. That conflates a missing required key with null
   and omits explicit null during encoding. The serialization adapter requires
   the key, decodes a nullable value, and always encodes the key.
-- Nullable siblings on references are ignored by the generator's reference
-  handling. The adapter resolves nullability from the schema, including nullable
-  reference targets, and restores it in the generated property and initializer.
-- Optional nullable properties need three states. Their generated Swift type is
+- Nullable reference annotations: Apple's OpenAPI 3.0.1 document uses `nullable`
+  beside `$ref`. The [Reference Object contract](https://spec.openapis.org/oas/v3.0.1.html#reference-object)
+  ignores those siblings. The package adapter honors Apple's nullable annotations
+  and nullable reference targets in the Swift properties and initializers.
+- Upstream optional-nullable defect: generated serialization conflates omission
+  and explicit null. The adapter preserves three states. The adapted Swift type is
   `T??`: outer `nil` omits the key, `.some(nil)` encodes JSON null, and
   `.some(.some(value))` encodes a value. Decoding preserves all three states.
 
