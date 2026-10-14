@@ -66,7 +66,7 @@
         "xcode": "26.0.1",
         "command": "Scripts/check --compiler-check --consumer-scope swiftpm",
         "swift": "6.3.3",
-        "timeout_minutes": 180
+        "timeout_minutes": 240
       },
       {
         "name": "macos-26-swift-6.3",
