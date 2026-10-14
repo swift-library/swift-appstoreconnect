@@ -1895,6 +1895,29 @@ import Testing
     ])
 }
 
+@Test func optionalWorkflowUpdatesOmitUnspecifiedNullableFields() async throws {
+  let transport = WorkflowOpenAPITransport()
+  let commands = PublicAPIWriteCommands(
+    client: AppStoreConnectPublicClient(
+      client: Client(
+        serverURL: URL(string: "https://api.appstoreconnect.apple.com")!, transport: transport)))
+  _ = try await commands.updateApp(.init(id: "app-1", primaryLocale: "en-US"))
+  _ = try await commands.updateBetaAppReviewDetail(
+    .init(id: "review-detail-1", contactEmail: "qa@example.com"))
+  _ = try await commands.updateAppStoreVersion(
+    .init(id: "version-1", releaseType: "AFTER_APPROVAL"))
+  let requests = await transport.requests()
+  let expected = ["primaryLocale", "contactEmail", "releaseType"]
+  for (request, key) in zip(requests, expected) {
+    let body = try #require(request.body)
+    let document = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+    let data = try #require(document["data"] as? [String: Any])
+    let attributes = try #require(data["attributes"] as? [String: Any])
+    #expect(Set(attributes.keys) == [key])
+    #expect(attributes[key] is String)
+  }
+}
+
 @Test func publicWriteCommandsMutateReleaseReviewResourcesThroughPublicAPIFacade() async throws {
   let transport = WorkflowOpenAPITransport()
   let publicClient = AppStoreConnectPublicClient(
@@ -3044,6 +3067,7 @@ import Testing
 private struct WorkflowRecordedRequest: Sendable, Equatable {
   var operationID: String
   var path: String?
+  var body: Data? = nil
 }
 
 private func temporaryFileURL(_ name: String) -> URL {
@@ -3082,10 +3106,17 @@ private actor WorkflowOpenAPITransport: ClientTransport {
     baseURL: URL,
     operationID: String
   ) async throws -> (HTTPResponse, HTTPBody?) {
+    let bodyData: Data?
+    if let body {
+      bodyData = try await Data(collecting: body, upTo: 1_048_576)
+    } else {
+      bodyData = nil
+    }
     recordedRequests.append(
       WorkflowRecordedRequest(
         operationID: operationID,
-        path: request.path
+        path: request.path,
+        body: bodyData
       ))
 
     if failAppLookup, operationID == Operations.AppsGetInstance.id {

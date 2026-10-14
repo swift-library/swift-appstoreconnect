@@ -2745,13 +2745,13 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.BetaGroupCreateRequest(
         data: .init(
           attributes: .init(
-            feedbackEnabled: input.feedbackEnabled,
-            hasAccessToAllBuilds: input.hasAccessToAllBuilds,
-            isInternalGroup: input.isInternalGroup,
+            feedbackEnabled: (input.feedbackEnabled).map { .some($0) },
+            hasAccessToAllBuilds: (input.hasAccessToAllBuilds).map { .some($0) },
+            isInternalGroup: (input.isInternalGroup).map { .some($0) },
             name: input.name,
-            publicLinkEnabled: input.publicLinkEnabled,
-            publicLinkLimit: input.publicLinkLimit,
-            publicLinkLimitEnabled: input.publicLinkLimitEnabled
+            publicLinkEnabled: (input.publicLinkEnabled).map { .some($0) },
+            publicLinkLimit: (input.publicLinkLimit).map { .some($0) },
+            publicLinkLimitEnabled: (input.publicLinkLimitEnabled).map { .some($0) }
           ),
           relationships: .init(
             app: .init(data: .init(id: input.appID, _type: .apps)),
@@ -2770,13 +2770,17 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.BetaGroupUpdateRequest(
         data: .init(
           attributes: .init(
-            feedbackEnabled: input.feedbackEnabled,
-            iosBuildsAvailableForAppleSiliconMac: input.iosBuildsAvailableForAppleSiliconMac,
-            iosBuildsAvailableForAppleVision: input.iosBuildsAvailableForAppleVision,
-            name: input.name,
-            publicLinkEnabled: input.publicLinkEnabled,
-            publicLinkLimit: input.publicLinkLimit,
-            publicLinkLimitEnabled: input.publicLinkLimitEnabled
+            feedbackEnabled: (input.feedbackEnabled).map { .some($0) },
+            iosBuildsAvailableForAppleSiliconMac: (input.iosBuildsAvailableForAppleSiliconMac).map {
+              .some($0)
+            },
+            iosBuildsAvailableForAppleVision: (input.iosBuildsAvailableForAppleVision).map {
+              .some($0)
+            },
+            name: (input.name).map { .some($0) },
+            publicLinkEnabled: (input.publicLinkEnabled).map { .some($0) },
+            publicLinkLimit: (input.publicLinkLimit).map { .some($0) },
+            publicLinkLimitEnabled: (input.publicLinkLimitEnabled).map { .some($0) }
           ),
           id: input.id,
           _type: .betaGroups
@@ -2792,8 +2796,8 @@ public struct PublicAPIWriteCommands: Sendable {
         data: .init(
           attributes: .init(
             email: input.email,
-            firstName: input.firstName,
-            lastName: input.lastName
+            firstName: (input.firstName).map { .some($0) },
+            lastName: (input.lastName).map { .some($0) }
           ),
           relationships: betaTesterCreateRelationshipsPayload(input),
           _type: .betaTesters
@@ -2808,14 +2812,14 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.BetaAppReviewDetailUpdateRequest(
         data: .init(
           attributes: .init(
-            contactEmail: input.contactEmail,
-            contactFirstName: input.contactFirstName,
-            contactLastName: input.contactLastName,
-            contactPhone: input.contactPhone,
-            demoAccountName: input.demoAccountName,
-            demoAccountPassword: input.demoAccountPassword,
-            demoAccountRequired: input.demoAccountRequired,
-            notes: input.notes
+            contactEmail: (input.contactEmail).map { .some($0) },
+            contactFirstName: (input.contactFirstName).map { .some($0) },
+            contactLastName: (input.contactLastName).map { .some($0) },
+            contactPhone: (input.contactPhone).map { .some($0) },
+            demoAccountName: (input.demoAccountName).map { .some($0) },
+            demoAccountPassword: (input.demoAccountPassword).map { .some($0) },
+            demoAccountRequired: (input.demoAccountRequired).map { .some($0) },
+            notes: (input.notes).map { .some($0) }
           ),
           id: input.id,
           _type: .betaAppReviewDetails
@@ -2844,13 +2848,16 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.AppUpdateRequest(
         data: .init(
           attributes: .init(
-            accessibilityUrl: input.accessibilityURL,
-            contentRightsDeclaration: try optionalContentRightsDeclaration(
-              input.contentRightsDeclaration),
-            primaryLocale: input.primaryLocale,
-            streamlinedPurchasingEnabled: input.streamlinedPurchasingEnabled,
-            subscriptionStatusUrl: input.subscriptionStatusURL,
-            subscriptionStatusUrlForSandbox: input.subscriptionStatusURLForSandbox
+            accessibilityUrl: (input.accessibilityURL).map { .some($0) },
+            contentRightsDeclaration: try
+              (optionalContentRightsDeclaration(
+                input.contentRightsDeclaration)).map { .some($0) },
+            primaryLocale: (input.primaryLocale).map { .some($0) },
+            streamlinedPurchasingEnabled: (input.streamlinedPurchasingEnabled).map { .some($0) },
+            subscriptionStatusUrl: (input.subscriptionStatusURL).map { .some($0) },
+            subscriptionStatusUrlForSandbox: (input.subscriptionStatusURLForSandbox).map {
+              .some($0)
+            }
           ),
           id: input.id,
           _type: .apps
@@ -2865,11 +2872,11 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.AppStoreVersionCreateRequest(
         data: .init(
           attributes: .init(
-            copyright: input.copyright,
-            earliestReleaseDate: input.earliestReleaseDate,
+            copyright: (input.copyright).map { .some($0) },
+            earliestReleaseDate: (input.earliestReleaseDate).map { .some($0) },
             platform: try requiredPlatform(input.platform),
-            releaseType: try optionalCreateReleaseType(input.releaseType),
-            reviewType: try optionalCreateReviewType(input.reviewType),
+            releaseType: try (optionalCreateReleaseType(input.releaseType)).map { .some($0) },
+            reviewType: try (optionalCreateReviewType(input.reviewType)).map { .some($0) },
             versionString: input.versionString
           ),
           relationships: .init(
@@ -2888,12 +2895,12 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.AppStoreVersionUpdateRequest(
         data: .init(
           attributes: .init(
-            copyright: input.copyright,
-            downloadable: input.downloadable,
-            earliestReleaseDate: input.earliestReleaseDate,
-            releaseType: try optionalUpdateReleaseType(input.releaseType),
-            reviewType: try optionalUpdateReviewType(input.reviewType),
-            versionString: input.versionString
+            copyright: (input.copyright).map { .some($0) },
+            downloadable: (input.downloadable).map { .some($0) },
+            earliestReleaseDate: (input.earliestReleaseDate).map { .some($0) },
+            releaseType: try (optionalUpdateReleaseType(input.releaseType)).map { .some($0) },
+            reviewType: try (optionalUpdateReviewType(input.reviewType)).map { .some($0) },
+            versionString: (input.versionString).map { .some($0) }
           ),
           id: input.id,
           relationships: appStoreVersionUpdateRelationshipsPayload(input),
@@ -2923,7 +2930,7 @@ public struct PublicAPIWriteCommands: Sendable {
     .json(
       Components.Schemas.ReviewSubmissionCreateRequest(
         data: .init(
-          attributes: .init(platform: try optionalPlatform(input.platform)),
+          attributes: .init(platform: try (optionalPlatform(input.platform)).map { .some($0) }),
           relationships: .init(app: .init(data: .init(id: input.appID, _type: .apps))),
           _type: .reviewSubmissions
         )
@@ -2937,9 +2944,9 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.ReviewSubmissionUpdateRequest(
         data: .init(
           attributes: .init(
-            canceled: input.canceled,
-            platform: try optionalPlatform(input.platform),
-            submitted: input.submitted
+            canceled: (input.canceled).map { .some($0) },
+            platform: try (optionalPlatform(input.platform)).map { .some($0) },
+            submitted: (input.submitted).map { .some($0) }
           ),
           id: input.id,
           _type: .reviewSubmissions
@@ -2970,7 +2977,9 @@ public struct PublicAPIWriteCommands: Sendable {
     .json(
       Components.Schemas.ReviewSubmissionItemUpdateRequest(
         data: .init(
-          attributes: .init(removed: input.removed, resolved: input.resolved),
+          attributes: .init(
+            removed: (input.removed).map { .some($0) }, resolved: (input.resolved).map { .some($0) }
+          ),
           id: input.id,
           _type: .reviewSubmissionItems
         )
@@ -3003,12 +3012,12 @@ public struct PublicAPIWriteCommands: Sendable {
         Components.Schemas.AppEventCreateRequest(
           data: .init(
             attributes: .init(
-              badge: try optionalAppEventCreateBadge(input.badge),
-              deepLink: input.deepLink,
-              primaryLocale: input.primaryLocale,
-              priority: try optionalAppEventCreatePriority(input.priority),
-              purchaseRequirement: input.purchaseRequirement,
-              purpose: try optionalAppEventCreatePurpose(input.purpose),
+              badge: try (optionalAppEventCreateBadge(input.badge)).map { .some($0) },
+              deepLink: (input.deepLink).map { .some($0) },
+              primaryLocale: (input.primaryLocale).map { .some($0) },
+              priority: try (optionalAppEventCreatePriority(input.priority)).map { .some($0) },
+              purchaseRequirement: (input.purchaseRequirement).map { .some($0) },
+              purpose: try (optionalAppEventCreatePurpose(input.purpose)).map { .some($0) },
               referenceName: input.referenceName
             ),
             relationships: .init(
@@ -3026,13 +3035,13 @@ public struct PublicAPIWriteCommands: Sendable {
         Components.Schemas.AppEventUpdateRequest(
           data: .init(
             attributes: .init(
-              badge: try optionalAppEventUpdateBadge(input.badge),
-              deepLink: input.deepLink,
-              primaryLocale: input.primaryLocale,
-              priority: try optionalAppEventUpdatePriority(input.priority),
-              purchaseRequirement: input.purchaseRequirement,
-              purpose: try optionalAppEventUpdatePurpose(input.purpose),
-              referenceName: input.referenceName
+              badge: try (optionalAppEventUpdateBadge(input.badge)).map { .some($0) },
+              deepLink: (input.deepLink).map { .some($0) },
+              primaryLocale: (input.primaryLocale).map { .some($0) },
+              priority: try (optionalAppEventUpdatePriority(input.priority)).map { .some($0) },
+              purchaseRequirement: (input.purchaseRequirement).map { .some($0) },
+              purpose: try (optionalAppEventUpdatePurpose(input.purpose)).map { .some($0) },
+              referenceName: (input.referenceName).map { .some($0) }
             ),
             id: input.id,
             _type: .appEvents
@@ -3091,93 +3100,94 @@ public struct PublicAPIWriteCommands: Sendable {
       typealias Attributes = Components.Schemas.AgeRatingDeclarationUpdateRequest.DataPayload
         .AttributesPayload
       let attributes = try Attributes(
-        advertising: booleanRatings["advertising"],
-        ageAssurance: booleanRatings["ageAssurance"],
-        ageRatingOverrideV2: optionalEnum(
+        advertising: (booleanRatings["advertising"]).map { .some($0) },
+        ageAssurance: (booleanRatings["ageAssurance"]).map { .some($0) },
+        ageRatingOverrideV2: (optionalEnum(
           input.ageRatingOverrideV2 ?? allNoneOverride,
           fieldName: "ageRatingOverrideV2",
           as: Attributes.AgeRatingOverrideV2Payload.self
-        ),
-        alcoholTobaccoOrDrugUseOrReferences: optionalEnum(
+        )).map { .some($0) },
+        alcoholTobaccoOrDrugUseOrReferences: (optionalEnum(
           frequencyRatings["alcoholTobaccoOrDrugUseOrReferences"],
           fieldName: "alcoholTobaccoOrDrugUseOrReferences",
           as: Attributes.AlcoholTobaccoOrDrugUseOrReferencesPayload.self
-        ),
-        contests: optionalEnum(
+        )).map { .some($0) },
+        contests: (optionalEnum(
           frequencyRatings["contests"],
           fieldName: "contests",
           as: Attributes.ContestsPayload.self
-        ),
-        developerAgeRatingInfoUrl: input.developerAgeRatingInfoURL,
-        gambling: booleanRatings["gambling"],
-        gamblingSimulated: optionalEnum(
+        )).map { .some($0) },
+        developerAgeRatingInfoUrl: (input.developerAgeRatingInfoURL).map { .some($0) },
+        gambling: (booleanRatings["gambling"]).map { .some($0) },
+        gamblingSimulated: (optionalEnum(
           frequencyRatings["gamblingSimulated"],
           fieldName: "gamblingSimulated",
           as: Attributes.GamblingSimulatedPayload.self
-        ),
-        gunsOrOtherWeapons: optionalEnum(
+        )).map { .some($0) },
+        gunsOrOtherWeapons: (optionalEnum(
           frequencyRatings["gunsOrOtherWeapons"],
           fieldName: "gunsOrOtherWeapons",
           as: Attributes.GunsOrOtherWeaponsPayload.self
-        ),
-        healthOrWellnessTopics: booleanRatings["healthOrWellnessTopics"],
-        horrorOrFearThemes: optionalEnum(
+        )).map { .some($0) },
+        healthOrWellnessTopics: (booleanRatings["healthOrWellnessTopics"]).map { .some($0) },
+        horrorOrFearThemes: (optionalEnum(
           frequencyRatings["horrorOrFearThemes"],
           fieldName: "horrorOrFearThemes",
           as: Attributes.HorrorOrFearThemesPayload.self
-        ),
-        kidsAgeBand: optionalEnum(
-          input.kidsAgeBand, fieldName: "kidsAgeBand", as: Components.Schemas.KidsAgeBand.self),
-        koreaAgeRatingOverride: optionalEnum(
+        )).map { .some($0) },
+        kidsAgeBand: (optionalEnum(
+          input.kidsAgeBand, fieldName: "kidsAgeBand", as: Components.Schemas.KidsAgeBand.self)).map
+        { .some($0) },
+        koreaAgeRatingOverride: (optionalEnum(
           input.koreaAgeRatingOverride ?? allNoneOverride,
           fieldName: "koreaAgeRatingOverride",
           as: Attributes.KoreaAgeRatingOverridePayload.self
-        ),
-        lootBox: booleanRatings["lootBox"],
-        matureOrSuggestiveThemes: optionalEnum(
+        )).map { .some($0) },
+        lootBox: (booleanRatings["lootBox"]).map { .some($0) },
+        matureOrSuggestiveThemes: (optionalEnum(
           frequencyRatings["matureOrSuggestiveThemes"],
           fieldName: "matureOrSuggestiveThemes",
           as: Attributes.MatureOrSuggestiveThemesPayload.self
-        ),
-        medicalOrTreatmentInformation: optionalEnum(
+        )).map { .some($0) },
+        medicalOrTreatmentInformation: (optionalEnum(
           frequencyRatings["medicalOrTreatmentInformation"],
           fieldName: "medicalOrTreatmentInformation",
           as: Attributes.MedicalOrTreatmentInformationPayload.self
-        ),
-        messagingAndChat: booleanRatings["messagingAndChat"],
-        parentalControls: booleanRatings["parentalControls"],
-        profanityOrCrudeHumor: optionalEnum(
+        )).map { .some($0) },
+        messagingAndChat: (booleanRatings["messagingAndChat"]).map { .some($0) },
+        parentalControls: (booleanRatings["parentalControls"]).map { .some($0) },
+        profanityOrCrudeHumor: (optionalEnum(
           frequencyRatings["profanityOrCrudeHumor"],
           fieldName: "profanityOrCrudeHumor",
           as: Attributes.ProfanityOrCrudeHumorPayload.self
-        ),
-        sexualContentGraphicAndNudity: optionalEnum(
+        )).map { .some($0) },
+        sexualContentGraphicAndNudity: (optionalEnum(
           frequencyRatings["sexualContentGraphicAndNudity"],
           fieldName: "sexualContentGraphicAndNudity",
           as: Attributes.SexualContentGraphicAndNudityPayload.self
-        ),
-        sexualContentOrNudity: optionalEnum(
+        )).map { .some($0) },
+        sexualContentOrNudity: (optionalEnum(
           frequencyRatings["sexualContentOrNudity"],
           fieldName: "sexualContentOrNudity",
           as: Attributes.SexualContentOrNudityPayload.self
-        ),
-        unrestrictedWebAccess: booleanRatings["unrestrictedWebAccess"],
-        userGeneratedContent: booleanRatings["userGeneratedContent"],
-        violenceCartoonOrFantasy: optionalEnum(
+        )).map { .some($0) },
+        unrestrictedWebAccess: (booleanRatings["unrestrictedWebAccess"]).map { .some($0) },
+        userGeneratedContent: (booleanRatings["userGeneratedContent"]).map { .some($0) },
+        violenceCartoonOrFantasy: (optionalEnum(
           frequencyRatings["violenceCartoonOrFantasy"],
           fieldName: "violenceCartoonOrFantasy",
           as: Attributes.ViolenceCartoonOrFantasyPayload.self
-        ),
-        violenceRealistic: optionalEnum(
+        )).map { .some($0) },
+        violenceRealistic: (optionalEnum(
           frequencyRatings["violenceRealistic"],
           fieldName: "violenceRealistic",
           as: Attributes.ViolenceRealisticPayload.self
-        ),
-        violenceRealisticProlongedGraphicOrSadistic: optionalEnum(
+        )).map { .some($0) },
+        violenceRealisticProlongedGraphicOrSadistic: (optionalEnum(
           frequencyRatings["violenceRealisticProlongedGraphicOrSadistic"],
           fieldName: "violenceRealisticProlongedGraphicOrSadistic",
           as: Attributes.ViolenceRealisticProlongedGraphicOrSadisticPayload.self
-        )
+        )).map { .some($0) }
       )
 
       return .json(
@@ -3220,11 +3230,11 @@ public struct PublicAPIWriteCommands: Sendable {
         Components.Schemas.WebhookUpdateRequest(
           data: .init(
             attributes: .init(
-              enabled: input.enabled,
-              eventTypes: try optionalWebhookEventTypes(input.eventTypes),
-              name: input.name,
-              secret: input.secret,
-              url: input.url
+              enabled: (input.enabled).map { .some($0) },
+              eventTypes: try (optionalWebhookEventTypes(input.eventTypes)).map { .some($0) },
+              name: (input.name).map { .some($0) },
+              secret: (input.secret).map { .some($0) },
+              url: (input.url).map { .some($0) }
             ),
             id: input.id,
             _type: .webhooks
@@ -3306,7 +3316,7 @@ public struct PublicAPIWriteCommands: Sendable {
             identifier: input.identifier,
             name: input.name,
             platform: try requiredBundleIDPlatform(input.platform),
-            seedId: input.seedID
+            seedId: (input.seedID).map { .some($0) }
           ),
           _type: .bundleIds
         )
@@ -3319,7 +3329,7 @@ public struct PublicAPIWriteCommands: Sendable {
     .json(
       Components.Schemas.BundleIdUpdateRequest(
         data: .init(
-          attributes: .init(name: input.name),
+          attributes: .init(name: (input.name).map { .some($0) }),
           id: input.id,
           _type: .bundleIds
         )
@@ -3334,7 +3344,7 @@ public struct PublicAPIWriteCommands: Sendable {
         data: .init(
           attributes: .init(
             capabilityType: try requiredBundleIDCapabilityType(input.capabilityType),
-            settings: try bundleIDCapabilitySettings(from: input.settingsJSON)
+            settings: try (bundleIDCapabilitySettings(from: input.settingsJSON)).map { .some($0) }
           ),
           relationships: .init(
             bundleId: .init(data: .init(id: input.bundleID, _type: .bundleIds))
@@ -3351,8 +3361,10 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.BundleIdCapabilityUpdateRequest(
         data: .init(
           attributes: .init(
-            capabilityType: try input.capabilityType.map(requiredBundleIDCapabilityType),
-            settings: try bundleIDCapabilitySettings(from: input.settingsJSON)
+            capabilityType: try (input.capabilityType.map(requiredBundleIDCapabilityType)).map {
+              .some($0)
+            },
+            settings: try (bundleIDCapabilitySettings(from: input.settingsJSON)).map { .some($0) }
           ),
           id: input.id,
           _type: .bundleIdCapabilities
@@ -3382,7 +3394,7 @@ public struct PublicAPIWriteCommands: Sendable {
     .json(
       Components.Schemas.CertificateUpdateRequest(
         data: .init(
-          attributes: .init(activated: input.activated),
+          attributes: .init(activated: (input.activated).map { .some($0) }),
           id: input.id,
           _type: .certificates
         )
@@ -3412,8 +3424,8 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.DeviceUpdateRequest(
         data: .init(
           attributes: .init(
-            name: input.name,
-            status: try optionalDeviceStatus(input.status)
+            name: (input.name).map { .some($0) },
+            status: try (optionalDeviceStatus(input.status)).map { .some($0) }
           ),
           id: input.id,
           _type: .devices
@@ -3449,11 +3461,11 @@ public struct PublicAPIWriteCommands: Sendable {
       Components.Schemas.UserInvitationCreateRequest(
         data: .init(
           attributes: .init(
-            allAppsVisible: input.allAppsVisible,
+            allAppsVisible: (input.allAppsVisible).map { .some($0) },
             email: input.email,
             firstName: input.firstName,
             lastName: input.lastName,
-            provisioningAllowed: input.provisioningAllowed,
+            provisioningAllowed: (input.provisioningAllowed).map { .some($0) },
             roles: try requiredUserRoles(input.roles)
           ),
           relationships: userInvitationCreateRelationshipsPayload(input.visibleAppIDs),
@@ -3472,9 +3484,9 @@ public struct PublicAPIWriteCommands: Sendable {
     let attributes =
       hasAttributes
       ? Components.Schemas.UserUpdateRequest.DataPayload.AttributesPayload(
-        allAppsVisible: input.allAppsVisible,
-        provisioningAllowed: input.provisioningAllowed,
-        roles: try optionalUserRoles(input.roles)
+        allAppsVisible: (input.allAppsVisible).map { .some($0) },
+        provisioningAllowed: (input.provisioningAllowed).map { .some($0) },
+        roles: try (optionalUserRoles(input.roles)).map { .some($0) }
       )
       : nil
 

@@ -157,6 +157,50 @@ public struct GeneratorCommand: Sendable {
       let reportText = String(data: data, encoding: .utf8) ?? ""
       return "selected OpenAPI input verified\n\(reportText)"
 
+    case "generate-typed-openapi":
+      let schema = try requiredURL("--schema", in: options)
+      let configuration = try requiredURL("--config", in: options)
+      let executable = try requiredURL("--generator", in: options)
+      let intermediate = try requiredURL("--intermediate", in: options)
+      let output = try requiredURL("--output", in: options)
+      let files = try requiredList("--files", in: options)
+      guard
+        files.allSatisfy({
+          URL(fileURLWithPath: $0).lastPathComponent == $0 && $0.hasSuffix(".swift")
+        })
+      else {
+        throw GeneratorCommandError.validationFailed("generated outputs must be Swift filenames")
+      }
+      try FileManager.default.createDirectory(at: intermediate, withIntermediateDirectories: true)
+      try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+      let process = Process()
+      process.executableURL = executable
+      process.arguments = [
+        "generate", schema.path, "--config", configuration.path,
+        "--output-directory", intermediate.path, "--plugin-source", "build",
+      ]
+      try process.run()
+      process.waitUntilExit()
+      guard process.terminationReason == .exit && process.terminationStatus == 0 else {
+        throw GeneratorCommandError.validationFailed(
+          "typed generator failed with status \(process.terminationStatus)")
+      }
+      let schemaData = try Data(contentsOf: schema)
+      let sources = try Dictionary(
+        uniqueKeysWithValues: files.map { file in
+          (file, try String(contentsOf: intermediate.appendingPathComponent(file), encoding: .utf8))
+        })
+      let adapted = try OpenAPISerializationAdapter().adapt(
+        sources: sources, schemaData: schemaData)
+      for file in files {
+        let destination = output.appendingPathComponent(file)
+        let data = Data(adapted[file, default: ""].utf8)
+        if (try? Data(contentsOf: destination)) != data {
+          try data.write(to: destination, options: .atomic)
+        }
+      }
+      return "generated and adapted typed OpenAPI sources"
+
     case "generate-openapi-facade":
       let capabilitiesURL = try requiredURL("--capabilities", in: options)
       let selectedURL = try requiredURL("--selected", in: options)

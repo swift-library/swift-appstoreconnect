@@ -31,3 +31,25 @@ let client = AppStoreConnectPublicClient(
 )
 let apps = client.apps
 ```
+
+### Nullable request fields
+
+An optional nullable property uses `T??` to distinguish an omitted key from an
+explicit JSON null. Outer `nil` omits the key, `.some(nil)` clears the field,
+and `.some(.some(value))` sends a value. Required nullable properties use `T?`,
+require an initializer argument, and always encode the key; their decoder
+rejects a missing key.
+
+```swift
+import AppStoreConnectPublicAPI
+
+let attributes = Components.Schemas.AppUpdateRequest.DataPayload.AttributesPayload(
+    accessibilityUrl: .some(nil),
+    primaryLocale: .some(.some("en-US"))
+)
+```
+
+This update clears the accessibility URL, sets the primary locale, and omits
+other attributes. When forwarding a `T?` whose `nil` means “leave unchanged,”
+use `value.map { .some($0) }` to preserve the missing-key state. Workflow input
+optionals retain that omission behavior.

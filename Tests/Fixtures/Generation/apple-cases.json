@@ -1,0 +1,608 @@
+[
+  {
+    "schema": "AppAssetLibraryPlacementOrderingRequestCreateRequest",
+    "branch": 0,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacementOrderingRequests",
+        "attributes": {
+          "placementGroup": "sample"
+        },
+        "relationships": {
+          "orderedPlacements": {
+            "data": [
+              {
+                "type": "appAssetLibraryPlacements",
+                "id": "sample"
+              }
+            ]
+          },
+          "appStoreVersionLocalization": {
+            "data": {
+              "type": "appStoreVersionLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementOrderingRequestCreateRequest",
+    "branch": 0,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacementOrderingRequests",
+        "attributes": {
+          "placementGroup": null
+        },
+        "relationships": {
+          "orderedPlacements": {
+            "data": [
+              {
+                "type": "appAssetLibraryPlacements",
+                "id": "sample"
+              }
+            ]
+          },
+          "appStoreVersionLocalization": {
+            "data": {
+              "type": "appStoreVersionLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementOrderingRequestCreateRequest",
+    "branch": 1,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacementOrderingRequests",
+        "attributes": {
+          "placementGroup": "sample"
+        },
+        "relationships": {
+          "orderedPlacements": {
+            "data": [
+              {
+                "type": "appAssetLibraryPlacements",
+                "id": "sample"
+              }
+            ]
+          },
+          "appCustomProductPageLocalization": {
+            "data": {
+              "type": "appCustomProductPageLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementOrderingRequestCreateRequest",
+    "branch": 1,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacementOrderingRequests",
+        "attributes": {
+          "placementGroup": null
+        },
+        "relationships": {
+          "orderedPlacements": {
+            "data": [
+              {
+                "type": "appAssetLibraryPlacements",
+                "id": "sample"
+              }
+            ]
+          },
+          "appCustomProductPageLocalization": {
+            "data": {
+              "type": "appCustomProductPageLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementOrderingRequestCreateRequest",
+    "branch": 2,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacementOrderingRequests",
+        "attributes": {
+          "placementGroup": "sample"
+        },
+        "relationships": {
+          "orderedPlacements": {
+            "data": [
+              {
+                "type": "appAssetLibraryPlacements",
+                "id": "sample"
+              }
+            ]
+          },
+          "appStoreVersionExperimentTreatmentLocalization": {
+            "data": {
+              "type": "appStoreVersionExperimentTreatmentLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementOrderingRequestCreateRequest",
+    "branch": 2,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacementOrderingRequests",
+        "attributes": {
+          "placementGroup": null
+        },
+        "relationships": {
+          "orderedPlacements": {
+            "data": [
+              {
+                "type": "appAssetLibraryPlacements",
+                "id": "sample"
+              }
+            ]
+          },
+          "appStoreVersionExperimentTreatmentLocalization": {
+            "data": {
+              "type": "appStoreVersionExperimentTreatmentLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 0,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appEventLocalization": {
+            "data": {
+              "type": "appEventLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 0,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appEventLocalization": {
+            "data": {
+              "type": "appEventLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 1,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionLocalization": {
+            "data": {
+              "type": "appStoreVersionLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 1,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionLocalization": {
+            "data": {
+              "type": "appStoreVersionLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 2,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appCustomProductPageLocalization": {
+            "data": {
+              "type": "appCustomProductPageLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 2,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appCustomProductPageLocalization": {
+            "data": {
+              "type": "appCustomProductPageLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 3,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionExperimentTreatmentLocalization": {
+            "data": {
+              "type": "appStoreVersionExperimentTreatmentLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 3,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "image": {
+            "data": {
+              "type": "appAssetLibraryImages",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionExperimentTreatmentLocalization": {
+            "data": {
+              "type": "appStoreVersionExperimentTreatmentLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 4,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appEventLocalization": {
+            "data": {
+              "type": "appEventLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 4,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appEventLocalization": {
+            "data": {
+              "type": "appEventLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 5,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionLocalization": {
+            "data": {
+              "type": "appStoreVersionLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 5,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionLocalization": {
+            "data": {
+              "type": "appStoreVersionLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 6,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appCustomProductPageLocalization": {
+            "data": {
+              "type": "appCustomProductPageLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 6,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appCustomProductPageLocalization": {
+            "data": {
+              "type": "appCustomProductPageLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 7,
+    "null": false,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": "APP_SCREENSHOT"
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionExperimentTreatmentLocalization": {
+            "data": {
+              "type": "appStoreVersionExperimentTreatmentLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "schema": "AppAssetLibraryPlacementCreateRequest",
+    "branch": 7,
+    "null": true,
+    "value": {
+      "data": {
+        "type": "appAssetLibraryPlacements",
+        "attributes": {
+          "placementType": null
+        },
+        "relationships": {
+          "video": {
+            "data": {
+              "type": "appAssetLibraryVideos",
+              "id": "sample"
+            }
+          },
+          "appStoreVersionExperimentTreatmentLocalization": {
+            "data": {
+              "type": "appStoreVersionExperimentTreatmentLocalizations",
+              "id": "sample"
+            }
+          }
+        }
+      }
+    }
+  }
+]

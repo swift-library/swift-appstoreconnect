@@ -20,7 +20,13 @@ source-intake work and must update:
 
 - `spec.lock.json`
 - `schema-audit.json`
-- `PLAN.md`
+- the selected `Sources/AppStoreConnectPublicAPI/openapi.json` input, its capability
+  manifest, and generation regression coverage;
+- the release version and migration notes when model or requirement changes are breaking.
+
+Review drift using [the generation guide](../../Documentation/Architecture/Codegen.md).
+Keep the archive and extracted schema byte-for-byte identical to Apple's download.
+All compatibility transformations belong to the package generation adapter.
 
 Generated Swift must be emitted by the package generator into SwiftPM's plugin
 work directory, not checked in under `Sources/`.

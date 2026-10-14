@@ -4,23 +4,23 @@
     "documentationURL": "https://developer.apple.com/documentation/appstoreconnectapi",
     "overviewURL": "https://developer.apple.com/app-store-connect/api/",
     "downloadURL": "https://developer.apple.com/sample-code/app-store-connect/app-store-connect-openapi-specification.zip",
-    "checkedAt": "2026-05-05T14:04:41Z",
-    "httpLastModified": "Tue, 10 Mar 2026 19:57:18 GMT",
+    "checkedAt": "2026-10-14T04:08:49Z",
+    "httpLastModified": "Tue, 06 Oct 2026 17:01:38 GMT",
     "contentType": "application/zip",
-    "contentLength": 238508
+    "contentLength": 277001
   },
   "archive": {
     "path": "archive/app-store-connect-openapi-specification.zip",
     "fileName": "app-store-connect-openapi-specification.zip",
-    "sha256": "75d0f1ce1b8c1df3cae1d60b13076a0fb448514b8a37ce546e66d724f82d6990",
+    "sha256": "7b826ae9ca3e45b0e7df2643cbb811c9930632640944db11a8af4586fab9db46",
     "extractedFile": "openapi.oas.json"
   },
   "schema": {
     "path": "schema/app-store-connect-openapi.json",
-    "sha256": "83f485960fc7198542461050e192cd21716274c5f3828c683fba35333482a02f",
+    "sha256": "7518d3a94a8bd701ac25c1c601b95b8f53aad92091affb15a2a9d331713dac1a",
     "openapi": "3.0.1",
     "title": "App Store Connect API",
-    "version": "4.3"
+    "version": "4.5.1"
   },
   "normalization": {
     "command": "vendor official archive unchanged, then unzip openapi.oas.json and copy it to schema/app-store-connect-openapi.json",

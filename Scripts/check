@@ -42,6 +42,7 @@ if [ "$RELEASE_CHECK_SCOPE" = all ] || [ "$RELEASE_CHECK_SCOPE" = format ]; then
 fi
 if [ "$RELEASE_CHECK_SCOPE" = all ] || [ "$RELEASE_CHECK_SCOPE" = compiler ]; then
   python3 -B -m unittest discover -s Tests/ReleaseTools
+  Scripts/check-generation > .build/release-validation/generation.log 2>&1
   Scripts/check-consumer --scope "$RELEASE_CONSUMER_SCOPE"
   python3 - <<'PY'
 import json, pathlib, re, shutil, subprocess
@@ -122,7 +123,7 @@ if result['scope'] in ('all', 'format'):
     result['checks'].append('strict-format')
     result['formatter'] = subprocess.check_output(['xcrun', 'swift-format', '--version'], text=True).strip()
 if result['scope'] in ('all', 'compiler'):
-    result['checks'] += ['release-tools', 'trait-matrix', 'release-build', 'cli-smoke', 'docc', 'local-consumer']
+    result['checks'] += ['release-tools', 'generated-serialization', 'trait-matrix', 'release-build', 'cli-smoke', 'docc', 'local-consumer']
     if os.environ['RELEASE_CONSUMER_SCOPE'] == 'all':
         result['checks'].append('platform-builds')
     result['traits'] = json.loads((root / 'traits.json').read_text())

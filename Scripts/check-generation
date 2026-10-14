@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0 WITH Swift-exception
+# Copyright (c) 2026 Xudong Xu
+"""Compile generated regression models against the package's resolved dependencies."""
+import hashlib
+import json
+import pathlib
+import shutil
+import subprocess
+
+root = pathlib.Path(__file__).resolve().parent.parent
+output = root / '.build/generation-regression'
+output.mkdir(parents=True, exist_ok=True)
+
+def run(arguments, **kwargs):
+    subprocess.run([str(value) for value in arguments], cwd=root, check=True, **kwargs)
+
+for product in ('AppStoreConnectPublicAPIGen', 'swift-openapi-generator'):
+    run(['swift', 'build', '--build-system', 'native', '--force-resolved-versions', '--product', product])
+bin_path = pathlib.Path(subprocess.check_output(
+    ['swift', 'build', '--build-system', 'native', '--show-bin-path'], cwd=root, text=True).strip())
+selector = bin_path / 'AppStoreConnectPublicAPIGen'
+fixture = json.loads((root / 'Tests/Fixtures/Generation/openapi.json').read_text())
+apple = json.loads((root / 'Vendor/AppStoreConnectOpenAPI/schema/app-store-connect-openapi.json').read_text())
+cases = json.loads((root / 'Tests/Fixtures/Generation/apple-cases.json').read_text())
+fixture['components']['schemas'].update(apple['components']['schemas'])
+alternatives = fixture['paths']['/probe']['get']['responses']['200']['content']['application/json']['schema']['oneOf']
+for name in sorted({case['schema'] for case in cases}):
+    alternatives.append({'$ref': '#/components/schemas/' + name})
+(output / 'input.json').write_text(json.dumps(fixture))
+run([selector, 'trim-openapi', '--schema', output / 'input.json',
+     '--operations', 'probe', '--output', output / 'openapi.json'])
+manifest = json.loads((root / 'Sources/AppStoreConnectPublicAPI/openapi-generation.json').read_text())
+files = [name for name in manifest['output']['files'] if name != 'AppStoreConnectPublicAPI+Facade.swift']
+sources = output / 'Sources/Regression'
+run([selector, 'generate-typed-openapi', '--schema', output / 'openapi.json',
+     '--config', root / 'Sources/AppStoreConnectPublicAPI/openapi-generator-config.yaml',
+     '--generator', bin_path / 'swift-openapi-generator', '--intermediate', output / 'raw',
+     '--output', sources, '--files', ','.join(files)])
+shutil.copyfile(root / 'Tests/Fixtures/Generation/main.swift', sources / 'main.swift')
+pins = {pin['identity']: pin for pin in json.loads((root / 'Package.resolved').read_text())['pins']}
+identities = ['swift-openapi-runtime', 'swift-http-types']
+dependencies = ',\n'.join('.package(url: ' + json.dumps(pins[name]['location'])
+    + ', exact: ' + json.dumps(pins[name]['state']['version']) + ')' for name in identities)
+(output / 'Package.swift').write_text('''// swift-tools-version: 6.3
+import PackageDescription
+let package = Package(name: "GenerationRegression", platforms: [.macOS(.v15)],
+  dependencies: [
+''' + dependencies + '''
+  ], targets: [.executableTarget(name: "Regression", dependencies: [
+    .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
+    .product(name: "HTTPTypes", package: "swift-http-types")])])
+''')
+run(['swift', 'package', '--package-path', output, '--security-path', output / 'security', 'resolve'])
+resolved = {pin['identity']: pin for pin in json.loads((output / 'Package.resolved').read_text())['pins']}
+for name in identities:
+    if resolved[name]['state'] != pins[name]['state']:
+        raise RuntimeError('Regression dependency differs from the package lock: ' + name)
+run(['swift', 'run', '--package-path', output, '--build-system', 'native',
+     '--force-resolved-versions', 'Regression', root / 'Tests/Fixtures/Generation/apple-cases.json', output / 'result.json'])
+result = json.loads((output / 'result.json').read_text())
+result['dependency_pins'] = [resolved[name] for name in identities]
+result['generator'] = pins['swift-openapi-generator']['state']
+inputs = [*sorted((root / 'Tests/Fixtures/Generation').glob('*')),
+          *sorted((root / 'Plugins/AppStoreConnectPublicAPIGenCore').glob('*.swift')),
+          root / 'Vendor/AppStoreConnectOpenAPI/schema/app-store-connect-openapi.json',
+          pathlib.Path(__file__).resolve()]
+result['input_digests'] = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+                          for path in inputs}
+evidence = root / '.build/release-validation'
+evidence.mkdir(parents=True, exist_ok=True)
+(evidence / 'generation.json').write_text(json.dumps(result, indent=2) + '\n')
+shutil.rmtree(output)

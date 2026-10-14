@@ -122,12 +122,14 @@ public struct SelectedOpenAPITrimEmitter: Sendable {
     }
 
     var removedEmptyEnumCount = 0
-    let trimmedSchemas = schemaNames.sorted().reduce(into: [String: Any]()) { result, schemaName in
+    let trimmedSchemas = try schemaNames.sorted().reduce(into: [String: Any]()) {
+      result, schemaName in
       guard let schema = componentSchemas[schemaName] else {
         return
       }
-      result[schemaName] = normalizedForTypedGenerator(
-        schema, removedEmptyEnumCount: &removedEmptyEnumCount)
+      result[schemaName] = try OpenAPICompositionNormalizer.normalize(
+        normalizedForTypedGenerator(
+          schema, removedEmptyEnumCount: &removedEmptyEnumCount))
     }
 
     var trimmedComponents: [String: Any] = ["schemas": trimmedSchemas]
@@ -141,8 +143,9 @@ public struct SelectedOpenAPITrimEmitter: Sendable {
     var trimmedRoot: [String: Any] = [
       "openapi": root["openapi"] ?? "3.0.1",
       "info": root["info"] ?? [:],
-      "paths": normalizedForTypedGenerator(
-        selectedPaths, removedEmptyEnumCount: &removedEmptyEnumCount),
+      "paths": try OpenAPICompositionNormalizer.normalize(
+        normalizedForTypedGenerator(
+          selectedPaths, removedEmptyEnumCount: &removedEmptyEnumCount)),
       "components": trimmedComponents,
     ]
 

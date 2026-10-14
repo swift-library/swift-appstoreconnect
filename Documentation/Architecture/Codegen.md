@@ -194,6 +194,13 @@ The plugin writes selected generated Swift into the plugin work directory:
 <plugin-work-directory>/
   GeneratedSources/
     Types.swift
+    Types+Components.swift
+    Types+Operations.swift
+    Types+Components+Schemas.swift
+    Types+Components+Parameters.swift
+    Types+Components+RequestBodies.swift
+    Types+Components+Responses.swift
+    Types+Components+Headers.swift
     Client.swift
     Server.swift
     AppStoreConnectPublicAPI+Facade.swift
@@ -218,18 +225,23 @@ The package generator exposes deterministic commands for two audiences:
 - `verify-openapi-selection`: verify a generated or tracked selected OpenAPI
   input against the locked schema and capability manifest, then write a build
   stamp;
+- `generate-typed-openapi`: plugin-facing command that runs the pinned typed
+  generator, restores schema nullability and key-presence semantics, and writes
+  the declared Swift outputs;
 - `generate-openapi-facade`: plugin-facing command that emits package-owned
   capability clients over the generated selected OpenAPI client;
 - `generate-type-overrides-config`: diagnostic command that creates an Apple
   generator config replacing selected named component schemas with
   `OpenAPIRuntime.OpenAPIValueContainer`.
 
-The build tool plugin invokes `filter-openapi`, then runs Apple's
-`swift-openapi-generator generate` executable with the filtered document and
-generator config. Both executables and the selector's core dependency declare
+The build tool plugin invokes `filter-openapi`, then `generate-typed-openapi`.
+The latter runs `swift-openapi-generator generate` with the filtered document
+and generator config, then applies the serialization adapter before writing
+final Swift outputs. Both executables and the selector's core dependency declare
 development-host platform conditions; they execute on the host when the public
-libraries compile for another platform. The generator's `--plugin-source build` option produces all declared
-outputs, including an empty file for each unselected mode. The plugin emits the
+libraries compile for another platform. The generator's `--plugin-source build`
+option produces all declared outputs, including an empty file for each unselected
+mode. The plugin emits the
 facade from the same active OpenAPI input. These commands use only tracked
 schema, lock, audit, partition, generation manifests, capability manifest,
 generated compilation conditions,
@@ -262,9 +274,10 @@ Package-owned mapping policy is limited to:
 
 - generating Apple filter configs from trait partitions and active slice
   manifests;
-- applying deterministic schema normalization only when a locked schema artifact
-  would otherwise make Apple generated Swift invalid, such as unsupported empty
-  enum artifacts;
+- applying deterministic schema normalization for unsupported empty enums and
+  object constraints beside composition alternatives;
+- restoring schema nullability and required-key semantics in typed output,
+  with generated-model decoding and serialization regression coverage;
 - applying `typeOverrides` when a trait slice explicitly chooses JSON value
   replacement for named component schemas;
 - validating generated operation/path/schema counts against the locked schema
@@ -315,7 +328,8 @@ The intended dependency flow is:
 trait -> Package.swift trait-conditioned define
       -> plugin reads compilationConditions
       -> active API slice manifests selected and merged
-      -> Apple filter/typeOverrides -> Apple generator once
+      -> normalized active schema -> Apple generator once
+      -> serialization adapter -> generated Swift
       -> facade availability and compiled symbols change
 ```
 
@@ -358,35 +372,65 @@ Codegen is complete for a schema snapshot only when:
 - `swift build` and `swift test` invoke generation without checked-in generated
   Swift output.
 
-Current status: the selected typed-client path is active for the current public
-workflow seed.
-Its tracked `openapi-capabilities.json` drives `openapi.json`, which contains 7
-capabilities, 74 paths, 128 operations, and 240 referenced component schemas.
-Default
-`swift build` verifies the selection stamp and compiles the typed generated
-source emitted by `AppStoreConnectOpenAPIGen` through its host tools:
+The locked 4.5.1 snapshot contains 1,303 operations across 1,001 paths and
+1,473 component schemas. The default capability manifest selects 144 operations
+across 89 paths with 295 referenced schemas. `PublicAPIFull` selects all 1,303
+operations and their 1,458 reachable component schemas. Unreferenced components
+remain in the unchanged vendored schema.
 
-- `Types.swift`: 93,690 generated lines;
-- `Client.swift`: 26,040 generated lines;
-- `AppStoreConnectPublicAPI+Facade.swift`: 1,494 generated lines;
-- generated `Client` async methods for the current apps/release metadata,
-  builds, TestFlight, media assets, reports, users, and certificates/profiles
-  core operation slice.
-- generated `AppStoreConnectPublicClient` capability subclients and 128
-  capability method wrappers over the selected operations.
+The build plugin invokes the exact 1.14.0 generator, then the package-owned
+serialization adapter. It declares every split `Types` namespace file, the
+client and server output files, and the capability facade as build outputs.
+Intermediate generated source stays in the plugin work directory. The active
+trait union is generated once per build. The facade emitter derives the public
+`AppStoreConnectSelectedOpenAPI` metadata from the default capability selection,
+so its version, operation list and counts stay synchronized with that input.
 
-Measured Apple generation sizes from the locked schema:
+## Generator compatibility
 
-- selected deep `types + client`: 119,730 generated lines, about 6.2 MB;
-- selected `client` only: 26,040 generated lines, about 1.2 MB, but it is not
-  standalone because it depends on `Types.swift`;
-- full deep `types + client`: 916,788 generated lines, about 48 MB;
-- full shallow `types + client` with all component schemas overridden to
-  `OpenAPIRuntime.OpenAPIValueContainer`: 792,546 generated lines, about 40 MB.
-  This measurement proves that `Operations.*`, `Input`, `Output`,
-  `APIProtocol`, and `Client` remain significant even when component schemas
-  are replaced. The first trait-aligned route accepts that generated output can
-  be large and keeps size optimization as follow-up work.
+The generation adapter addresses upstream generator defects and Apple's nullable
+reference annotations. Apple's archive/schema and the generator/runtime
+dependencies remain unchanged:
+
+- Upstream composition defect: object properties and required constraints beside `anyOf` or `oneOf` are
+  ignored during typed generation. The input adapter distributes shared object
+  constraints into every alternative and recursively combines nested properties
+  and required keys. Conflicting constraints fail validation before generation.
+- Upstream required-nullable defect: nullable required properties use `decodeIfPresent` and
+  `encodeIfPresent` semantics. That conflates a missing required key with null
+  and omits explicit null during encoding. The serialization adapter requires
+  the key, decodes a nullable value, and always encodes the key.
+- Nullable reference annotations: Apple's OpenAPI 3.0.1 document uses `nullable`
+  beside `$ref`. The [Reference Object contract](https://spec.openapis.org/oas/v3.0.1.html#reference-object)
+  ignores those siblings. The package adapter honors Apple's nullable annotations
+  and nullable reference targets in the Swift properties and initializers.
+- Upstream optional-nullable defect: generated serialization conflates omission
+  and explicit null. The adapter preserves three states. The adapted Swift type is
+  `T??`: outer `nil` omits the key, `.some(nil)` encodes JSON null, and
+  `.some(.some(value))` encodes a value. Decoding preserves all three states.
+
+The source adapter maps the pinned generator's source remarks to schema
+properties, including inline arrays and composition alternatives. It preserves
+custom handling of additional properties and rejects unexpected initializer or
+Codable statement shapes. The exact generator pin and declared output files
+must be reviewed together when upgrading the generator.
+
+`Scripts/check-generation` generates and compiles independent regression models
+against the package's resolved runtime dependencies. It checks concrete values,
+explicit nulls, missing keys, reference siblings/targets, inline arrays, closed
+objects, additional properties, and both new Apple request compositions. The
+repository's `Scripts/check` runs this check before consumer and trait builds.
+
+## Reviewing specification drift
+
+The scheduled drift workflow compares Apple's download with the locked bytes.
+A drift finding requires an issue or pull request in this repository with the
+new source checksum/version and a compatibility review. Refresh the archive and
+schema unchanged; regenerate the audit, capability schema version, selected
+input, and tests. Review removed fields, required-key changes, enum cases and
+composition shapes, then apply the shared versioning standard before release.
+Never alter the vendored bytes to accommodate a generator limitation; put a
+covered generic transformation in the generation adapter.
 
 ## Risks / Known Gaps
 

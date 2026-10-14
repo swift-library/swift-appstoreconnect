@@ -9,7 +9,7 @@ import OpenAPIRuntime
 import Testing
 
 @Test func selectedTypedOpenAPIModelsAreUsable() {
-  #expect(AppStoreConnectSelectedOpenAPI.schemaVersion == "4.3")
+  #expect(AppStoreConnectSelectedOpenAPI.schemaVersion == "4.5.1")
   #expect(
     AppStoreConnectSelectedOpenAPI.capabilityIDs == [
       "apps",
@@ -20,8 +20,8 @@ import Testing
       "users",
       "certificates-profiles",
     ])
-  #expect(AppStoreConnectSelectedOpenAPI.pathCount == 86)
-  #expect(AppStoreConnectSelectedOpenAPI.schemaCount == 255)
+  #expect(AppStoreConnectSelectedOpenAPI.pathCount == 89)
+  #expect(AppStoreConnectSelectedOpenAPI.schemaCount == 295)
   #expect(Components.Schemas.App._TypePayload.apps.rawValue == "apps")
 
   let response = Components.Schemas.AppsResponse(
@@ -39,8 +39,8 @@ import Testing
 }
 
 @Test func selectedTypedOpenAPIClientIsGenerated() {
-  #expect(AppStoreConnectSelectedOpenAPI.schemaVersion == "4.3")
-  #expect(AppStoreConnectSelectedOpenAPI.operationIDs.count == 140)
+  #expect(AppStoreConnectSelectedOpenAPI.schemaVersion == "4.5.1")
+  #expect(AppStoreConnectSelectedOpenAPI.operationIDs.count == 144)
   #expect(Operations.AppsGetCollection.id == "apps_getCollection")
   #expect(
     Operations.AppsAppStoreVersionsGetToManyRelated.id == "apps_appStoreVersions_getToManyRelated")

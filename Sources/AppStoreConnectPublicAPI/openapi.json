@@ -119,6 +119,9 @@
                 ],
                 "type" : "string"
               },
+              "gracRatingClassificationNumber" : {
+                "type" : "string"
+              },
               "gunsOrOtherWeapons" : {
                 "enum" : [
                   "NONE",
@@ -148,6 +151,8 @@
               "koreaAgeRatingOverride" : {
                 "enum" : [
                   "NONE",
+                  "ALL",
+                  "TWELVE_PLUS",
                   "FIFTEEN_PLUS",
                   "NINETEEN_PLUS"
                 ],
@@ -211,6 +216,12 @@
                   "FREQUENT"
                 ],
                 "type" : "string"
+              },
+              "socialMedia" : {
+                "type" : "boolean"
+              },
+              "socialMediaAgeRestricted" : {
+                "type" : "boolean"
               },
               "unrestrictedWebAccess" : {
                 "type" : "boolean"
@@ -1127,6 +1138,14 @@
                 },
                 "type" : "object"
               },
+              "assetLibrary" : {
+                "properties" : {
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  }
+                },
+                "type" : "object"
+              },
               "backgroundAssets" : {
                 "properties" : {
                   "links" : {
@@ -1514,6 +1533,14 @@
                 },
                 "type" : "object"
               },
+              "performanceOverviews" : {
+                "properties" : {
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  }
+                },
+                "type" : "object"
+              },
               "perfPowerMetrics" : {
                 "properties" : {
                   "links" : {
@@ -1708,6 +1735,905 @@
         ],
         "title" : "App",
         "type" : "object"
+      },
+      "AppAssetLibraryAssetCategory" : {
+        "enum" : [
+          "CREATIVE_ASSETS",
+          "APP_SCREENSHOTS_AND_PREVIEWS"
+        ],
+        "type" : "string"
+      },
+      "AppAssetLibraryAssetState" : {
+        "enum" : [
+          "AWAITING_UPLOAD",
+          "UPLOAD_COMPLETE",
+          "FAILED",
+          "COMPLETE",
+          "PREPARE_FOR_SUBMISSION",
+          "READY_FOR_REVIEW",
+          "WAITING_FOR_REVIEW",
+          "IN_REVIEW",
+          "ACCEPTED",
+          "APPROVED",
+          "REJECTED",
+          "ARCHIVED"
+        ],
+        "type" : "string"
+      },
+      "AppAssetLibraryImage" : {
+        "properties" : {
+          "attributes" : {
+            "discriminator" : {
+              "mapping" : {
+                "ACCEPTED" : "#/components/schemas/AppAssetLibraryImageAcceptedAttributes",
+                "APPROVED" : "#/components/schemas/AppAssetLibraryImageApprovedAttributes",
+                "ARCHIVED" : "#/components/schemas/AppAssetLibraryImageArchivedAttributes",
+                "AWAITING_UPLOAD" : "#/components/schemas/AppAssetLibraryImageAwaitingUploadAttributes",
+                "COMPLETE" : "#/components/schemas/AppAssetLibraryImageCommonAttributes",
+                "FAILED" : "#/components/schemas/AppAssetLibraryImageFailedAttributes",
+                "IN_REVIEW" : "#/components/schemas/AppAssetLibraryImageInReviewAttributes",
+                "PREPARE_FOR_SUBMISSION" : "#/components/schemas/AppAssetLibraryImageCommonAttributes",
+                "READY_FOR_REVIEW" : "#/components/schemas/AppAssetLibraryImageReadyForReviewAttributes",
+                "REJECTED" : "#/components/schemas/AppAssetLibraryImageRejectedAttributes",
+                "UPLOAD_COMPLETE" : "#/components/schemas/AppAssetLibraryImageUploadCompleteAttributes",
+                "WAITING_FOR_REVIEW" : "#/components/schemas/AppAssetLibraryImageWaitingForReviewAttributes"
+              },
+              "propertyName" : "state"
+            },
+            "oneOf" : [
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageAwaitingUploadAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageUploadCompleteAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageFailedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageReadyForReviewAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageWaitingForReviewAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageInReviewAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageAcceptedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageApprovedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageRejectedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryImageArchivedAttributes"
+              }
+            ]
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "links" : {
+            "$ref" : "#/components/schemas/ResourceLinks"
+          },
+          "relationships" : {
+            "properties" : {
+              "placements" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "appAssetLibraryPlacements"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "type" : {
+            "enum" : [
+              "appAssetLibraryImages"
+            ],
+            "type" : "string"
+          }
+        },
+        "required" : [
+          "id",
+          "type"
+        ],
+        "title" : "AppAssetLibraryImage",
+        "type" : "object"
+      },
+      "AppAssetLibraryImageAcceptedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageAcceptedAttributes"
+      },
+      "AppAssetLibraryImageApprovedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageApprovedAttributes"
+      },
+      "AppAssetLibraryImageArchivedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageArchivedAttributes"
+      },
+      "AppAssetLibraryImageAwaitingUploadAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "properties" : {
+              "uploadOperations" : {
+                "items" : {
+                  "$ref" : "#/components/schemas/UploadOperation"
+                },
+                "type" : "array"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageAwaitingUploadAttributes"
+      },
+      "AppAssetLibraryImageCommonAttributes" : {
+        "properties" : {
+          "category" : {
+            "$ref" : "#/components/schemas/AppAssetLibraryAssetCategory"
+          },
+          "createdDate" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "fileName" : {
+            "type" : "string"
+          },
+          "fileSize" : {
+            "format" : "int64",
+            "maximum" : 9007199254740991,
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "imageAsset" : {
+            "$ref" : "#/components/schemas/ImageAsset"
+          },
+          "lastModifiedDate" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "referenceName" : {
+            "type" : "string"
+          },
+          "specId" : {
+            "type" : "string"
+          },
+          "state" : {
+            "$ref" : "#/components/schemas/AppAssetLibraryAssetState"
+          },
+          "stateDetails" : {
+            "items" : {
+              "$ref" : "#/components/schemas/StateDetail"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [
+          "state"
+        ],
+        "title" : "AppAssetLibraryImageCommonAttributes",
+        "type" : "object"
+      },
+      "AppAssetLibraryImageFailedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "properties" : {
+              "uploadOperations" : {
+                "items" : {
+                  "$ref" : "#/components/schemas/UploadOperation"
+                },
+                "type" : "array"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageFailedAttributes"
+      },
+      "AppAssetLibraryImageInReviewAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageInReviewAttributes"
+      },
+      "AppAssetLibraryImageReadyForReviewAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageReadyForReviewAttributes"
+      },
+      "AppAssetLibraryImageRejectedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageRejectedAttributes"
+      },
+      "AppAssetLibraryImageUploadCompleteAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "properties" : {
+              "uploadOperations" : {
+                "items" : {
+                  "$ref" : "#/components/schemas/UploadOperation"
+                },
+                "type" : "array"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageUploadCompleteAttributes"
+      },
+      "AppAssetLibraryImageWaitingForReviewAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryImageCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryImageWaitingForReviewAttributes"
+      },
+      "AppAssetLibraryMediaType" : {
+        "enum" : [
+          "IMAGE",
+          "VIDEO"
+        ],
+        "type" : "string"
+      },
+      "AppAssetLibraryPlacement" : {
+        "properties" : {
+          "attributes" : {
+            "properties" : {
+              "createdDate" : {
+                "format" : "date-time",
+                "type" : "string"
+              },
+              "lastModifiedDate" : {
+                "format" : "date-time",
+                "type" : "string"
+              },
+              "mediaType" : {
+                "$ref" : "#/components/schemas/AppAssetLibraryMediaType"
+              },
+              "placementGroup" : {
+                "type" : "string"
+              },
+              "placementType" : {
+                "$ref" : "#/components/schemas/AppAssetLibraryPlacementType"
+              },
+              "state" : {
+                "$ref" : "#/components/schemas/AppAssetLibraryPlacementState"
+              },
+              "stateDetails" : {
+                "items" : {
+                  "$ref" : "#/components/schemas/StateDetail"
+                },
+                "type" : "array"
+              }
+            },
+            "type" : "object"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "links" : {
+            "$ref" : "#/components/schemas/ResourceLinks"
+          },
+          "relationships" : {
+            "discriminator" : {
+              "mapping" : {
+                "IMAGE" : "#/components/schemas/AppAssetLibraryPlacementImageRelationships",
+                "VIDEO" : "#/components/schemas/AppAssetLibraryPlacementVideoRelationships"
+              },
+              "propertyName" : "mediaType"
+            },
+            "oneOf" : [
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryPlacementImageRelationships"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryPlacementVideoRelationships"
+              }
+            ]
+          },
+          "type" : {
+            "enum" : [
+              "appAssetLibraryPlacements"
+            ],
+            "type" : "string"
+          }
+        },
+        "required" : [
+          "id",
+          "type"
+        ],
+        "title" : "AppAssetLibraryPlacement",
+        "type" : "object"
+      },
+      "AppAssetLibraryPlacementCommonRelationships" : {
+        "properties" : {
+          "appCustomProductPageLocalization" : {
+            "properties" : {
+              "data" : {
+                "properties" : {
+                  "id" : {
+                    "type" : "string"
+                  },
+                  "type" : {
+                    "enum" : [
+                      "appCustomProductPageLocalizations"
+                    ],
+                    "type" : "string"
+                  }
+                },
+                "required" : [
+                  "id",
+                  "type"
+                ],
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "appEventLocalization" : {
+            "properties" : {
+              "data" : {
+                "properties" : {
+                  "id" : {
+                    "type" : "string"
+                  },
+                  "type" : {
+                    "enum" : [
+                      "appEventLocalizations"
+                    ],
+                    "type" : "string"
+                  }
+                },
+                "required" : [
+                  "id",
+                  "type"
+                ],
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "appStoreVersionExperimentTreatmentLocalization" : {
+            "properties" : {
+              "data" : {
+                "properties" : {
+                  "id" : {
+                    "type" : "string"
+                  },
+                  "type" : {
+                    "enum" : [
+                      "appStoreVersionExperimentTreatmentLocalizations"
+                    ],
+                    "type" : "string"
+                  }
+                },
+                "required" : [
+                  "id",
+                  "type"
+                ],
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "appStoreVersionLocalization" : {
+            "properties" : {
+              "data" : {
+                "properties" : {
+                  "id" : {
+                    "type" : "string"
+                  },
+                  "type" : {
+                    "enum" : [
+                      "appStoreVersionLocalizations"
+                    ],
+                    "type" : "string"
+                  }
+                },
+                "required" : [
+                  "id",
+                  "type"
+                ],
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          }
+        },
+        "title" : "AppAssetLibraryPlacementCommonRelationships",
+        "type" : "object"
+      },
+      "AppAssetLibraryPlacementImageRelationships" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryPlacementCommonRelationships"
+          },
+          {
+            "properties" : {
+              "image" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "appAssetLibraryImages"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryPlacementImageRelationships"
+      },
+      "AppAssetLibraryPlacementState" : {
+        "enum" : [
+          "ASSET_PROCESSING",
+          "FAILED",
+          "PARENT_PREPARE_FOR_SUBMISSION",
+          "PARENT_READY_FOR_REVIEW",
+          "PARENT_WAITING_FOR_REVIEW",
+          "PARENT_IN_REVIEW",
+          "PARENT_APPROVED"
+        ],
+        "type" : "string"
+      },
+      "AppAssetLibraryPlacementType" : {
+        "enum" : [
+          "APP_SCREENSHOT",
+          "IMESSAGE_APP_SCREENSHOT",
+          "APP_PREVIEW",
+          "PRODUCT_PAGE_HEADER_ASSET",
+          "APP_STORE_SEARCH_RESULTS_ASSET",
+          "SEARCH_RESULTS_ADS_ASSET",
+          "TODAY_TAB_ADS_ASSET",
+          "EVENT_CARD_ASSET",
+          "EVENT_DETAILS_PAGE_ASSET",
+          "RETENTION_MESSAGE_ASSET"
+        ],
+        "type" : "string"
+      },
+      "AppAssetLibraryPlacementVideoRelationships" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryPlacementCommonRelationships"
+          },
+          {
+            "properties" : {
+              "video" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "appAssetLibraryVideos"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryPlacementVideoRelationships"
+      },
+      "AppAssetLibraryVideo" : {
+        "properties" : {
+          "attributes" : {
+            "discriminator" : {
+              "mapping" : {
+                "ACCEPTED" : "#/components/schemas/AppAssetLibraryVideoAcceptedAttributes",
+                "APPROVED" : "#/components/schemas/AppAssetLibraryVideoApprovedAttributes",
+                "ARCHIVED" : "#/components/schemas/AppAssetLibraryVideoArchivedAttributes",
+                "AWAITING_UPLOAD" : "#/components/schemas/AppAssetLibraryVideoAwaitingUploadAttributes",
+                "COMPLETE" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes",
+                "FAILED" : "#/components/schemas/AppAssetLibraryVideoFailedAttributes",
+                "IN_REVIEW" : "#/components/schemas/AppAssetLibraryVideoInReviewAttributes",
+                "PREPARE_FOR_SUBMISSION" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes",
+                "READY_FOR_REVIEW" : "#/components/schemas/AppAssetLibraryVideoReadyForReviewAttributes",
+                "REJECTED" : "#/components/schemas/AppAssetLibraryVideoRejectedAttributes",
+                "UPLOAD_COMPLETE" : "#/components/schemas/AppAssetLibraryVideoUploadCompleteAttributes",
+                "WAITING_FOR_REVIEW" : "#/components/schemas/AppAssetLibraryVideoWaitingForReviewAttributes"
+              },
+              "propertyName" : "state"
+            },
+            "oneOf" : [
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoAwaitingUploadAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoUploadCompleteAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoFailedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoReadyForReviewAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoWaitingForReviewAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoInReviewAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoAcceptedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoApprovedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoRejectedAttributes"
+              },
+              {
+                "$ref" : "#/components/schemas/AppAssetLibraryVideoArchivedAttributes"
+              }
+            ]
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "links" : {
+            "$ref" : "#/components/schemas/ResourceLinks"
+          },
+          "relationships" : {
+            "properties" : {
+              "placements" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "appAssetLibraryPlacements"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "type" : {
+            "enum" : [
+              "appAssetLibraryVideos"
+            ],
+            "type" : "string"
+          }
+        },
+        "required" : [
+          "id",
+          "type"
+        ],
+        "title" : "AppAssetLibraryVideo",
+        "type" : "object"
+      },
+      "AppAssetLibraryVideoAcceptedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoAcceptedAttributes"
+      },
+      "AppAssetLibraryVideoApprovedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoApprovedAttributes"
+      },
+      "AppAssetLibraryVideoArchivedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoArchivedAttributes"
+      },
+      "AppAssetLibraryVideoAwaitingUploadAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "properties" : {
+              "uploadOperations" : {
+                "items" : {
+                  "$ref" : "#/components/schemas/UploadOperation"
+                },
+                "type" : "array"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoAwaitingUploadAttributes"
+      },
+      "AppAssetLibraryVideoCommonAttributes" : {
+        "properties" : {
+          "category" : {
+            "$ref" : "#/components/schemas/AppAssetLibraryAssetCategory"
+          },
+          "createdDate" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "fileName" : {
+            "type" : "string"
+          },
+          "fileSize" : {
+            "format" : "int64",
+            "maximum" : 9007199254740991,
+            "minimum" : 1,
+            "type" : "integer"
+          },
+          "lastModifiedDate" : {
+            "format" : "date-time",
+            "type" : "string"
+          },
+          "previewFrameImage" : {
+            "$ref" : "#/components/schemas/PreviewFrameImage"
+          },
+          "previewFrameTimeCode" : {
+            "type" : "string"
+          },
+          "referenceName" : {
+            "type" : "string"
+          },
+          "specId" : {
+            "type" : "string"
+          },
+          "state" : {
+            "$ref" : "#/components/schemas/AppAssetLibraryAssetState"
+          },
+          "stateDetails" : {
+            "items" : {
+              "$ref" : "#/components/schemas/StateDetail"
+            },
+            "type" : "array"
+          },
+          "videoAsset" : {
+            "format" : "uri",
+            "type" : "string"
+          }
+        },
+        "required" : [
+          "state"
+        ],
+        "title" : "AppAssetLibraryVideoCommonAttributes",
+        "type" : "object"
+      },
+      "AppAssetLibraryVideoFailedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "properties" : {
+              "uploadOperations" : {
+                "items" : {
+                  "$ref" : "#/components/schemas/UploadOperation"
+                },
+                "type" : "array"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoFailedAttributes"
+      },
+      "AppAssetLibraryVideoInReviewAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoInReviewAttributes"
+      },
+      "AppAssetLibraryVideoReadyForReviewAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoReadyForReviewAttributes"
+      },
+      "AppAssetLibraryVideoRejectedAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoRejectedAttributes"
+      },
+      "AppAssetLibraryVideoUploadCompleteAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "properties" : {
+              "uploadOperations" : {
+                "items" : {
+                  "$ref" : "#/components/schemas/UploadOperation"
+                },
+                "type" : "array"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoUploadCompleteAttributes"
+      },
+      "AppAssetLibraryVideoWaitingForReviewAttributes" : {
+        "allOf" : [
+          {
+            "$ref" : "#/components/schemas/AppAssetLibraryVideoCommonAttributes"
+          },
+          {
+            "type" : "object"
+          }
+        ],
+        "title" : "AppAssetLibraryVideoWaitingForReviewAttributes"
       },
       "AppCategory" : {
         "properties" : {
@@ -2237,6 +3163,38 @@
                         "type" : {
                           "enum" : [
                             "appScreenshotSets"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              },
+              "placements" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "appAssetLibraryPlacements"
                           ],
                           "type" : "string"
                         }
@@ -2813,10 +3771,6 @@
                   "EIGHTEEN"
                 ],
                 "type" : "string"
-              },
-              "kidsAgeBand" : {
-                "$ref" : "#/components/schemas/KidsAgeBand",
-                "deprecated" : true
               },
               "koreaAgeRating" : {
                 "deprecated" : true,
@@ -5059,6 +6013,7 @@
         "enum" : [
           "L",
           "ALL",
+          "ZERO_ZERO",
           "ONE_PLUS",
           "TWO_PLUS",
           "THREE_PLUS",
@@ -6389,6 +7344,38 @@
                   }
                 },
                 "type" : "object"
+              },
+              "placements" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "appAssetLibraryPlacements"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
               }
             },
             "type" : "object"
@@ -6705,6 +7692,38 @@
                 },
                 "type" : "object"
               },
+              "placements" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "appAssetLibraryPlacements"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              },
               "searchKeywords" : {
                 "properties" : {
                   "data" : {
@@ -6822,6 +7841,32 @@
                       "data"
                     ],
                     "type" : "object"
+                  },
+                  "placements" : {
+                    "properties" : {
+                      "data" : {
+                        "items" : {
+                          "properties" : {
+                            "id" : {
+                              "type" : "string"
+                            },
+                            "type" : {
+                              "enum" : [
+                                "appAssetLibraryPlacements"
+                              ],
+                              "type" : "string"
+                            }
+                          },
+                          "required" : [
+                            "id",
+                            "type"
+                          ],
+                          "type" : "object"
+                        },
+                        "type" : "array"
+                      }
+                    },
+                    "type" : "object"
                   }
                 },
                 "required" : [
@@ -6859,6 +7904,7 @@
             "items" : {
               "discriminator" : {
                 "mapping" : {
+                  "appAssetLibraryPlacements" : "#/components/schemas/AppAssetLibraryPlacement",
                   "appKeywords" : "#/components/schemas/AppKeyword",
                   "appPreviewSets" : "#/components/schemas/AppPreviewSet",
                   "appScreenshotSets" : "#/components/schemas/AppScreenshotSet",
@@ -6867,6 +7913,9 @@
                 "propertyName" : "type"
               },
               "oneOf" : [
+                {
+                  "$ref" : "#/components/schemas/AppAssetLibraryPlacement"
+                },
                 {
                   "$ref" : "#/components/schemas/AppKeyword"
                 },
@@ -7656,6 +8705,9 @@
             "properties" : {
               "createdDate" : {
                 "format" : "date-time",
+                "type" : "string"
+              },
+              "locale" : {
                 "type" : "string"
               },
               "platforms" : {
@@ -14538,6 +15590,14 @@
                 },
                 "type" : "object"
               },
+              "blockedPlayers" : {
+                "properties" : {
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  }
+                },
+                "type" : "object"
+              },
               "challengeReleases" : {
                 "deprecated" : true,
                 "properties" : {
@@ -15535,6 +16595,168 @@
           "type"
         ],
         "title" : "InAppPurchase",
+        "type" : "object"
+      },
+      "InAppPurchaseVersion" : {
+        "properties" : {
+          "attributes" : {
+            "properties" : {
+              "state" : {
+                "enum" : [
+                  "PREPARE_FOR_SUBMISSION",
+                  "READY_FOR_REVIEW",
+                  "WAITING_FOR_REVIEW",
+                  "IN_REVIEW",
+                  "ACCEPTED",
+                  "APPROVED",
+                  "REPLACED_WITH_NEW_VERSION",
+                  "REJECTED",
+                  "DEVELOPER_REJECTED"
+                ],
+                "type" : "string"
+              },
+              "version" : {
+                "type" : "integer"
+              }
+            },
+            "type" : "object"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "links" : {
+            "$ref" : "#/components/schemas/ResourceLinks"
+          },
+          "relationships" : {
+            "properties" : {
+              "image" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "inAppPurchaseImages"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  }
+                },
+                "type" : "object"
+              },
+              "images" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "inAppPurchaseImages"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              },
+              "inAppPurchase" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "inAppPurchases"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              },
+              "localizations" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "inAppPurchaseLocalizations"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "type" : {
+            "enum" : [
+              "inAppPurchaseVersions"
+            ],
+            "type" : "string"
+          }
+        },
+        "required" : [
+          "id",
+          "type"
+        ],
+        "title" : "InAppPurchaseVersion",
         "type" : "object"
       },
       "InternalBetaState" : {
@@ -16678,6 +17900,52 @@
           },
           "relationships" : {
             "properties" : {
+              "appAssetLibraryImage" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "appAssetLibraryImages"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              },
+              "appAssetLibraryVideo" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "appAssetLibraryVideos"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              },
               "appCustomProductPageVersion" : {
                 "properties" : {
                   "data" : {
@@ -16930,6 +18198,75 @@
                   }
                 },
                 "type" : "object"
+              },
+              "inAppPurchaseVersion" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "inAppPurchaseVersions"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              },
+              "subscriptionGroupVersion" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "subscriptionGroupVersions"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              },
+              "subscriptionVersion" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "subscriptionVersions"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
               }
             },
             "type" : "object"
@@ -16954,6 +18291,52 @@
             "properties" : {
               "relationships" : {
                 "properties" : {
+                  "appAssetLibraryImage" : {
+                    "properties" : {
+                      "data" : {
+                        "properties" : {
+                          "id" : {
+                            "type" : "string"
+                          },
+                          "type" : {
+                            "enum" : [
+                              "appAssetLibraryImages"
+                            ],
+                            "type" : "string"
+                          }
+                        },
+                        "required" : [
+                          "id",
+                          "type"
+                        ],
+                        "type" : "object"
+                      }
+                    },
+                    "type" : "object"
+                  },
+                  "appAssetLibraryVideo" : {
+                    "properties" : {
+                      "data" : {
+                        "properties" : {
+                          "id" : {
+                            "type" : "string"
+                          },
+                          "type" : {
+                            "enum" : [
+                              "appAssetLibraryVideos"
+                            ],
+                            "type" : "string"
+                          }
+                        },
+                        "required" : [
+                          "id",
+                          "type"
+                        ],
+                        "type" : "object"
+                      }
+                    },
+                    "type" : "object"
+                  },
                   "appCustomProductPageVersion" : {
                     "properties" : {
                       "data" : {
@@ -17207,6 +18590,29 @@
                     },
                     "type" : "object"
                   },
+                  "inAppPurchaseVersion" : {
+                    "properties" : {
+                      "data" : {
+                        "properties" : {
+                          "id" : {
+                            "type" : "string"
+                          },
+                          "type" : {
+                            "enum" : [
+                              "inAppPurchaseVersions"
+                            ],
+                            "type" : "string"
+                          }
+                        },
+                        "required" : [
+                          "id",
+                          "type"
+                        ],
+                        "type" : "object"
+                      }
+                    },
+                    "type" : "object"
+                  },
                   "reviewSubmission" : {
                     "properties" : {
                       "data" : {
@@ -17231,6 +18637,52 @@
                     "required" : [
                       "data"
                     ],
+                    "type" : "object"
+                  },
+                  "subscriptionGroupVersion" : {
+                    "properties" : {
+                      "data" : {
+                        "properties" : {
+                          "id" : {
+                            "type" : "string"
+                          },
+                          "type" : {
+                            "enum" : [
+                              "subscriptionGroupVersions"
+                            ],
+                            "type" : "string"
+                          }
+                        },
+                        "required" : [
+                          "id",
+                          "type"
+                        ],
+                        "type" : "object"
+                      }
+                    },
+                    "type" : "object"
+                  },
+                  "subscriptionVersion" : {
+                    "properties" : {
+                      "data" : {
+                        "properties" : {
+                          "id" : {
+                            "type" : "string"
+                          },
+                          "type" : {
+                            "enum" : [
+                              "subscriptionVersions"
+                            ],
+                            "type" : "string"
+                          }
+                        },
+                        "required" : [
+                          "id",
+                          "type"
+                        ],
+                        "type" : "object"
+                      }
+                    },
                     "type" : "object"
                   }
                 },
@@ -17268,6 +18720,8 @@
             "items" : {
               "discriminator" : {
                 "mapping" : {
+                  "appAssetLibraryImages" : "#/components/schemas/AppAssetLibraryImage",
+                  "appAssetLibraryVideos" : "#/components/schemas/AppAssetLibraryVideo",
                   "appCustomProductPageVersions" : "#/components/schemas/AppCustomProductPageVersion",
                   "appEvents" : "#/components/schemas/AppEvent",
                   "appStoreVersionExperiments" : "#/components/schemas/AppStoreVersionExperiment",
@@ -17277,11 +18731,20 @@
                   "gameCenterActivityVersions" : "#/components/schemas/GameCenterActivityVersion",
                   "gameCenterChallengeVersions" : "#/components/schemas/GameCenterChallengeVersion",
                   "gameCenterLeaderboardSetVersions" : "#/components/schemas/GameCenterLeaderboardSetVersionV2",
-                  "gameCenterLeaderboardVersions" : "#/components/schemas/GameCenterLeaderboardVersionV2"
+                  "gameCenterLeaderboardVersions" : "#/components/schemas/GameCenterLeaderboardVersionV2",
+                  "inAppPurchaseVersions" : "#/components/schemas/InAppPurchaseVersion",
+                  "subscriptionGroupVersions" : "#/components/schemas/SubscriptionGroupVersion",
+                  "subscriptionVersions" : "#/components/schemas/SubscriptionVersion"
                 },
                 "propertyName" : "type"
               },
               "oneOf" : [
+                {
+                  "$ref" : "#/components/schemas/AppAssetLibraryImage"
+                },
+                {
+                  "$ref" : "#/components/schemas/AppAssetLibraryVideo"
+                },
                 {
                   "$ref" : "#/components/schemas/AppCustomProductPageVersion"
                 },
@@ -17311,6 +18774,15 @@
                 },
                 {
                   "$ref" : "#/components/schemas/GameCenterLeaderboardVersionV2"
+                },
+                {
+                  "$ref" : "#/components/schemas/InAppPurchaseVersion"
+                },
+                {
+                  "$ref" : "#/components/schemas/SubscriptionGroupVersion"
+                },
+                {
+                  "$ref" : "#/components/schemas/SubscriptionVersion"
                 }
               ]
             },
@@ -17759,6 +19231,38 @@
                   }
                 },
                 "type" : "object"
+              },
+              "versions" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "subscriptionGroupVersions"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
               }
             },
             "type" : "object"
@@ -17777,12 +19281,278 @@
         "title" : "SubscriptionGroup",
         "type" : "object"
       },
+      "SubscriptionGroupVersion" : {
+        "properties" : {
+          "attributes" : {
+            "properties" : {
+              "state" : {
+                "enum" : [
+                  "PREPARE_FOR_SUBMISSION",
+                  "READY_FOR_REVIEW",
+                  "WAITING_FOR_REVIEW",
+                  "IN_REVIEW",
+                  "ACCEPTED",
+                  "APPROVED",
+                  "REPLACED_WITH_NEW_VERSION",
+                  "REJECTED",
+                  "DEVELOPER_REJECTED"
+                ],
+                "type" : "string"
+              },
+              "version" : {
+                "type" : "integer"
+              }
+            },
+            "type" : "object"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "links" : {
+            "$ref" : "#/components/schemas/ResourceLinks"
+          },
+          "relationships" : {
+            "properties" : {
+              "localizations" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "subscriptionGroupLocalizations"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              },
+              "subscriptionGroup" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "subscriptionGroups"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "type" : {
+            "enum" : [
+              "subscriptionGroupVersions"
+            ],
+            "type" : "string"
+          }
+        },
+        "required" : [
+          "id",
+          "type"
+        ],
+        "title" : "SubscriptionGroupVersion",
+        "type" : "object"
+      },
       "SubscriptionStatusUrlVersion" : {
         "enum" : [
           "V1",
           "V2"
         ],
         "type" : "string"
+      },
+      "SubscriptionVersion" : {
+        "properties" : {
+          "attributes" : {
+            "properties" : {
+              "state" : {
+                "enum" : [
+                  "PREPARE_FOR_SUBMISSION",
+                  "READY_FOR_REVIEW",
+                  "WAITING_FOR_REVIEW",
+                  "IN_REVIEW",
+                  "ACCEPTED",
+                  "APPROVED",
+                  "REPLACED_WITH_NEW_VERSION",
+                  "REJECTED",
+                  "DEVELOPER_REJECTED"
+                ],
+                "type" : "string"
+              },
+              "version" : {
+                "type" : "integer"
+              }
+            },
+            "type" : "object"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "links" : {
+            "$ref" : "#/components/schemas/ResourceLinks"
+          },
+          "relationships" : {
+            "properties" : {
+              "image" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "subscriptionImages"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  }
+                },
+                "type" : "object"
+              },
+              "images" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "subscriptionImages"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              },
+              "localizations" : {
+                "properties" : {
+                  "data" : {
+                    "items" : {
+                      "properties" : {
+                        "id" : {
+                          "type" : "string"
+                        },
+                        "type" : {
+                          "enum" : [
+                            "subscriptionLocalizations"
+                          ],
+                          "type" : "string"
+                        }
+                      },
+                      "required" : [
+                        "id",
+                        "type"
+                      ],
+                      "type" : "object"
+                    },
+                    "type" : "array"
+                  },
+                  "links" : {
+                    "$ref" : "#/components/schemas/RelationshipLinks"
+                  },
+                  "meta" : {
+                    "$ref" : "#/components/schemas/PagingInformation"
+                  }
+                },
+                "type" : "object"
+              },
+              "subscription" : {
+                "properties" : {
+                  "data" : {
+                    "properties" : {
+                      "id" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "enum" : [
+                          "subscriptions"
+                        ],
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [
+                      "id",
+                      "type"
+                    ],
+                    "type" : "object"
+                  }
+                },
+                "type" : "object"
+              }
+            },
+            "type" : "object"
+          },
+          "type" : {
+            "enum" : [
+              "subscriptionVersions"
+            ],
+            "type" : "string"
+          }
+        },
+        "required" : [
+          "id",
+          "type"
+        ],
+        "title" : "SubscriptionVersion",
+        "type" : "object"
       },
       "UploadOperation" : {
         "properties" : {
@@ -18279,7 +20049,7 @@
   },
   "info" : {
     "title" : "App Store Connect API",
-    "version" : "4.3",
+    "version" : "4.5.1",
     "x-platforms" : {
       "app_store_connect_api" : "App Store Connect API"
     }
@@ -19077,6 +20847,40 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type appInfos",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appInfos]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "appStoreState",
+                  "state",
+                  "appStoreAgeRating",
+                  "australiaAgeRating",
+                  "brazilAgeRating",
+                  "brazilAgeRatingV2",
+                  "franceAgeRating",
+                  "koreaAgeRating",
+                  "app",
+                  "ageRatingDeclaration",
+                  "appInfoLocalizations",
+                  "primaryCategory",
+                  "primarySubcategoryOne",
+                  "primarySubcategoryTwo",
+                  "secondaryCategory",
+                  "secondarySubcategoryOne",
+                  "secondarySubcategoryTwo",
+                  "territoryAgeRatings"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "comma-separated list of relationships to include",
             "explode" : false,
             "in" : "query",
@@ -19293,7 +21097,6 @@
                   "brazilAgeRatingV2",
                   "franceAgeRating",
                   "koreaAgeRating",
-                  "kidsAgeBand",
                   "app",
                   "ageRatingDeclaration",
                   "appInfoLocalizations",
@@ -19304,6 +21107,79 @@
                   "secondarySubcategoryOne",
                   "secondarySubcategoryTwo",
                   "territoryAgeRatings"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type apps",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[apps]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "accessibilityUrl",
+                  "name",
+                  "bundleId",
+                  "sku",
+                  "primaryLocale",
+                  "isOrEverWasMadeForKids",
+                  "subscriptionStatusUrl",
+                  "subscriptionStatusUrlVersion",
+                  "subscriptionStatusUrlForSandbox",
+                  "subscriptionStatusUrlVersionForSandbox",
+                  "contentRightsDeclaration",
+                  "streamlinedPurchasingEnabled",
+                  "accessibilityDeclarations",
+                  "appEncryptionDeclarations",
+                  "appStoreIcon",
+                  "ciProduct",
+                  "betaTesters",
+                  "betaGroups",
+                  "appStoreVersions",
+                  "appTags",
+                  "preReleaseVersions",
+                  "betaAppLocalizations",
+                  "builds",
+                  "betaLicenseAgreement",
+                  "betaAppReviewDetail",
+                  "appInfos",
+                  "appClips",
+                  "appPricePoints",
+                  "endUserLicenseAgreement",
+                  "appPriceSchedule",
+                  "appAvailabilityV2",
+                  "inAppPurchases",
+                  "subscriptionGroups",
+                  "gameCenterEnabledVersions",
+                  "performanceOverviews",
+                  "perfPowerMetrics",
+                  "appCustomProductPages",
+                  "inAppPurchasesV2",
+                  "promotedPurchases",
+                  "appEvents",
+                  "reviewSubmissions",
+                  "subscriptionGracePeriod",
+                  "customerReviews",
+                  "customerReviewSummarizations",
+                  "gameCenterDetail",
+                  "appStoreVersionExperimentsV2",
+                  "alternativeDistributionKey",
+                  "analyticsReportRequests",
+                  "marketplaceSearchDetail",
+                  "buildUploads",
+                  "backgroundAssets",
+                  "assetLibrary",
+                  "betaFeedbackScreenshotSubmissions",
+                  "betaFeedbackCrashSubmissions",
+                  "searchKeywords",
+                  "webhooks",
+                  "androidToIosAppMappingDetails"
                 ],
                 "type" : "string"
               },
@@ -19336,6 +21212,8 @@
                   "ageAssurance",
                   "sexualContentGraphicAndNudity",
                   "sexualContentOrNudity",
+                  "socialMedia",
+                  "socialMediaAgeRestricted",
                   "horrorOrFearThemes",
                   "matureOrSuggestiveThemes",
                   "unrestrictedWebAccess",
@@ -19346,6 +21224,7 @@
                   "ageRatingOverride",
                   "ageRatingOverrideV2",
                   "koreaAgeRatingOverride",
+                  "gracRatingClassificationNumber",
                   "developerAgeRatingInfoUrl"
                 ],
                 "type" : "string"
@@ -19796,6 +21675,27 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type appPreviewSets",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appPreviewSets]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "previewType",
+                  "appStoreVersionLocalization",
+                  "appCustomProductPageLocalization",
+                  "appStoreVersionExperimentTreatmentLocalization",
+                  "appPreviews"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "comma-separated list of relationships to include",
             "explode" : false,
             "in" : "query",
@@ -20161,6 +22061,78 @@
                   "appCustomProductPageLocalization",
                   "appStoreVersionExperimentTreatmentLocalization",
                   "appPreviews"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreVersionLocalizations",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersionLocalizations]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "description",
+                  "locale",
+                  "keywords",
+                  "marketingUrl",
+                  "promotionalText",
+                  "supportUrl",
+                  "whatsNew",
+                  "appStoreVersion",
+                  "appScreenshotSets",
+                  "appPreviewSets",
+                  "searchKeywords",
+                  "placements"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appCustomProductPageLocalizations",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appCustomProductPageLocalizations]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "locale",
+                  "promotionalText",
+                  "appCustomProductPageVersion",
+                  "appScreenshotSets",
+                  "appPreviewSets",
+                  "searchKeywords",
+                  "placements"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreVersionExperimentTreatmentLocalizations",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersionExperimentTreatmentLocalizations]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "locale",
+                  "appStoreVersionExperimentTreatment",
+                  "appScreenshotSets",
+                  "appPreviewSets",
+                  "placements"
                 ],
                 "type" : "string"
               },
@@ -20589,6 +22561,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -20605,6 +22578,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -20643,6 +22617,26 @@
                   "app",
                   "builds",
                   "appEncryptionDeclarationDocument"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type buildIcons",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[buildIcons]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "iconAsset",
+                  "iconType",
+                  "masked",
+                  "name"
                 ],
                 "type" : "string"
               },
@@ -20893,7 +22887,6 @@
                   "brazilAgeRatingV2",
                   "franceAgeRating",
                   "koreaAgeRating",
-                  "kidsAgeBand",
                   "app",
                   "ageRatingDeclaration",
                   "appInfoLocalizations",
@@ -20976,7 +22969,8 @@
                   "iapPriceSchedule",
                   "inAppPurchaseAvailability",
                   "images",
-                  "offerCodes"
+                  "offerCodes",
+                  "versions"
                 ],
                 "type" : "string"
               },
@@ -20995,7 +22989,8 @@
                 "enum" : [
                   "referenceName",
                   "subscriptions",
-                  "subscriptionGroupLocalizations"
+                  "subscriptionGroupLocalizations",
+                  "versions"
                 ],
                 "type" : "string"
               },
@@ -21169,6 +23164,7 @@
                   "challengeReleases",
                   "leaderboardReleases",
                   "leaderboardSetReleases",
+                  "blockedPlayers",
                   "challengesMinimumPlatformVersions"
                 ],
                 "type" : "string"
@@ -21578,6 +23574,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -21594,6 +23591,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -21632,6 +23630,26 @@
                   "app",
                   "builds",
                   "appEncryptionDeclarationDocument"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type buildIcons",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[buildIcons]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "iconAsset",
+                  "iconType",
+                  "masked",
+                  "name"
                 ],
                 "type" : "string"
               },
@@ -21882,7 +23900,6 @@
                   "brazilAgeRatingV2",
                   "franceAgeRating",
                   "koreaAgeRating",
-                  "kidsAgeBand",
                   "app",
                   "ageRatingDeclaration",
                   "appInfoLocalizations",
@@ -21965,7 +23982,8 @@
                   "iapPriceSchedule",
                   "inAppPurchaseAvailability",
                   "images",
-                  "offerCodes"
+                  "offerCodes",
+                  "versions"
                 ],
                 "type" : "string"
               },
@@ -21984,7 +24002,8 @@
                 "enum" : [
                   "referenceName",
                   "subscriptions",
-                  "subscriptionGroupLocalizations"
+                  "subscriptionGroupLocalizations",
+                  "versions"
                 ],
                 "type" : "string"
               },
@@ -22158,6 +24177,7 @@
                   "challengeReleases",
                   "leaderboardReleases",
                   "leaderboardSetReleases",
+                  "blockedPlayers",
                   "challengesMinimumPlatformVersions"
                 ],
                 "type" : "string"
@@ -22827,6 +24847,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -22843,6 +24864,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -22873,7 +24895,8 @@
                   "appStoreVersion",
                   "appScreenshotSets",
                   "appPreviewSets",
-                  "searchKeywords"
+                  "searchKeywords",
+                  "placements"
                 ],
                 "type" : "string"
               },
@@ -24238,6 +26261,27 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type appScreenshotSets",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appScreenshotSets]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "screenshotDisplayType",
+                  "appStoreVersionLocalization",
+                  "appCustomProductPageLocalization",
+                  "appStoreVersionExperimentTreatmentLocalization",
+                  "appScreenshots"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "comma-separated list of relationships to include",
             "explode" : false,
             "in" : "query",
@@ -24611,6 +26655,78 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type appStoreVersionLocalizations",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersionLocalizations]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "description",
+                  "locale",
+                  "keywords",
+                  "marketingUrl",
+                  "promotionalText",
+                  "supportUrl",
+                  "whatsNew",
+                  "appStoreVersion",
+                  "appScreenshotSets",
+                  "appPreviewSets",
+                  "searchKeywords",
+                  "placements"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appCustomProductPageLocalizations",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appCustomProductPageLocalizations]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "locale",
+                  "promotionalText",
+                  "appCustomProductPageVersion",
+                  "appScreenshotSets",
+                  "appPreviewSets",
+                  "searchKeywords",
+                  "placements"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreVersionExperimentTreatmentLocalizations",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersionExperimentTreatmentLocalizations]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "locale",
+                  "appStoreVersionExperimentTreatment",
+                  "appScreenshotSets",
+                  "appPreviewSets",
+                  "placements"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "the fields to include for returned resources of type appScreenshots",
             "explode" : false,
             "in" : "query",
@@ -24917,6 +27033,32 @@
                   "uploadOperations",
                   "assetDeliveryState",
                   "appStoreReviewDetail"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreReviewDetails",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreReviewDetails]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "contactFirstName",
+                  "contactLastName",
+                  "contactPhone",
+                  "contactEmail",
+                  "demoAccountName",
+                  "demoAccountPassword",
+                  "demoAccountRequired",
+                  "notes",
+                  "appStoreVersion",
+                  "appStoreReviewAttachments"
                 ],
                 "type" : "string"
               },
@@ -25234,6 +27376,46 @@
                   "notes",
                   "appStoreVersion",
                   "appStoreReviewAttachments"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreVersions",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersions]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "platform",
+                  "versionString",
+                  "appStoreState",
+                  "appVersionState",
+                  "copyright",
+                  "reviewType",
+                  "releaseType",
+                  "earliestReleaseDate",
+                  "usesIdfa",
+                  "downloadable",
+                  "createdDate",
+                  "app",
+                  "appStoreVersionLocalizations",
+                  "build",
+                  "appStoreVersionPhasedRelease",
+                  "gameCenterAppVersion",
+                  "routingAppCoverage",
+                  "appStoreReviewDetail",
+                  "appStoreVersionSubmission",
+                  "appClipDefaultExperience",
+                  "appStoreVersionExperiments",
+                  "appStoreVersionExperimentsV2",
+                  "customerReviews",
+                  "alternativeDistributionPackage"
                 ],
                 "type" : "string"
               },
@@ -25646,7 +27828,48 @@
                   "appStoreVersion",
                   "appScreenshotSets",
                   "appPreviewSets",
-                  "searchKeywords"
+                  "searchKeywords",
+                  "placements"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreVersions",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersions]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "platform",
+                  "versionString",
+                  "appStoreState",
+                  "appVersionState",
+                  "copyright",
+                  "reviewType",
+                  "releaseType",
+                  "earliestReleaseDate",
+                  "usesIdfa",
+                  "downloadable",
+                  "createdDate",
+                  "app",
+                  "appStoreVersionLocalizations",
+                  "build",
+                  "appStoreVersionPhasedRelease",
+                  "gameCenterAppVersion",
+                  "routingAppCoverage",
+                  "appStoreReviewDetail",
+                  "appStoreVersionSubmission",
+                  "appClipDefaultExperience",
+                  "appStoreVersionExperiments",
+                  "appStoreVersionExperimentsV2",
+                  "customerReviews",
+                  "alternativeDistributionPackage"
                 ],
                 "type" : "string"
               },
@@ -25697,6 +27920,35 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type appAssetLibraryPlacements",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appAssetLibraryPlacements]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "mediaType",
+                  "placementType",
+                  "placementGroup",
+                  "createdDate",
+                  "lastModifiedDate",
+                  "state",
+                  "stateDetails",
+                  "image",
+                  "video",
+                  "appEventLocalization",
+                  "appStoreVersionLocalization",
+                  "appCustomProductPageLocalization",
+                  "appStoreVersionExperimentTreatmentLocalization"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "comma-separated list of relationships to include",
             "explode" : false,
             "in" : "query",
@@ -25708,7 +27960,8 @@
                   "appStoreVersion",
                   "appScreenshotSets",
                   "appPreviewSets",
-                  "searchKeywords"
+                  "searchKeywords",
+                  "placements"
                 ],
                 "type" : "string"
               },
@@ -25731,6 +27984,17 @@
             "description" : "maximum number of related appScreenshotSets returned (when they are included)",
             "in" : "query",
             "name" : "limit[appScreenshotSets]",
+            "required" : false,
+            "schema" : {
+              "maximum" : 50,
+              "type" : "integer"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "maximum number of related placements returned (when they are included)",
+            "in" : "query",
+            "name" : "limit[placements]",
             "required" : false,
             "schema" : {
               "maximum" : 50,
@@ -26481,6 +28745,79 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type apps",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[apps]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "accessibilityUrl",
+                  "name",
+                  "bundleId",
+                  "sku",
+                  "primaryLocale",
+                  "isOrEverWasMadeForKids",
+                  "subscriptionStatusUrl",
+                  "subscriptionStatusUrlVersion",
+                  "subscriptionStatusUrlForSandbox",
+                  "subscriptionStatusUrlVersionForSandbox",
+                  "contentRightsDeclaration",
+                  "streamlinedPurchasingEnabled",
+                  "accessibilityDeclarations",
+                  "appEncryptionDeclarations",
+                  "appStoreIcon",
+                  "ciProduct",
+                  "betaTesters",
+                  "betaGroups",
+                  "appStoreVersions",
+                  "appTags",
+                  "preReleaseVersions",
+                  "betaAppLocalizations",
+                  "builds",
+                  "betaLicenseAgreement",
+                  "betaAppReviewDetail",
+                  "appInfos",
+                  "appClips",
+                  "appPricePoints",
+                  "endUserLicenseAgreement",
+                  "appPriceSchedule",
+                  "appAvailabilityV2",
+                  "inAppPurchases",
+                  "subscriptionGroups",
+                  "gameCenterEnabledVersions",
+                  "performanceOverviews",
+                  "perfPowerMetrics",
+                  "appCustomProductPages",
+                  "inAppPurchasesV2",
+                  "promotedPurchases",
+                  "appEvents",
+                  "reviewSubmissions",
+                  "subscriptionGracePeriod",
+                  "customerReviews",
+                  "customerReviewSummarizations",
+                  "gameCenterDetail",
+                  "appStoreVersionExperimentsV2",
+                  "alternativeDistributionKey",
+                  "analyticsReportRequests",
+                  "marketplaceSearchDetail",
+                  "buildUploads",
+                  "backgroundAssets",
+                  "assetLibrary",
+                  "betaFeedbackScreenshotSubmissions",
+                  "betaFeedbackCrashSubmissions",
+                  "searchKeywords",
+                  "webhooks",
+                  "androidToIosAppMappingDetails"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "the fields to include for returned resources of type appStoreVersionLocalizations",
             "explode" : false,
             "in" : "query",
@@ -26499,7 +28836,8 @@
                   "appStoreVersion",
                   "appScreenshotSets",
                   "appPreviewSets",
-                  "searchKeywords"
+                  "searchKeywords",
+                  "placements"
                 ],
                 "type" : "string"
               },
@@ -27136,6 +29474,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -27152,6 +29491,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -27469,6 +29809,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -27485,6 +29826,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -27779,6 +30121,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -27795,6 +30138,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -27964,6 +30308,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -27980,6 +30325,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -29357,6 +31703,73 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type builds",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[builds]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "version",
+                  "uploadedDate",
+                  "expirationDate",
+                  "expired",
+                  "minOsVersion",
+                  "lsMinimumSystemVersion",
+                  "computedMinMacOsVersion",
+                  "computedMinVisionOsVersion",
+                  "iconAssetToken",
+                  "processingState",
+                  "buildAudienceType",
+                  "usesNonExemptEncryption",
+                  "preReleaseVersion",
+                  "individualTesters",
+                  "betaGroups",
+                  "betaBuildLocalizations",
+                  "appEncryptionDeclaration",
+                  "betaAppReviewSubmission",
+                  "app",
+                  "buildBetaDetail",
+                  "appStoreVersion",
+                  "icons",
+                  "buildBundles",
+                  "buildUpload",
+                  "perfPowerMetrics",
+                  "diagnosticSignatures"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type betaTesters",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[betaTesters]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "inviteType",
+                  "state",
+                  "appDevices",
+                  "apps",
+                  "betaGroups",
+                  "builds"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "comma-separated list of relationships to include",
             "explode" : false,
             "in" : "query",
@@ -29590,6 +32003,73 @@
                   "screenshots",
                   "build",
                   "tester"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type builds",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[builds]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "version",
+                  "uploadedDate",
+                  "expirationDate",
+                  "expired",
+                  "minOsVersion",
+                  "lsMinimumSystemVersion",
+                  "computedMinMacOsVersion",
+                  "computedMinVisionOsVersion",
+                  "iconAssetToken",
+                  "processingState",
+                  "buildAudienceType",
+                  "usesNonExemptEncryption",
+                  "preReleaseVersion",
+                  "individualTesters",
+                  "betaGroups",
+                  "betaBuildLocalizations",
+                  "appEncryptionDeclaration",
+                  "betaAppReviewSubmission",
+                  "app",
+                  "buildBetaDetail",
+                  "appStoreVersion",
+                  "icons",
+                  "buildBundles",
+                  "buildUpload",
+                  "perfPowerMetrics",
+                  "diagnosticSignatures"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type betaTesters",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[betaTesters]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "inviteType",
+                  "state",
+                  "appDevices",
+                  "apps",
+                  "betaGroups",
+                  "builds"
                 ],
                 "type" : "string"
               },
@@ -29911,6 +32391,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -29927,6 +32408,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -30364,6 +32846,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -30380,6 +32863,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -31027,6 +33511,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -31043,6 +33528,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -31205,6 +33691,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -31221,6 +33708,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -31734,6 +34222,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -31750,6 +34239,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -32182,6 +34672,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -32198,6 +34689,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -33417,6 +35909,39 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type betaGroups",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[betaGroups]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "name",
+                  "createdDate",
+                  "isInternalGroup",
+                  "hasAccessToAllBuilds",
+                  "publicLinkEnabled",
+                  "publicLinkId",
+                  "publicLinkLimitEnabled",
+                  "publicLinkLimit",
+                  "publicLink",
+                  "feedbackEnabled",
+                  "iosBuildsAvailableForAppleSiliconMac",
+                  "iosBuildsAvailableForAppleVision",
+                  "app",
+                  "builds",
+                  "betaTesters",
+                  "betaRecruitmentCriteria",
+                  "betaRecruitmentCriterionCompatibleBuildCheck"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "the fields to include for returned resources of type betaBuildLocalizations",
             "explode" : false,
             "in" : "query",
@@ -33530,6 +36055,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -33546,6 +36072,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -33631,6 +36158,73 @@
                   "iconType",
                   "masked",
                   "name"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type buildBundles",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[buildBundles]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "bundleId",
+                  "bundleType",
+                  "sdkBuild",
+                  "platformBuild",
+                  "fileName",
+                  "hasSirikit",
+                  "hasOnDemandResources",
+                  "hasPrerenderedIcon",
+                  "usesLocationServices",
+                  "isIosBuildMacAppStoreCompatible",
+                  "includesSymbols",
+                  "dSYMUrl",
+                  "supportedArchitectures",
+                  "requiredCapabilities",
+                  "deviceProtocols",
+                  "locales",
+                  "entitlements",
+                  "baDownloadAllowance",
+                  "baMaxInstallSize",
+                  "minimumOsVersion",
+                  "appClipDomainCacheStatus",
+                  "appClipDomainDebugStatus",
+                  "betaAppClipInvocations",
+                  "buildBundleFileSizes"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type buildUploads",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[buildUploads]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "cfBundleShortVersionString",
+                  "cfBundleVersion",
+                  "createdDate",
+                  "state",
+                  "platform",
+                  "uploadedDate",
+                  "build",
+                  "assetFile",
+                  "assetDescriptionFile",
+                  "assetSpiFile",
+                  "buildUploadFiles"
                 ],
                 "type" : "string"
               },
@@ -33881,6 +36475,39 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type betaGroups",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[betaGroups]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "name",
+                  "createdDate",
+                  "isInternalGroup",
+                  "hasAccessToAllBuilds",
+                  "publicLinkEnabled",
+                  "publicLinkId",
+                  "publicLinkLimitEnabled",
+                  "publicLinkLimit",
+                  "publicLink",
+                  "feedbackEnabled",
+                  "iosBuildsAvailableForAppleSiliconMac",
+                  "iosBuildsAvailableForAppleVision",
+                  "app",
+                  "builds",
+                  "betaTesters",
+                  "betaRecruitmentCriteria",
+                  "betaRecruitmentCriterionCompatibleBuildCheck"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "the fields to include for returned resources of type betaBuildLocalizations",
             "explode" : false,
             "in" : "query",
@@ -33994,6 +36621,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -34010,6 +36638,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -34095,6 +36724,73 @@
                   "iconType",
                   "masked",
                   "name"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type buildBundles",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[buildBundles]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "bundleId",
+                  "bundleType",
+                  "sdkBuild",
+                  "platformBuild",
+                  "fileName",
+                  "hasSirikit",
+                  "hasOnDemandResources",
+                  "hasPrerenderedIcon",
+                  "usesLocationServices",
+                  "isIosBuildMacAppStoreCompatible",
+                  "includesSymbols",
+                  "dSYMUrl",
+                  "supportedArchitectures",
+                  "requiredCapabilities",
+                  "deviceProtocols",
+                  "locales",
+                  "entitlements",
+                  "baDownloadAllowance",
+                  "baMaxInstallSize",
+                  "minimumOsVersion",
+                  "appClipDomainCacheStatus",
+                  "appClipDomainDebugStatus",
+                  "betaAppClipInvocations",
+                  "buildBundleFileSizes"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type buildUploads",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[buildUploads]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "cfBundleShortVersionString",
+                  "cfBundleVersion",
+                  "createdDate",
+                  "state",
+                  "platform",
+                  "uploadedDate",
+                  "build",
+                  "assetFile",
+                  "assetDescriptionFile",
+                  "assetSpiFile",
+                  "buildUploadFiles"
                 ],
                 "type" : "string"
               },
@@ -34941,6 +37637,72 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type builds",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[builds]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "version",
+                  "uploadedDate",
+                  "expirationDate",
+                  "expired",
+                  "minOsVersion",
+                  "lsMinimumSystemVersion",
+                  "computedMinMacOsVersion",
+                  "computedMinVisionOsVersion",
+                  "iconAssetToken",
+                  "processingState",
+                  "buildAudienceType",
+                  "usesNonExemptEncryption",
+                  "preReleaseVersion",
+                  "individualTesters",
+                  "betaGroups",
+                  "betaBuildLocalizations",
+                  "appEncryptionDeclaration",
+                  "betaAppReviewSubmission",
+                  "app",
+                  "buildBetaDetail",
+                  "appStoreVersion",
+                  "icons",
+                  "buildBundles",
+                  "buildUpload",
+                  "perfPowerMetrics",
+                  "diagnosticSignatures"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type buildUploadFiles",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[buildUploadFiles]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "assetDeliveryState",
+                  "assetToken",
+                  "assetType",
+                  "fileName",
+                  "fileSize",
+                  "sourceFileChecksums",
+                  "uploadOperations",
+                  "uti"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "comma-separated list of relationships to include",
             "explode" : false,
             "in" : "query",
@@ -35521,6 +38283,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -35537,6 +38300,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -35923,6 +38687,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -35939,6 +38704,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -37781,6 +40547,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -37797,6 +40564,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -38015,6 +40783,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -38031,6 +40800,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -39187,6 +41957,79 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type apps",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[apps]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "accessibilityUrl",
+                  "name",
+                  "bundleId",
+                  "sku",
+                  "primaryLocale",
+                  "isOrEverWasMadeForKids",
+                  "subscriptionStatusUrl",
+                  "subscriptionStatusUrlVersion",
+                  "subscriptionStatusUrlForSandbox",
+                  "subscriptionStatusUrlVersionForSandbox",
+                  "contentRightsDeclaration",
+                  "streamlinedPurchasingEnabled",
+                  "accessibilityDeclarations",
+                  "appEncryptionDeclarations",
+                  "appStoreIcon",
+                  "ciProduct",
+                  "betaTesters",
+                  "betaGroups",
+                  "appStoreVersions",
+                  "appTags",
+                  "preReleaseVersions",
+                  "betaAppLocalizations",
+                  "builds",
+                  "betaLicenseAgreement",
+                  "betaAppReviewDetail",
+                  "appInfos",
+                  "appClips",
+                  "appPricePoints",
+                  "endUserLicenseAgreement",
+                  "appPriceSchedule",
+                  "appAvailabilityV2",
+                  "inAppPurchases",
+                  "subscriptionGroups",
+                  "gameCenterEnabledVersions",
+                  "performanceOverviews",
+                  "perfPowerMetrics",
+                  "appCustomProductPages",
+                  "inAppPurchasesV2",
+                  "promotedPurchases",
+                  "appEvents",
+                  "reviewSubmissions",
+                  "subscriptionGracePeriod",
+                  "customerReviews",
+                  "customerReviewSummarizations",
+                  "gameCenterDetail",
+                  "appStoreVersionExperimentsV2",
+                  "alternativeDistributionKey",
+                  "analyticsReportRequests",
+                  "marketplaceSearchDetail",
+                  "buildUploads",
+                  "backgroundAssets",
+                  "assetLibrary",
+                  "betaFeedbackScreenshotSubmissions",
+                  "betaFeedbackCrashSubmissions",
+                  "searchKeywords",
+                  "webhooks",
+                  "androidToIosAppMappingDetails"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "the fields to include for returned resources of type reviewSubmissionItems",
             "explode" : false,
             "in" : "query",
@@ -39201,12 +42044,78 @@
                   "appStoreVersionExperiment",
                   "appStoreVersionExperimentV2",
                   "appEvent",
+                  "appAssetLibraryImage",
+                  "appAssetLibraryVideo",
                   "backgroundAssetVersion",
                   "gameCenterAchievementVersion",
                   "gameCenterActivityVersion",
                   "gameCenterChallengeVersion",
                   "gameCenterLeaderboardSetVersion",
-                  "gameCenterLeaderboardVersion"
+                  "gameCenterLeaderboardVersion",
+                  "inAppPurchaseVersion",
+                  "subscriptionVersion",
+                  "subscriptionGroupVersion"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreVersions",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersions]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "platform",
+                  "versionString",
+                  "appStoreState",
+                  "appVersionState",
+                  "copyright",
+                  "reviewType",
+                  "releaseType",
+                  "earliestReleaseDate",
+                  "usesIdfa",
+                  "downloadable",
+                  "createdDate",
+                  "app",
+                  "appStoreVersionLocalizations",
+                  "build",
+                  "appStoreVersionPhasedRelease",
+                  "gameCenterAppVersion",
+                  "routingAppCoverage",
+                  "appStoreReviewDetail",
+                  "appStoreVersionSubmission",
+                  "appClipDefaultExperience",
+                  "appStoreVersionExperiments",
+                  "appStoreVersionExperimentsV2",
+                  "customerReviews",
+                  "alternativeDistributionPackage"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type actors",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[actors]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "actorType",
+                  "userFirstName",
+                  "userLastName",
+                  "userEmail",
+                  "apiKeyId"
                 ],
                 "type" : "string"
               },
@@ -39432,6 +42341,79 @@
             "style" : "form"
           },
           {
+            "description" : "the fields to include for returned resources of type apps",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[apps]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "accessibilityUrl",
+                  "name",
+                  "bundleId",
+                  "sku",
+                  "primaryLocale",
+                  "isOrEverWasMadeForKids",
+                  "subscriptionStatusUrl",
+                  "subscriptionStatusUrlVersion",
+                  "subscriptionStatusUrlForSandbox",
+                  "subscriptionStatusUrlVersionForSandbox",
+                  "contentRightsDeclaration",
+                  "streamlinedPurchasingEnabled",
+                  "accessibilityDeclarations",
+                  "appEncryptionDeclarations",
+                  "appStoreIcon",
+                  "ciProduct",
+                  "betaTesters",
+                  "betaGroups",
+                  "appStoreVersions",
+                  "appTags",
+                  "preReleaseVersions",
+                  "betaAppLocalizations",
+                  "builds",
+                  "betaLicenseAgreement",
+                  "betaAppReviewDetail",
+                  "appInfos",
+                  "appClips",
+                  "appPricePoints",
+                  "endUserLicenseAgreement",
+                  "appPriceSchedule",
+                  "appAvailabilityV2",
+                  "inAppPurchases",
+                  "subscriptionGroups",
+                  "gameCenterEnabledVersions",
+                  "performanceOverviews",
+                  "perfPowerMetrics",
+                  "appCustomProductPages",
+                  "inAppPurchasesV2",
+                  "promotedPurchases",
+                  "appEvents",
+                  "reviewSubmissions",
+                  "subscriptionGracePeriod",
+                  "customerReviews",
+                  "customerReviewSummarizations",
+                  "gameCenterDetail",
+                  "appStoreVersionExperimentsV2",
+                  "alternativeDistributionKey",
+                  "analyticsReportRequests",
+                  "marketplaceSearchDetail",
+                  "buildUploads",
+                  "backgroundAssets",
+                  "assetLibrary",
+                  "betaFeedbackScreenshotSubmissions",
+                  "betaFeedbackCrashSubmissions",
+                  "searchKeywords",
+                  "webhooks",
+                  "androidToIosAppMappingDetails"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
             "description" : "the fields to include for returned resources of type reviewSubmissionItems",
             "explode" : false,
             "in" : "query",
@@ -39446,12 +42428,78 @@
                   "appStoreVersionExperiment",
                   "appStoreVersionExperimentV2",
                   "appEvent",
+                  "appAssetLibraryImage",
+                  "appAssetLibraryVideo",
                   "backgroundAssetVersion",
                   "gameCenterAchievementVersion",
                   "gameCenterActivityVersion",
                   "gameCenterChallengeVersion",
                   "gameCenterLeaderboardSetVersion",
-                  "gameCenterLeaderboardVersion"
+                  "gameCenterLeaderboardVersion",
+                  "inAppPurchaseVersion",
+                  "subscriptionVersion",
+                  "subscriptionGroupVersion"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type appStoreVersions",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[appStoreVersions]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "platform",
+                  "versionString",
+                  "appStoreState",
+                  "appVersionState",
+                  "copyright",
+                  "reviewType",
+                  "releaseType",
+                  "earliestReleaseDate",
+                  "usesIdfa",
+                  "downloadable",
+                  "createdDate",
+                  "app",
+                  "appStoreVersionLocalizations",
+                  "build",
+                  "appStoreVersionPhasedRelease",
+                  "gameCenterAppVersion",
+                  "routingAppCoverage",
+                  "appStoreReviewDetail",
+                  "appStoreVersionSubmission",
+                  "appClipDefaultExperience",
+                  "appStoreVersionExperiments",
+                  "appStoreVersionExperimentsV2",
+                  "customerReviews",
+                  "alternativeDistributionPackage"
+                ],
+                "type" : "string"
+              },
+              "type" : "array"
+            },
+            "style" : "form"
+          },
+          {
+            "description" : "the fields to include for returned resources of type actors",
+            "explode" : false,
+            "in" : "query",
+            "name" : "fields[actors]",
+            "required" : false,
+            "schema" : {
+              "items" : {
+                "enum" : [
+                  "actorType",
+                  "userFirstName",
+                  "userLastName",
+                  "userEmail",
+                  "apiKeyId"
                 ],
                 "type" : "string"
               },
@@ -39989,6 +43037,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -40005,6 +43054,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -40334,6 +43384,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -40350,6 +43401,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -40617,6 +43669,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -40633,6 +43686,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
@@ -40872,6 +43926,7 @@
                   "inAppPurchases",
                   "subscriptionGroups",
                   "gameCenterEnabledVersions",
+                  "performanceOverviews",
                   "perfPowerMetrics",
                   "appCustomProductPages",
                   "inAppPurchasesV2",
@@ -40888,6 +43943,7 @@
                   "marketplaceSearchDetail",
                   "buildUploads",
                   "backgroundAssets",
+                  "assetLibrary",
                   "betaFeedbackScreenshotSubmissions",
                   "betaFeedbackCrashSubmissions",
                   "searchKeywords",
