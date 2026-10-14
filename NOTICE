@@ -24,5 +24,6 @@ for their complete terms. The downloaded specification contains no separate
 redistribution license; this notice does not grant rights to Apple's materials.
 
 Dependency licenses are available with each dependency's source:
-- Apple Swift Argument Parser, Swift OpenAPI Generator, Swift OpenAPI Runtime,
-  Swift OpenAPI URLSession, and Swift HTTP Types: Apache-2.0 WITH Swift-exception.
+- Apple Swift Argument Parser: Apache-2.0 WITH Swift-exception.
+- Apple Swift OpenAPI Generator, Swift OpenAPI Runtime, Swift OpenAPI URLSession,
+  and Swift HTTP Types: Apache-2.0.
