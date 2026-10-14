@@ -194,6 +194,13 @@ The plugin writes selected generated Swift into the plugin work directory:
 <plugin-work-directory>/
   GeneratedSources/
     Types.swift
+    Types+Components.swift
+    Types+Operations.swift
+    Types+Components+Schemas.swift
+    Types+Components+Parameters.swift
+    Types+Components+RequestBodies.swift
+    Types+Components+Responses.swift
+    Types+Components+Headers.swift
     Client.swift
     Server.swift
     AppStoreConnectPublicAPI+Facade.swift
@@ -218,18 +225,23 @@ The package generator exposes deterministic commands for two audiences:
 - `verify-openapi-selection`: verify a generated or tracked selected OpenAPI
   input against the locked schema and capability manifest, then write a build
   stamp;
+- `generate-typed-openapi`: plugin-facing command that runs the pinned typed
+  generator, restores schema nullability and key-presence semantics, and writes
+  the declared Swift outputs;
 - `generate-openapi-facade`: plugin-facing command that emits package-owned
   capability clients over the generated selected OpenAPI client;
 - `generate-type-overrides-config`: diagnostic command that creates an Apple
   generator config replacing selected named component schemas with
   `OpenAPIRuntime.OpenAPIValueContainer`.
 
-The build tool plugin invokes `filter-openapi`, then runs Apple's
-`swift-openapi-generator generate` executable with the filtered document and
-generator config. Both executables and the selector's core dependency declare
+The build tool plugin invokes `filter-openapi`, then `generate-typed-openapi`.
+The latter runs `swift-openapi-generator generate` with the filtered document
+and generator config, then applies the serialization adapter before writing
+final Swift outputs. Both executables and the selector's core dependency declare
 development-host platform conditions; they execute on the host when the public
-libraries compile for another platform. The generator's `--plugin-source build` option produces all declared
-outputs, including an empty file for each unselected mode. The plugin emits the
+libraries compile for another platform. The generator's `--plugin-source build`
+option produces all declared outputs, including an empty file for each unselected
+mode. The plugin emits the
 facade from the same active OpenAPI input. These commands use only tracked
 schema, lock, audit, partition, generation manifests, capability manifest,
 generated compilation conditions,
@@ -262,9 +274,10 @@ Package-owned mapping policy is limited to:
 
 - generating Apple filter configs from trait partitions and active slice
   manifests;
-- applying deterministic schema normalization only when a locked schema artifact
-  would otherwise make Apple generated Swift invalid, such as unsupported empty
-  enum artifacts;
+- applying deterministic schema normalization for unsupported empty enums and
+  object constraints beside composition alternatives;
+- restoring schema nullability and required-key semantics in typed output,
+  with generated-model decoding and serialization regression coverage;
 - applying `typeOverrides` when a trait slice explicitly chooses JSON value
   replacement for named component schemas;
 - validating generated operation/path/schema counts against the locked schema
@@ -315,7 +328,8 @@ The intended dependency flow is:
 trait -> Package.swift trait-conditioned define
       -> plugin reads compilationConditions
       -> active API slice manifests selected and merged
-      -> Apple filter/typeOverrides -> Apple generator once
+      -> normalized active schema -> Apple generator once
+      -> serialization adapter -> generated Swift
       -> facade availability and compiled symbols change
 ```
 
