@@ -105,6 +105,21 @@ public struct PublicAPIFacadeEmitter: Sendable {
       lines.append("}")
     }
 
+    let selected = try SelectedOpenAPITrimEmitter().trimmedDocument(
+      schemaURL: selectedOpenAPIURL, operationIDs: operationIDs)
+    lines.append("")
+    lines.append("extension AppStoreConnectSelectedOpenAPI {")
+    lines.append(
+      "    public static let schemaVersion = \(String(reflecting: manifest.schemaVersion))")
+    lines.append("    public static let capabilityIDs: [String] = [")
+    lines += manifest.capabilities.map { "        \(String(reflecting: $0.id))," }
+    lines.append("    ]")
+    lines.append("    public static let pathCount = \(selected.report.pathCount)")
+    lines.append("    public static let schemaCount = \(selected.report.schemaCount)")
+    lines.append("    public static let operationIDs: [String] = [")
+    lines += operationIDs.map { "        \(String(reflecting: $0))," }
+    lines.append("    ]")
+    lines.append("}")
     lines.append("")
     return lines.joined(separator: "\n")
   }

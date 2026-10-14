@@ -41,11 +41,20 @@ struct AppStoreConnectOpenAPIGen: BuildToolPlugin {
     let generatedFacade =
       generatedSources
       .appendingPathComponent("AppStoreConnectPublicAPI+Facade.swift")
-    let generatedFiles = [
-      generatedSources.appendingPathComponent("Types.swift"),
-      generatedSources.appendingPathComponent("Client.swift"),
-      generatedSources.appendingPathComponent("Server.swift"),
+    let generatedFileNames = [
+      "Types.swift",
+      "Types+Components.swift",
+      "Types+Operations.swift",
+      "Types+Components+Schemas.swift",
+      "Types+Components+Parameters.swift",
+      "Types+Components+RequestBodies.swift",
+      "Types+Components+Responses.swift",
+      "Types+Components+Headers.swift",
+      "Client.swift",
+      "Server.swift",
     ]
+    let generatedFiles = generatedFileNames.map { generatedSources.appendingPathComponent($0) }
+    let intermediate = context.pluginWorkDirectoryURL.appendingPathComponent("GeneratorOutput")
 
     return [
       .buildCommand(
@@ -64,12 +73,15 @@ struct AppStoreConnectOpenAPIGen: BuildToolPlugin {
       ),
       .buildCommand(
         displayName: "Generate AppStoreConnect OpenAPI Swift",
-        executable: generator.url,
+        executable: selector.url,
         arguments: [
-          "generate", activeOpenAPI.path,
+          "generate-typed-openapi",
+          "--generator", generator.url.path,
+          "--schema", activeOpenAPI.path,
           "--config", config.path,
-          "--output-directory", generatedSources.path,
-          "--plugin-source", "build",
+          "--intermediate", intermediate.path,
+          "--output", generatedSources.path,
+          "--files", generatedFileNames.joined(separator: ","),
         ],
         inputFiles: [stamp, activeOpenAPI, config],
         outputFiles: generatedFiles

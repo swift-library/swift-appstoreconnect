@@ -18,6 +18,13 @@
     "directory": "GeneratedSources",
     "files": [
       "Types.swift",
+      "Types+Components.swift",
+      "Types+Operations.swift",
+      "Types+Components+Schemas.swift",
+      "Types+Components+Parameters.swift",
+      "Types+Components+RequestBodies.swift",
+      "Types+Components+Responses.swift",
+      "Types+Components+Headers.swift",
       "Client.swift",
       "Server.swift",
       "AppStoreConnectPublicAPI+Facade.swift"

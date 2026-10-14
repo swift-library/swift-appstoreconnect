@@ -2808,11 +2808,11 @@
         .init(
           data: .init(
             attributes: .init(
-              familySharable: input.familySharable,
+              familySharable: (input.familySharable).map { .some($0) },
               inAppPurchaseType: try requiredInAppPurchaseType(input.inAppPurchaseType),
               name: input.name,
               productId: input.productID,
-              reviewNote: input.reviewNote
+              reviewNote: (input.reviewNote).map { .some($0) }
             ),
             relationships: .init(app: .init(data: .init(id: input.appID, _type: .apps))),
             _type: .inAppPurchases
@@ -2826,9 +2826,9 @@
         .init(
           data: .init(
             attributes: .init(
-              familySharable: input.familySharable,
-              name: input.name,
-              reviewNote: input.reviewNote
+              familySharable: (input.familySharable).map { .some($0) },
+              name: (input.name).map { .some($0) },
+              reviewNote: (input.reviewNote).map { .some($0) }
             ),
             id: input.id,
             _type: .inAppPurchases
@@ -2860,7 +2860,7 @@
         .init(
           data: .init(
             attributes: .init(
-              enabled: input.enabled,
+              enabled: (input.enabled).map { .some($0) },
               visibleForAllUsers: input.visibleForAllUsers
             ),
             relationships: .init(
@@ -2883,8 +2883,8 @@
         .init(
           data: .init(
             attributes: .init(
-              enabled: input.enabled,
-              visibleForAllUsers: input.visibleForAllUsers
+              enabled: (input.enabled).map { .some($0) },
+              visibleForAllUsers: (input.visibleForAllUsers).map { .some($0) }
             ),
             id: input.id,
             _type: .promotedPurchases
@@ -2909,7 +2909,7 @@
       .json(
         .init(
           data: .init(
-            attributes: .init(referenceName: input.referenceName),
+            attributes: .init(referenceName: (input.referenceName).map { .some($0) }),
             id: input.id,
             _type: .subscriptionGroups
           )))
@@ -2922,12 +2922,13 @@
         .init(
           data: .init(
             attributes: .init(
-              familySharable: input.familySharable,
-              groupLevel: input.groupLevel,
+              familySharable: (input.familySharable).map { .some($0) },
+              groupLevel: (input.groupLevel).map { .some($0) },
               name: input.name,
               productId: input.productID,
-              reviewNote: input.reviewNote,
-              subscriptionPeriod: try optionalCreateSubscriptionPeriod(input.subscriptionPeriod)
+              reviewNote: (input.reviewNote).map { .some($0) },
+              subscriptionPeriod: try (optionalCreateSubscriptionPeriod(input.subscriptionPeriod))
+                .map { .some($0) }
             ),
             relationships: .init(
               group: .init(data: .init(id: input.groupID, _type: .subscriptionGroups))),
@@ -2942,11 +2943,12 @@
         .init(
           data: .init(
             attributes: .init(
-              familySharable: input.familySharable,
-              groupLevel: input.groupLevel,
-              name: input.name,
-              reviewNote: input.reviewNote,
-              subscriptionPeriod: try optionalUpdateSubscriptionPeriod(input.subscriptionPeriod)
+              familySharable: (input.familySharable).map { .some($0) },
+              groupLevel: (input.groupLevel).map { .some($0) },
+              name: (input.name).map { .some($0) },
+              reviewNote: (input.reviewNote).map { .some($0) },
+              subscriptionPeriod: try (optionalUpdateSubscriptionPeriod(input.subscriptionPeriod))
+                .map { .some($0) }
             ),
             id: input.id,
             _type: .subscriptions
@@ -2973,7 +2975,7 @@
         .init(
           data: .init(
             attributes: .init(
-              description: input.description,
+              description: (input.description).map { .some($0) },
               locale: input.locale,
               name: input.name
             ),
@@ -2991,8 +2993,8 @@
         .init(
           data: .init(
             attributes: .init(
-              description: input.description,
-              name: input.name
+              description: (input.description).map { .some($0) },
+              name: (input.name).map { .some($0) }
             ),
             id: input.id,
             _type: .inAppPurchaseLocalizations
@@ -3006,7 +3008,7 @@
         .init(
           data: .init(
             attributes: .init(
-              description: input.description,
+              description: (input.description).map { .some($0) },
               locale: input.locale,
               name: input.name
             ),
@@ -3024,8 +3026,8 @@
         .init(
           data: .init(
             attributes: .init(
-              description: input.description,
-              name: input.name
+              description: (input.description).map { .some($0) },
+              name: (input.name).map { .some($0) }
             ),
             id: input.id,
             _type: .subscriptionLocalizations
@@ -3039,7 +3041,7 @@
         .init(
           data: .init(
             attributes: .init(
-              customAppName: input.customAppName,
+              customAppName: (input.customAppName).map { .some($0) },
               locale: input.locale,
               name: input.name
             ),
@@ -3057,8 +3059,8 @@
         .init(
           data: .init(
             attributes: .init(
-              customAppName: input.customAppName,
-              name: input.name
+              customAppName: (input.customAppName).map { .some($0) },
+              name: (input.name).map { .some($0) }
             ),
             id: input.id,
             _type: .subscriptionGroupLocalizations
@@ -3083,14 +3085,17 @@
                 maximum: input.lastSubscribedMaxMonths,
                 minimum: input.lastSubscribedMinMonths
               ),
-              customerEligibilityWaitBetweenOffersInMonths: input.waitBetweenOffersMonths,
+              customerEligibilityWaitBetweenOffersInMonths: (input.waitBetweenOffersMonths).map {
+                .some($0)
+              },
               duration: try requiredSubscriptionOfferDuration(input.duration),
-              endDate: input.endDate,
+              endDate: (input.endDate).map { .some($0) },
               offerId: input.offerID,
               offerMode: try requiredSubscriptionOfferMode(input.offerMode),
               periodCount: input.periodCount,
               priority: try requiredWinBackOfferPriority(input.priority),
-              promotionIntent: try optionalWinBackOfferPromotionIntent(input.promotionIntent),
+              promotionIntent: try (optionalWinBackOfferPromotionIntent(input.promotionIntent)).map
+              { .some($0) },
               referenceName: input.referenceName,
               startDate: input.startDate
             ),
@@ -3109,17 +3114,22 @@
         .init(
           data: .init(
             attributes: .init(
-              customerEligibilityPaidSubscriptionDurationInMonths: input
-                .paidSubscriptionDurationMonths,
-              customerEligibilityTimeSinceLastSubscribedInMonths: optionalIntegerRange(
+              customerEligibilityPaidSubscriptionDurationInMonths: (input
+                .paidSubscriptionDurationMonths).map { .some($0) },
+              customerEligibilityTimeSinceLastSubscribedInMonths: (optionalIntegerRange(
                 minimum: input.lastSubscribedMinMonths,
                 maximum: input.lastSubscribedMaxMonths
-              ),
-              customerEligibilityWaitBetweenOffersInMonths: input.waitBetweenOffersMonths,
-              endDate: input.endDate,
-              priority: try optionalWinBackOfferUpdatePriority(input.priority),
-              promotionIntent: try optionalWinBackOfferUpdatePromotionIntent(input.promotionIntent),
-              startDate: input.startDate
+              )).map { .some($0) },
+              customerEligibilityWaitBetweenOffersInMonths: (input.waitBetweenOffersMonths).map {
+                .some($0)
+              },
+              endDate: (input.endDate).map { .some($0) },
+              priority: try (optionalWinBackOfferUpdatePriority(input.priority)).map { .some($0) },
+              promotionIntent: try
+                (optionalWinBackOfferUpdatePromotionIntent(input.promotionIntent)).map {
+                  .some($0)
+                },
+              startDate: (input.startDate).map { .some($0) }
             ),
             id: input.id,
             _type: .winBackOffers

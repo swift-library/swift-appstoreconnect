@@ -1,65 +1,78 @@
 {
-  "generatedAt": "2026-05-05T14:04:41Z",
+  "generatedAt": "2026-10-14T04:08:49Z",
   "schema": {
     "path": "schema/app-store-connect-openapi.json",
-    "sha256": "83f485960fc7198542461050e192cd21716274c5f3828c683fba35333482a02f",
+    "sha256": "7518d3a94a8bd701ac25c1c601b95b8f53aad92091affb15a2a9d331713dac1a",
     "openapi": "3.0.1",
     "title": "App Store Connect API",
-    "version": "4.3"
+    "version": "4.5.1"
   },
   "inventory": {
-    "pathCount": 923,
-    "operationCount": 1208,
-    "schemaCount": 1337,
-    "securitySchemes": [
-      "itc-bearer-token"
-    ],
+    "constructCounts": {
+      "additionalProperties": 4,
+      "allOf": 23,
+      "anyOf": 2,
+      "binaryFormat": 1,
+      "nullable": 577,
+      "oneOf": 186
+    },
     "methodCounts": [
       {
-        "method": "delete",
-        "count": 127
+        "count": 135,
+        "method": "delete"
       },
       {
-        "method": "get",
-        "count": 763
+        "count": 826,
+        "method": "get"
       },
       {
-        "method": "patch",
-        "count": 151
+        "count": 162,
+        "method": "patch"
       },
       {
-        "method": "post",
-        "count": 167
+        "count": 180,
+        "method": "post"
       }
     ],
+    "operationCount": 1303,
+    "pathCount": 1001,
     "requestBodyContentTypes": [
       {
-        "contentType": "application/json",
-        "count": 339
+        "count": 363,
+        "contentType": "application/json"
       }
     ],
     "responseContentTypes": [
       {
-        "contentType": "application/a-gzip",
-        "count": 2
+        "count": 2,
+        "contentType": "application/a-gzip"
       },
       {
-        "contentType": "application/json",
-        "count": 7475
+        "count": 8143,
+        "contentType": "application/json"
       },
       {
-        "contentType": "application/vnd.apple.diagnostic-logs+json",
-        "count": 1
+        "count": 1,
+        "contentType": "application/vnd.apple.diagnostic-logs+json"
       },
       {
-        "contentType": "application/vnd.apple.xcode-metrics+json",
-        "count": 2
+        "count": 2,
+        "contentType": "application/vnd.apple.xcode-metrics+json"
       },
       {
-        "contentType": "text/csv",
-        "count": 9
+        "count": 1,
+        "contentType": "application/vnd.apple.xcode-overview+json"
+      },
+      {
+        "count": 10,
+        "contentType": "text/csv"
       }
     ],
+    "schemaCount": 1473,
+    "securitySchemes": [
+      "itc-bearer-token"
+    ],
+    "unsupportedConstructCountForFirstGeneratorSlice": 186,
     "uploadRelatedOperationCount": 15,
     "uploadRelatedOperations": [
       {
@@ -152,20 +165,11 @@
         "operationId": "buildUploads_buildUploadFiles_getToManyRelated",
         "summary": null
       }
-    ],
-    "constructCounts": {
-      "allOf": 0,
-      "oneOf": 173,
-      "anyOf": 0,
-      "nullable": 530,
-      "additionalProperties": 4,
-      "binaryFormat": 1
-    },
-    "unsupportedConstructCountForFirstGeneratorSlice": 173
+    ]
   },
   "generationReadiness": {
-    "firstSlice": "support-only",
-    "unsupportedReason": "oneOf mapping is intentionally not selected yet; broad endpoint generation remains gated.",
-    "broadEndpointGenerationAllowed": false
+    "broadEndpointGenerationAllowed": true,
+    "typedGeneratorVersion": "1.14.0",
+    "compatibilityAdapter": "Plugins/AppStoreConnectPublicAPIGenCore"
   }
 }

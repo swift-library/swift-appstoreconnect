@@ -1,0 +1,286 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Generation regression fixture",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/probe": {
+      "get": {
+        "operationId": "probe",
+        "responses": {
+          "200": {
+            "description": "Fixture",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Choice"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Nullability"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ClosedNullability"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OpenNullability"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TypedOpenNullability"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ArrayNullability"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NullableText"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NullableTarget"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Composed"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Choice": {
+        "type": "string",
+        "enum": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "Nullability": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "choice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          },
+          "optionalText": {
+            "type": "string",
+            "nullable": true
+          },
+          "optionalChoice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          }
+        },
+        "required": [
+          "text",
+          "choice"
+        ]
+      },
+      "ClosedNullability": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "choice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          },
+          "optionalText": {
+            "type": "string",
+            "nullable": true
+          },
+          "optionalChoice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          }
+        },
+        "required": [
+          "text",
+          "choice"
+        ],
+        "additionalProperties": false
+      },
+      "OpenNullability": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "choice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          },
+          "optionalText": {
+            "type": "string",
+            "nullable": true
+          },
+          "optionalChoice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          }
+        },
+        "required": [
+          "text",
+          "choice"
+        ],
+        "additionalProperties": true
+      },
+      "TypedOpenNullability": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "choice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          },
+          "optionalText": {
+            "type": "string",
+            "nullable": true
+          },
+          "optionalChoice": {
+            "$ref": "#/components/schemas/Choice",
+            "nullable": true
+          }
+        },
+        "required": [
+          "text",
+          "choice"
+        ],
+        "additionalProperties": {
+          "type": "integer"
+        }
+      },
+      "ArrayNullability": {
+        "type": "object",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "choice": {
+                  "$ref": "#/components/schemas/Choice",
+                  "nullable": true
+                },
+                "optionalText": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "optionalChoice": {
+                  "$ref": "#/components/schemas/Choice",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "text",
+                "choice"
+              ]
+            }
+          }
+        },
+        "required": [
+          "entries"
+        ]
+      },
+      "NullableText": {
+        "type": "string",
+        "nullable": true
+      },
+      "NullableTarget": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/NullableText"
+          },
+          "optionalValue": {
+            "$ref": "#/components/schemas/NullableText"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "Composed": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "nullable": true
+              },
+              "choice": {
+                "$ref": "#/components/schemas/Choice",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "first"
+                ]
+              },
+              "attributes": {
+                "required": [
+                  "field"
+                ]
+              }
+            },
+            "required": [
+              "attributes"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "second"
+                ]
+              },
+              "attributes": {
+                "required": [
+                  "choice"
+                ]
+              }
+            },
+            "required": [
+              "attributes"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

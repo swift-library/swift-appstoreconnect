@@ -727,13 +727,13 @@ import Testing
 
   #expect(official["openapi"] as? String == "3.0.1")
   #expect(official["title"] as? String == "App Store Connect API")
-  #expect(official["version"] as? String == "4.3")
-  #expect(official["pathCount"] as? Int == 923)
-  #expect(official["operationCount"] as? Int == 1208)
-  #expect(official["schemaCount"] as? Int == 1337)
+  #expect(official["version"] as? String == "4.5.1")
+  #expect(official["pathCount"] as? Int == 1001)
+  #expect(official["operationCount"] as? Int == 1303)
+  #expect(official["schemaCount"] as? Int == 1473)
   #expect(selected["pathCount"] as? Int == 89)
   #expect(selected["operationCount"] as? Int == 144)
-  #expect(selected["schemaCount"] as? Int == 259)
+  #expect(selected["schemaCount"] as? Int == 295)
   #expect(generation["defaultTraits"] as? [String] == ["PublicAPIBase"])
   #expect(generation["fullTrait"] as? String == "PublicAPIFull")
 }

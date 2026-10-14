@@ -31,7 +31,8 @@ build engine. Consumer checks use the toolchain's default engine and Xcode.
 Each trait configuration uses an independent build directory; validation retains
 its logs and removes the generated products after a successful run.
 
-`Scripts/check` tests default traits, disabled default traits, `PublicAPIFull`
+`Scripts/check` first compiles generated serialization regression fixtures against
+the resolved runtime dependencies, then tests default traits, disabled default traits, `PublicAPIFull`
 and `Experimental` with defaults. WebSession and Iris products compile empty
 when `Experimental` is disabled. Public API code generation always includes
 the baseline needed by the Workflow and CLI; domain traits select additional

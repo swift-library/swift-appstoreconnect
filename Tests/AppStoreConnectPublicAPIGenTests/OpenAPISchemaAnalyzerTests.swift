@@ -12,13 +12,13 @@ import Testing
 
   #expect(audit.schema.openapi == "3.0.1")
   #expect(audit.schema.title == "App Store Connect API")
-  #expect(audit.schema.version == "4.3")
-  #expect(audit.inventory.pathCount == 923)
-  #expect(audit.inventory.operationCount == 1208)
-  #expect(audit.inventory.schemaCount == 1337)
+  #expect(audit.schema.version == "4.5.1")
+  #expect(audit.inventory.pathCount == 1001)
+  #expect(audit.inventory.operationCount == 1303)
+  #expect(audit.inventory.schemaCount == 1473)
   #expect(audit.inventory.securitySchemes == ["itc-bearer-token"])
   #expect(audit.inventory.uploadRelatedOperationCount == 15)
-  #expect(audit.inventory.constructCounts.oneOf == 173)
+  #expect(audit.inventory.constructCounts.oneOf == 186)
 }
 
 @Test func generatorPlanCoversModelsAndOperations() throws {
@@ -36,8 +36,8 @@ import Testing
     output.contains("\"relativePath\" : \"Operations\\/AppStoreConnectPublicAPI+Operations.swift\"")
   )
   #expect(
-    output.contains("1280 object structs, 54 string enums, 1 dictionary aliases, 2 scalar aliases"))
-  #expect(output.contains("1208 operation IDs, descriptors, and raw request builders"))
+    output.contains("1407 object structs, 63 string enums, 1 dictionary aliases, 2 scalar aliases"))
+  #expect(output.contains("1303 operation IDs, descriptors, and raw request builders"))
   #expect(output.contains("\"broadEndpointGenerationAllowed\" : true"))
 }
 
@@ -71,10 +71,10 @@ import Testing
   )
 
   #expect(supportSource.contains("public enum AppStoreConnectPublicAPIGenerated"))
-  #expect(supportSource.contains("public static let schemaVersion = \"4.3\""))
-  #expect(supportSource.contains("public static let pathCount = 923"))
-  #expect(supportSource.contains("public static let generatedOperationCount = 1208"))
-  #expect(supportSource.contains("public static let explicitlyMappedOneOfConstructCount = 173"))
+  #expect(supportSource.contains("public static let schemaVersion = \"4.5.1\""))
+  #expect(supportSource.contains("public static let pathCount = 1001"))
+  #expect(supportSource.contains("public static let generatedOperationCount = 1303"))
+  #expect(supportSource.contains("public static let explicitlyMappedOneOfConstructCount = 186"))
   #expect(supportSource.contains("public indirect enum AppStoreConnectJSONValue"))
 
   #expect(modelSource.contains("public enum Platform"))
@@ -129,7 +129,7 @@ import Testing
   let manifest = try OpenAPICapabilityManifest.load(from: manifestURL)
   let operationIDs = try manifest.operationIDs()
 
-  #expect(manifest.schemaVersion == "4.3")
+  #expect(manifest.schemaVersion == "4.5.1")
   #expect(
     manifest.capabilities.map(\.id) == [
       "apps",
@@ -181,13 +181,13 @@ import Testing
   let iap = try #require(report.capabilities.first { $0.id == "iap" })
   let upstream = try #require(report.upstreams.first)
 
-  #expect(report.schema.version == "4.3")
-  #expect(report.officialOperationCount == 1208)
+  #expect(report.schema.version == "4.5.1")
+  #expect(report.officialOperationCount == 1303)
   #expect(report.selectedOperationCount == 144)
   #expect(apps.selectionStatus == "partial")
   #expect(apps.selectedOperationIDs.contains("apps_getCollection"))
   #expect(iap.selectionStatus == "deferred")
-  #expect(upstream.operationCount == 1208)
+  #expect(upstream.operationCount == 1303)
   #expect(upstream.missingOfficialOperationCount == 0)
   #expect(upstream.extraOperationCount == 0)
 }
@@ -216,7 +216,7 @@ import Testing
 
   #expect(output.contains("selected OpenAPI input verified"))
   #expect(stamp.contains("\"operationCount\" : 144"))
-  #expect(stamp.contains("\"schemaCount\" : 259"))
+  #expect(stamp.contains("\"schemaCount\" : 295"))
 }
 
 @Test func generationPlannerUsesBaseTraitByDefault() throws {
