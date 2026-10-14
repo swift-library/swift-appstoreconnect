@@ -1,0 +1,10 @@
+{
+  "source_revision": "b58d92f7a9e5eb2b73b39ee350f4bfcfd522cdb2",
+  "executable_sha256": "6e6a0f404d8b81a00077f4c3691cc5c05c515499c1fd222adca29a095cd9caca",
+  "swift": "Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)\nTarget: arm64-apple-macosx27.0.0",
+  "environment": "PATH only; no credentials",
+  "command_exit_codes": [
+    0,
+    0
+  ]
+}
