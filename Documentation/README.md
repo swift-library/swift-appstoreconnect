@@ -4,6 +4,9 @@ This directory holds repository-level documentation for `swift-appstoreconnect`.
 
 ## Index
 
+- [Usage guide](Reference/Usage.md): clients, CLI commands, traits, and limits.
+- [Terminal demonstration](Reference/TerminalDemo.md): captured commands and asset reproduction.
+
 - `Architecture/`: current module boundaries and design constraints.
 
 ## Role Boundaries
