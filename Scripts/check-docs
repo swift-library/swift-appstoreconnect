@@ -15,24 +15,35 @@ MODULES = ['AppStoreConnectCore', 'AppStoreConnectPublicAPI', 'AppStoreConnectWo
            'AppStoreConnectWebSession', 'AppStoreConnectIrisAPI', 'AppStoreConnectCLI']
 
 
-def main():
-    argparse.ArgumentParser(description=__doc__).parse_args()
+def main(arguments=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--symbol-graphs', type=Path, help='Use graphs emitted by the Experimental trait validation')
+    args = parser.parse_args(arguments)
     root = Path(__file__).resolve().parent.parent
     evidence = root / '.build/release-validation'
     evidence.mkdir(parents=True, exist_ok=True)
     work = root / '.build/documentation'
-    graphs = work / 'symbol-graphs'
+    graphs = args.symbol_graphs.resolve() if args.symbol_graphs else work / 'symbol-graphs'
+    if args.symbol_graphs and graphs.is_relative_to(work):
+        raise RuntimeError('Input symbol graphs must be outside the documentation output directory')
     if work.exists():
         shutil.rmtree(work)
-    graphs.mkdir(parents=True)
-    result = subprocess.run(['swift', 'build', '--build-system', 'native', '--scratch-path', str(work / 'build'),
+    work.mkdir(parents=True)
+    if args.symbol_graphs:
+        (evidence / 'docc-symbolgraph.log').write_text('Symbol graphs emitted during Experimental trait validation; see tests-experimental.log.\n')
+    else:
+        graphs.mkdir(parents=True)
+        result = subprocess.run(['swift', 'build', '--build-system', 'native', '--scratch-path', str(work / 'build'),
                              '--traits', 'Experimental,default',
                              '--force-resolved-versions', '--disable-index-store', '-debug-info-format', 'none',
                              '-Xswiftc', '-emit-symbol-graph', '-Xswiftc', '-emit-symbol-graph-dir', '-Xswiftc', str(graphs)], cwd=root,
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    (evidence / 'docc-symbolgraph.log').write_text(result.stdout)
-    if result.returncode:
-        raise RuntimeError('Symbol extraction failed; inspect .build/release-validation/docc-symbolgraph.log')
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        (evidence / 'docc-symbolgraph.log').write_text(result.stdout)
+        if result.returncode:
+            raise RuntimeError('Symbol extraction failed; inspect .build/release-validation/docc-symbolgraph.log')
+    for module in MODULES:
+        if not (graphs / (module + '.symbols.json')).is_file():
+            raise RuntimeError('Missing public module symbol graph: ' + module)
     archives = []
     graph_digests = {}
     generated_prefix = (root / '.build').as_uri() + '/'
@@ -68,6 +79,7 @@ def main():
         bundle.add(merged, arcname=merged.name)
     receipt = {'checker_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                'modules': MODULES, 'traits': ['PublicAPIBase', 'Experimental'], 'symbol_graphs': graph_digests,
+               'symbol_graph_source': 'trait-validation' if args.symbol_graphs else 'standalone-build',
                'archive': archive.name, 'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(),
                'checks': ['public-symbol-extraction', 'docc-warnings-as-errors', 'docc-merge']}
     (evidence / 'documentation.json').write_text(json.dumps(receipt, indent=2) + '\n')

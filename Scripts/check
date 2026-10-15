@@ -50,6 +50,10 @@ import json, pathlib, re, shutil, subprocess
 root = pathlib.Path('.build/release-validation')
 config = json.loads(pathlib.Path('.github/release.json').read_text())
 results = []
+graphs = pathlib.Path('.build/release-symbol-graphs').resolve()
+if graphs.exists():
+    shutil.rmtree(graphs)
+graphs.mkdir(parents=True)
 for entry in config['trait_configurations']:
     name = entry['name']
     print('Build and test traits: ' + name, flush=True)
@@ -57,6 +61,10 @@ for entry in config['trait_configurations']:
     build_path = pathlib.Path('.build/release-traits') / name
     command = ['swift', 'test', '--build-system', 'native', '--scratch-path', str(build_path), '--force-resolved-versions', '--disable-index-store',
                '-debug-info-format', 'none', *entry['arguments']]
+    if name == 'experimental':
+        if entry['arguments'] != ['--traits', 'Experimental,default']:
+            raise SystemExit('Documentation requires the Experimental and default trait configuration')
+        command += ['-Xswiftc', '-emit-symbol-graph', '-Xswiftc', '-emit-symbol-graph-dir', '-Xswiftc', str(graphs)]
     with log_path.open('w') as log:
         status = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT).returncode
     text = log_path.read_text(errors='replace')
@@ -90,7 +98,8 @@ receipt = {'version': pathlib.Path('VERSION').read_text().strip(),
 pathlib.Path('.build/release-validation/cli-binary.json').write_text(json.dumps(receipt, indent=2) + '\n')
 shutil.rmtree(products)
 PY
-  Scripts/check-docs
+  Scripts/check-docs --symbol-graphs .build/release-symbol-graphs
+  rm -rf .build/release-symbol-graphs
 fi
 python3 - <<'PY'
 import hashlib, json, os, pathlib, platform, subprocess, tempfile
