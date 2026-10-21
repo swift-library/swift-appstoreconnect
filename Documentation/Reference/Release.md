@@ -89,7 +89,7 @@ Evidence belongs in `.build/release-validation`.
 | Version update and check | `Scripts/check` compares the built CLI version with `VERSION` | Not established. |
 | Candidate validation and build | `Scripts/check`; `Scripts/check --compiler-check --consumer-scope swiftpm`; `Scripts/check-docs`; `Scripts/check-spec` | Complete matrix: Xcode 26.4 or later; local Xcode process execution: macOS. |
 | Status and interrupted-run recovery | Not established. | Not established. |
-| Acceptance and publication | Not established. | Not established. |
+| Acceptance and publication | Run [`Release`](../../.github/workflows/release.yml) with the accepted tag; it validates the tag and publishes the GitHub release. | Repository write access to run workflows |
 | Cleanup | `Scripts/check` removes generated products after a successful run | Not established. |
 
 Each trait configuration uses an independent build directory; validation retains
