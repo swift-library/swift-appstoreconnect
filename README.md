@@ -92,7 +92,7 @@ live API access requires your own credentials and is excluded from public CI.
 - [API documentation](https://swift-library.github.io/swift-appstoreconnect/): module reference and usage.
 - [Command guide](Sources/AppStoreConnectCLI/AppStoreConnectCLI.docc/CommandGuide.md): commands, traits, and execution boundaries.
 - [Documentation index](Documentation/README.md): module design and architecture.
-- [Versioning and release](Documentation/Architecture/VersioningAndRelease.md): compatibility and release policy.
+- [Release](Documentation/Reference/Release.md): release facts and mechanics; version rules are in VERSIONING.
 - [Specification lock](Vendor/AppStoreConnectOpenAPI/spec.lock.json): Apple specification source and checksums.
 - [Changelog](CHANGELOG.md): release history.
 
