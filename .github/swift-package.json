@@ -1,0 +1,77 @@
+{
+  "compilers": [
+    {
+      "name": "macos-15-swift-6.3-minimum",
+      "runner": "macos-15",
+      "xcode": "26.0.1",
+      "swift": "6.3.3"
+    },
+    {
+      "name": "macos-26-swift-6.3",
+      "runner": "macos-26",
+      "xcode": "26.6"
+    }
+  ],
+  "timeout_minutes": 240,
+  "build_system": "native",
+  "traits": [
+    ["default"],
+    [],
+    ["PublicAPIFull"],
+    ["Experimental", "default"]
+  ],
+  "format": {
+    "paths": ["Package.swift", "Sources", "Tests", "Plugins"]
+  },
+  "platforms": {
+    "apple": [
+      {
+        "name": "iOS",
+        "platform": "iOS",
+        "scheme": "AppStoreConnectWorkflow"
+      },
+      {
+        "name": "tvOS",
+        "platform": "tvOS",
+        "scheme": "AppStoreConnectWorkflow"
+      },
+      {
+        "name": "watchOS",
+        "platform": "watchOS",
+        "scheme": "AppStoreConnectWorkflow"
+      },
+      {
+        "name": "visionOS",
+        "platform": "visionOS",
+        "scheme": "AppStoreConnectWorkflow"
+      }
+    ]
+  },
+  "docs": {
+    "targets": [
+      "AppStoreConnectCore",
+      "AppStoreConnectPublicAPI",
+      "AppStoreConnectWorkflow",
+      "AppStoreConnectWebSession",
+      "AppStoreConnectIrisAPI",
+      "AppStoreConnectCLI"
+    ]
+  },
+  "demo": {
+    "product": "appstoreconnect"
+  },
+  "commands": [
+    {
+      "name": "spec",
+      "run": "scripts/check-spec"
+    },
+    {
+      "name": "generation",
+      "run": "scripts/check-generation"
+    },
+    {
+      "name": "cli",
+      "run": "swift build --build-system native -c release --product appstoreconnect\ncli=\"$(swift build --build-system native -c release --show-bin-path)/appstoreconnect\"\ndiff VERSION <(\"$cli\" --version)\n\"$cli\" --help > /dev/null\nfor completion_shell in zsh bash fish; do\n  \"$cli\" --generate-completion-script \"$completion_shell\" > /dev/null\ndone\n\"$cli\" workflow dry-run public-release-readiness --app-id example-app > /dev/null"
+    }
+  ]
+}

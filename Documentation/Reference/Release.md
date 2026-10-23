@@ -1,96 +1,73 @@
 # Release
 
-Release status: implemented validation; see [`Scripts/check`](../../Scripts/check)
-and [`Scripts/check-docs`](../../Scripts/check-docs).
-
-Version rules for swift-appstoreconnect, covering tags, release timing, choosing the
-next version and the changelog, are in
+Version rules for swift-appstoreconnect, covering tags, release timing, choosing
+the next version and the changelog, are in
 [VERSIONING](https://github.com/swift-library/.github/blob/master/VERSIONING.md).
-This document records the repository's release facts and mechanics and does not
-restate those rules.
-
-Module DocC catalogs are colocated with their targets.
+This document records the repository's release facts and mechanics.
 
 ## Components and Version Sources
 
-| Shipped component | Version meaning | Version source | Mirrors and derived fields | Update and read-only check |
-| --- | --- | --- | --- | --- |
-| swift-appstoreconnect package and CLI | Package version | [`VERSION`](../../VERSION), selected by `version_file` in [`.github/release.json`](../../.github/release.json) | CLI version generated at build time; [`CHANGELOG.md`](../../CHANGELOG.md) records release notes | `Scripts/check` builds the CLI and compares `--version` with `VERSION` |
+| Shipped component | Version source | Derived fields and checks |
+| --- | --- | --- |
+| swift-appstoreconnect package and CLI | [`VERSION`](../../VERSION), selected by [`.github/release.json`](../../.github/release.json) | The CLI version is generated at build time. The `cli` validation command compares `--version` with `VERSION`; [`CHANGELOG.md`](../../CHANGELOG.md) supplies release notes. |
 
 ## Compatibility Surface
 
 Compatibility includes typed Public API requests, domain traits, credentials,
-workflow plans and serialized output, CLI options, and compiler/platform requirements.
-WebSession and Iris APIs require the default-off `Experimental` trait.
+workflow plans and serialized output, CLI options, and compiler/platform
+requirements. WebSession and Iris APIs require the default-off `Experimental`
+trait.
 
-## Dependencies and Verified Combinations
-
-`.github/release.json` owns compiler, platform, trait and consumer-scope inputs
-for validation.
+## Dependencies and Validation
 
 The package requires Swift 6.3, iOS 18, macOS 15, tvOS 18, watchOS 11 or visionOS 2.
-The maintained system window covers iOS/tvOS 18/26/27, macOS 15/26/27,
-watchOS 11/26/27 and visionOS 2/26/27. CI combines standalone Swift 6.3.3 with
-Xcode 26.0.1 SDKs on macOS 15 and uses Xcode 26.6 on macOS 26.
-Strict formatting runs separately.
+[`.github/release.json`](../../.github/release.json) records the minimum Swift
+version and maintained platform generations.
+[`.github/swift-package.json`](../../.github/swift-package.json) owns validation:
 
-Both compiler lanes validate SwiftPM consumers. The macOS 26 lane also
-validates Xcode consumers on every declared Apple platform. Xcode's package
-resolver must support the manifest's Swift tools version; installing a separate
-Swift compiler does not update an older Xcode's resolver. The macOS 15 lane
-therefore selects the `swiftpm` consumer scope. Local `Scripts/check` defaults
-to the complete consumer scope and requires Xcode 26.4 or later.
+- Standalone Swift 6.3.3 with Xcode 26.0.1 SDKs on macOS 15, and Xcode 26.6 on
+  macOS 26, each test and build the default, disabled-default, `PublicAPIFull`,
+  and `Experimental` with defaults trait configurations using SwiftPM's native
+  build engine.
+- Strict formatting covers `Package.swift`, `Sources`, `Tests`, and `Plugins`.
+- Generic iOS, tvOS, watchOS, and visionOS builds use the
+  `AppStoreConnectWorkflow` scheme, which depends on all five library modules.
+- DocC builds the six target-local catalogs with warnings as errors.
+- The [terminal demo](TerminalDemo.md) checks a fresh release CLI recording.
+- Repository commands verify the locked specification, generated serialization,
+  CLI version, help, shell completions, and a workflow dry-run.
 
-An independent SwiftPM consumer measures its clean default-trait build. An
-Xcode framework consumer links the five public library products and compiles
-usage on every declared Apple platform. Its project uses the same dependency
-lock as the SwiftPM consumer and the deployment floors from release.json. Live API integration
-is opt-in and excluded from public CI. Local Xcode process execution requires
-macOS.
-
-The OpenAPI generator executable is pinned to an exact version so consumers
+The OpenAPI generator executable is pinned to an exact version so builds
 produce the reviewed generated Swift source. Dependency and specification
-notices remain with their owning inputs.
+notices remain with their owning inputs. Live API integration requires caller
+credentials and is opt-in. Local Xcode process execution requires macOS.
 
-## Derived Metadata and Drift Checks
+## Local Checks
 
-Repository tests, release builds and symbol extraction use SwiftPM's native
-build engine. Consumer checks use the toolchain's default engine and Xcode.
+```sh
+swift build
+swift test
+swift build -c release
+xcrun swift-format lint --strict --configuration .swift-format --recursive Package.swift Sources Tests Plugins
+scripts/check-spec
+scripts/check-generation
+```
 
-`Scripts/check` first compiles generated serialization regression fixtures against
-the resolved runtime dependencies, then tests default traits, disabled default traits, `PublicAPIFull`
-and `Experimental` with defaults. WebSession and Iris products compile empty
-when `Experimental` is disabled. Public API code generation always includes
-the baseline needed by the Workflow and CLI; domain traits select additional
-operations.
+The `commands` entries in `.github/swift-package.json` also provide the CLI
+checks. `scripts/check-generation` compiles generated serialization regression
+fixtures against the resolved runtime dependencies. `scripts/check-spec`
+verifies the unmodified Apple schema and archive; the weekly drift workflow
+uses its `--online` option to report updates without changing the lock.
+Temporary OpenAPI check results are written under `.build/release-validation`;
+the generation check removes its scratch package after success.
 
-`Scripts/check-spec` verifies the unmodified Apple schema and archive;
-the weekly drift workflow reports updates without changing the lock.
+## Acceptance and Publication
 
-## Candidate, Acceptance and Publication
+Required checks are `policy / policy` and `validate / result`. The shared
+validation workflow reads `.github/swift-package.json`; the policy workflow
+also validates the release declaration.
 
-Run `Scripts/check` with Xcode 26.4 or later for the complete trait and consumer
-matrix. `Scripts/check --compiler-check --consumer-scope swiftpm` provides the
-SwiftPM consumer scope for a standalone compiler with an older Xcode resolver.
-`Scripts/check` emits documentation symbol graphs during its existing
-Experimental trait test build, then converts all six catalogs and merges them
-with warnings as errors. `Scripts/check-docs` also supports a standalone clean
-symbol-graph build. Public CI uses offline
-fixtures; live API access requires explicit caller credentials and remains opt-in.
-
-## Evidence Reuse and Invalidation
-
-Evidence belongs in `.build/release-validation`.
-
-## Entry Points and Artifact Retention
-
-| Operation | Existing command or explicit manual procedure | Required access |
-| --- | --- | --- |
-| Version update and check | `Scripts/check` compares the built CLI version with `VERSION` | Not established. |
-| Candidate validation and build | `Scripts/check`; `Scripts/check --compiler-check --consumer-scope swiftpm`; `Scripts/check-docs`; `Scripts/check-spec` | Complete matrix: Xcode 26.4 or later; local Xcode process execution: macOS. |
-| Status and interrupted-run recovery | Not established. | Not established. |
-| Acceptance and publication | Run [`Release`](../../.github/workflows/release.yml) with the accepted tag; it validates the tag and publishes the GitHub release. | Repository write access to run workflows |
-| Cleanup | `Scripts/check` removes generated products after a successful run | Not established. |
-
-Each trait configuration uses an independent build directory; validation retains
-its logs and removes the generated products after a successful run.
+Pushing an accepted signed annotated `vX.Y.Z` tag starts
+[`Release`](../../.github/workflows/release.yml). It validates the tagged commit
+before the shared release workflow verifies the tag, version declaration, and
+changelog and publishes the release notes.

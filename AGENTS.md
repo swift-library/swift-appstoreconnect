@@ -81,7 +81,11 @@ points.
 - Read `Documentation/Architecture/Layering.md` and `Documentation/Architecture/TechnicalDesign.md` before changing module boundaries.
 - Keep WebSession acquisition separate from Iris endpoints. Both APIs and their Workflow/CLI paths require the default-off `Experimental` trait.
 - Keep the CLI as a thin process boundary over Workflow.
-- Validate with `Scripts/check`; `Scripts/check-docs` owns multi-module DocC compilation.
+- Validate with `swift build`, `swift test`, `swift build -c release`, and
+  `xcrun swift-format lint --strict --configuration .swift-format --recursive Package.swift Sources Tests Plugins`,
+  plus `scripts/check-spec` and `scripts/check-generation`.
+- `.github/swift-package.json` declares shared CI validation, including DocC
+  targets and CLI checks. Required checks are `policy / policy` and `validate / result`.
 
 ## Code Review Rules
 

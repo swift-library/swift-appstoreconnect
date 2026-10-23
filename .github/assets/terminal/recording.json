@@ -1,0 +1,13 @@
+{
+  "title": "App Store Connect · preview a write",
+  "steps": [
+    {
+      "command": "appstoreconnect --version",
+      "output": "0.2.0"
+    },
+    {
+      "command": "appstoreconnect testflight invitations create --app example-app",
+      "output": "Dry run betaTesterInvitations_createInstance\nSource: publicAPIBacked\nMutates: true\nCreate a TestFlight beta tester invitation for app example-app.\n- appID: example-app"
+    }
+  ]
+}

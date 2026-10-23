@@ -1,0 +1,11 @@
+title: App Store Connect · preview a write
+executable: appstoreconnect
+steps:
+  - run: appstoreconnect --version
+  - run: appstoreconnect testflight invitations create --app example-app
+  - run: appstoreconnect --version > version.txt
+    show: false
+expect:
+  - file: ~/project/version.txt
+    equals: |
+      0.2.0
