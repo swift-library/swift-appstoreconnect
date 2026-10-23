@@ -48,6 +48,7 @@
     ]
   },
   "docs": {
+    "traits": ["Experimental", "default"],
     "targets": [
       "AppStoreConnectCore",
       "AppStoreConnectPublicAPI",
