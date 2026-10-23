@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Breaking**: Require Swift 6.3 or later and macOS 15, iOS 18, tvOS 18,
+  watchOS 11, or visionOS 2 or later for the libraries and bundled CLI.
+
 ## 0.2.0
 
 - Update the unchanged Apple OpenAPI snapshot to 4.5.1 and the exact generator pin to 1.14.0.

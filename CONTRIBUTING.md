@@ -19,8 +19,10 @@ scripts/check-generation
 
 [`.github/swift-package.json`](.github/swift-package.json) declares the compiler
 and trait matrix, platform builds, DocC targets, terminal demo, and repository
-commands, including CLI version and shell completion checks. Required checks
-are `policy / policy` and `validate / result`.
+commands, including CLI version and shell completion checks. CI builds and
+tests with Xcode 26.6 on macOS 26. Default traits always run; `traits` lists
+only additional trait sets. Required checks are `policy / policy` and
+`validate / result`.
 
 Review the [release facts and mechanics](Documentation/Reference/Release.md)
 and the [swift-library versioning standard](https://github.com/swift-library/.github/blob/master/VERSIONING.md)

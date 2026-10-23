@@ -20,15 +20,15 @@ trait.
 
 ## Dependencies and Validation
 
-The package requires Swift 6.3, iOS 18, macOS 15, tvOS 18, watchOS 11 or visionOS 2.
+The libraries and bundled CLI require Swift 6.3, iOS 18, macOS 15, tvOS 18,
+watchOS 11 or visionOS 2 and newer.
 [`.github/release.json`](../../.github/release.json) records the minimum Swift
 version and maintained platform generations.
 [`.github/swift-package.json`](../../.github/swift-package.json) owns validation:
 
-- Standalone Swift 6.3.3 with Xcode 26.0.1 SDKs on macOS 15, and Xcode 26.6 on
-  macOS 26, each test and build the default, disabled-default, `PublicAPIFull`,
-  and `Experimental` with defaults trait configurations using SwiftPM's native
-  build engine.
+- Xcode 26.6 on macOS 26 runs tests with default traits and each additional
+  trait set: disabled-default, `PublicAPIFull`, and `Experimental` with defaults.
+  The release build uses default traits. All use SwiftPM's native build engine.
 - Strict formatting covers `Package.swift`, `Sources`, `Tests`, and `Plugins`.
 - Generic iOS, tvOS, watchOS, and visionOS builds use the
   `AppStoreConnectWorkflow` scheme, which depends on all five library modules.

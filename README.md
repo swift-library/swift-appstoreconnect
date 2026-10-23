@@ -80,7 +80,7 @@ Select domain traits for the typed API surface your application uses, or choose 
 ## Requirements
 
 Swift 6.3 or later; iOS 18, macOS 15, tvOS 18, watchOS 11, or visionOS 2 or later.
-Xcode integration requires Xcode 26.4 or later. Local Xcode process execution
+CI builds and tests with Xcode 26.6 on macOS 26. Local Xcode process execution
 requires macOS. Package checks cover the default,
 disabled-default, full Public API, and experimental trait configurations.
 CI builds the libraries for iOS, tvOS, watchOS, and visionOS;
