@@ -79,7 +79,7 @@ public struct OpenAPICapabilityMatrixEntry: Codable, Equatable, Sendable {
   public var selectedOperationIDs: [String]
   public var selectionStatus: String
   public var reason: String
-  public var upstreamEvidence: [OpenAPICapabilityUpstreamEvidence]
+  public var upstreamComparisons: [OpenAPICapabilityUpstreamComparison]
 
   public init(
     id: String,
@@ -91,7 +91,7 @@ public struct OpenAPICapabilityMatrixEntry: Codable, Equatable, Sendable {
     selectedOperationIDs: [String],
     selectionStatus: String,
     reason: String,
-    upstreamEvidence: [OpenAPICapabilityUpstreamEvidence]
+    upstreamComparisons: [OpenAPICapabilityUpstreamComparison]
   ) {
     self.id = id
     self.title = title
@@ -102,11 +102,11 @@ public struct OpenAPICapabilityMatrixEntry: Codable, Equatable, Sendable {
     self.selectedOperationIDs = selectedOperationIDs
     self.selectionStatus = selectionStatus
     self.reason = reason
-    self.upstreamEvidence = upstreamEvidence
+    self.upstreamComparisons = upstreamComparisons
   }
 }
 
-public struct OpenAPICapabilityUpstreamEvidence: Codable, Equatable, Sendable {
+public struct OpenAPICapabilityUpstreamComparison: Codable, Equatable, Sendable {
   public var upstream: String
   public var operationCount: Int
   public var missingOperationIDs: [String]
@@ -170,9 +170,9 @@ public struct OpenAPICapabilityMatrixReporter: Sendable {
       classifiedOperationIDs.formUnion(officialIDSet)
       classifiedTags.formUnion(official.flatMap(\.tags))
 
-      let upstreamEvidence = upstreamIndexes.map { input, index in
+      let upstreamComparisons = upstreamIndexes.map { input, index in
         let upstreamIDs = Set(index.operations(matching: definition).map(\.operationID))
-        return OpenAPICapabilityUpstreamEvidence(
+        return OpenAPICapabilityUpstreamComparison(
           upstream: input.name,
           operationCount: upstreamIDs.count,
           missingOperationIDs: officialIDSet.subtracting(upstreamIDs).sorted(),
@@ -197,7 +197,7 @@ public struct OpenAPICapabilityMatrixReporter: Sendable {
           selectedOperationCount: selectedIDs.count,
           officialOperationCount: officialIDs.count
         ),
-        upstreamEvidence: upstreamEvidence
+        upstreamComparisons: upstreamComparisons
       )
     }
 
