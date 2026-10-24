@@ -67,7 +67,7 @@ inputs = [*sorted((root / 'Tests/Fixtures/Generation').glob('*')),
           pathlib.Path(__file__).resolve()]
 result['input_digests'] = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
                           for path in inputs}
-evidence = root / '.build/release-validation'
-evidence.mkdir(parents=True, exist_ok=True)
-(evidence / 'generation.json').write_text(json.dumps(result, indent=2) + '\n')
+outputs = root / '.build/release-validation'
+outputs.mkdir(parents=True, exist_ok=True)
+(outputs / 'generation.json').write_text(json.dumps(result, indent=2) + '\n')
 shutil.rmtree(output)
