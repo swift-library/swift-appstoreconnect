@@ -3,7 +3,6 @@
   "version_file": "VERSION",
   "version_pattern": "^([^\\n]+)\\n?$",
   "changelog": "CHANGELOG.md",
-  "check_command": "Scripts/check",
   "minimum_swift": "6.3",
   "platforms": {
     "iOS": [
@@ -30,57 +29,6 @@
       2,
       26,
       27
-    ]
-  },
-  "trait_configurations": [
-    {
-      "name": "default",
-      "arguments": []
-    },
-    {
-      "name": "disabled",
-      "arguments": [
-        "--disable-default-traits"
-      ]
-    },
-    {
-      "name": "full",
-      "arguments": [
-        "--traits",
-        "PublicAPIFull"
-      ]
-    },
-    {
-      "name": "experimental",
-      "arguments": [
-        "--traits",
-        "Experimental,default"
-      ]
-    }
-  ],
-  "ci": {
-    "include": [
-      {
-        "name": "macos-15-swift-6.3-minimum",
-        "runner": "macos-15",
-        "xcode": "26.0.1",
-        "command": "Scripts/check --compiler-check --consumer-scope swiftpm",
-        "swift": "6.3.3",
-        "timeout_minutes": 240
-      },
-      {
-        "name": "macos-26-swift-6.3",
-        "runner": "macos-26",
-        "xcode": "26.6",
-        "command": "Scripts/check --compiler-check",
-        "timeout_minutes": 180
-      },
-      {
-        "name": "strict-format",
-        "runner": "macos-26",
-        "xcode": "26.6",
-        "command": "Scripts/check --format-check"
-      }
     ]
   }
 }

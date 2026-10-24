@@ -415,11 +415,12 @@ custom handling of additional properties and rejects unexpected initializer or
 Codable statement shapes. The exact generator pin and declared output files
 must be reviewed together when upgrading the generator.
 
-`Scripts/check-generation` generates and compiles independent regression models
+`scripts/check-generation` generates and compiles independent regression models
 against the package's resolved runtime dependencies. It checks concrete values,
 explicit nulls, missing keys, reference siblings/targets, inline arrays, closed
 objects, additional properties, and both new Apple request compositions. The
-repository's `Scripts/check` runs this check before consumer and trait builds.
+shared CI runs this check through the `generation` command in
+`.github/swift-package.json`.
 
 ## Reviewing specification drift
 

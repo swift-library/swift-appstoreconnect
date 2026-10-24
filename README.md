@@ -40,9 +40,9 @@ Preview a TestFlight invitation without credentials:
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="Documentation/Assets/Demo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="Documentation/Assets/Demo-light.svg">
-    <img src="Documentation/Assets/Demo-light.svg" alt="Terminal: appstoreconnect reports its version, then previews a TestFlight invitation as a dry run with its operation, source, mutation flag, and example app ID.">
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/terminal/terminal-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset=".github/assets/terminal/terminal-light.svg">
+    <img src=".github/assets/terminal/terminal-light.svg" alt="Terminal: appstoreconnect reports its version, then previews a TestFlight invitation as a dry run with its operation, source, mutation flag, and example app ID.">
   </picture>
 </p>
 
@@ -80,10 +80,10 @@ Select domain traits for the typed API surface your application uses, or choose 
 ## Requirements
 
 Swift 6.3 or later; iOS 18, macOS 15, tvOS 18, watchOS 11, or visionOS 2 or later.
-Xcode integration requires Xcode 26.4 or later. Local Xcode process execution
+CI builds and tests with Xcode 26.6 on macOS 26. Local Xcode process execution
 requires macOS. Package checks cover the default,
-disabled-default, full Public API, and experimental trait configurations, plus
-independent consumer builds. Simulator compilation checks deployment floors;
+disabled-default, full Public API, and experimental trait configurations.
+CI builds the libraries for iOS, tvOS, watchOS, and visionOS;
 live API access requires your own credentials and is excluded from public CI.
 
 ## Documentation
@@ -98,8 +98,9 @@ live API access requires your own credentials and is excluded from public CI.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Run `Scripts/check` for the complete
-package checks and `Scripts/check-docs` for the six-module documentation build.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local build, test, formatting, and
+OpenAPI checks. CI also builds all six module documentation catalogs and
+checks the [terminal demonstration](Documentation/Reference/TerminalDemo.md).
 Report security issues through [SECURITY.md](SECURITY.md).
 
 ## License

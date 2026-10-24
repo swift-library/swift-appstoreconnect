@@ -10,8 +10,9 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 jobs:
   policy:
-    uses: swift-library/.github/.github/workflows/policy.yml@43cc21f34684e47903762f6eb616c545b003c5ea
+    uses: swift-library/github-workflows/.github/workflows/policy.yml@17e33c3a130ed207bcf80ccfbbe54fcd481d953b
     with:
       allow-terms: Cursor

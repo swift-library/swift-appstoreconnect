@@ -25,7 +25,7 @@ Target internals and source layout are defined in `TechnicalDesign.md`.
 - `Workflow` is not a single endpoint layer; it composes public API calls, Iris calls, local Xcode steps, and state transitions.
 - `CLI` is not a workflow or endpoint layer; it parses command intent and delegates to workflow APIs.
 - Package behavior is implemented in Swift at the library boundary.
-- Each public module has a target-local DocC catalog. `Scripts/check-docs` compiles and merges the catalogs with warnings as errors.
+- Each public module has a target-local DocC catalog. The shared CI documentation job builds the targets declared in `.github/swift-package.json` with warnings as errors.
 
 ## Related Decisions
 
