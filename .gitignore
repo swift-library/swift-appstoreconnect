@@ -12,3 +12,7 @@ DerivedData/
 /.vscode
 /build
 *.p8
+/.agent/*
+!/.agent/instructions/
+!/.agent/agents.json
+!/.agent/agents.resolved
